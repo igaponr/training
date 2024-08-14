@@ -2,9 +2,13 @@
 # -*- coding: utf-8 -*-
 """
 クローリング
-    * ChromeDriverHelperを使って、指定サイト(site_url)をセレクタ(site_selectors)でクローリングする
-    * 指定サイトのクローリング結果を、crawling_file_pathに保持する
-    * crawling_file_pathのpage_urlsに対して、スクレイピングして末尾画像URLの展開URLでダウンロードして、zipに保存する
+    * 指定サイト(site_url)をセレクタ(site_selectors)でクローリングする(ChromeDriverHelperを使用)
+    * クローリング結果を、crawling_file_pathに保存する
+    * crawling_file_pathのpage_urlsは、スクレイピングする対象urlリストである
+    * crawling_file_pathのexclusion_urlsは、スクレイピングの除外urlリストである
+    * zip保存まで終わると、page_urlsからexclusion_urlsにurlを移す
+    * セレクタを、image_urlで定義すると、crawling_url_deploymentでスクレイピングして末尾画像URLの展開URLでダウンロードして、zipに保存する
+    * セレクタを、image_urlsで定義すると、crawling_urlsでスクレイピングしてダウンロードして、zipに保存する
 """
 import subprocess
 import json
@@ -18,9 +22,9 @@ class CrawlingValue:
     site_url: str = None
     site_selectors: dict = None
     crawling_items: dict = None
-    crawling_file_path: str = './crawling_list.txt'
+    crawling_file_path: str = None
 
-    def __init__(self, site_url, site_selectors, crawling_items, crawling_file_path=crawling_file_path):
+    def __init__(self, site_url, site_selectors, crawling_items, crawling_file_path):
         """完全コンストラクタパターン"""
         if not site_url:
             raise ValueError(f"{self.__class__.__name__}.{inspect.stack()[1].function}"
@@ -56,9 +60,14 @@ class Crawling:
     """クローリング"""
     value_object: CrawlingValue = None
     site_selectors: dict = None
-    crawling_file_path: str = CrawlingValue.crawling_file_path
+    crawling_items: dict = {"page_urls": [], "exclusion_urls": []}
+    crawling_file_path: str = './crawling_list.txt'
 
-    def __init__(self, value_object=None, site_selectors=None, crawling_file_path=crawling_file_path):
+    def __init__(self,
+                 value_object=None,
+                 site_selectors=None,
+                 crawling_items=None,
+                 crawling_file_path=crawling_file_path):
         if value_object:
             if isinstance(value_object, CrawlingValue):
                 value_object = copy.deepcopy(value_object)
@@ -69,7 +78,8 @@ class Crawling:
                 if site_selectors:
                     site_selectors = copy.deepcopy(site_selectors)
                     site_url = value_object
-                    crawling_items = self.scraping(site_url, site_selectors)
+                    if crawling_items is None:
+                        crawling_items = Crawling.crawling_items
                     self.value_object = CrawlingValue(site_url,
                                                       site_selectors,
                                                       crawling_items,
@@ -79,9 +89,13 @@ class Crawling:
                 else:
                     raise ValueError(f"{self.__class__.__name__}.{inspect.stack()[1].function}"
                                      f"引数エラー:site_selectors=None")
+            elif isinstance(value_object, dict):
+                site_selectors = copy.deepcopy(value_object)
+                self.load_text(site_selectors, crawling_file_path)
+                self.save_text()
             else:
                 raise ValueError(f"{self.__class__.__name__}.{inspect.stack()[1].function}"
-                                 f"引数エラー:value_objectの型")
+                                 f"引数エラー:value_objectが無効な型")
         else:
             raise ValueError(f"{self.__class__.__name__}.{inspect.stack()[1].function}"
                              f"引数エラー:value_object=None")
@@ -204,33 +218,37 @@ class Crawling:
             __work_file.write(__buff)
         return True
 
-    def load_text(self):
-        """独自フォーマットなファイルからデータを読み込み、value_objectを更新する
-        TODO: site_urlやselectorsが変わるときは、crawling_file_pathを初期化してから実行すべきか？
+    def load_text(self, selectors=None, crawling_file_path=crawling_file_path):
+        """独自フォーマットなファイルからデータを読み込み、value_objectを作り直す
+        作成されるvalue_objectは、引数を最優先して、次にvalue_objectの値を優先して、最後にファイルの値を適用する
+        crawling_file_pathで指定したファイルを読み込む
+        crawling_itemsはマージする
         :return: bool 成功/失敗=True/False
         """
-        __site_url2 = self.get_site_url()
-        __selectors2 = self.get_site_selectors()
-        __crawling_file_path2 = self.get_crawling_file_path()
-        __crawling_items2 = self.get_crawling_items()
-        if not os.path.exists(__crawling_file_path2):
-            return False
-        with open(__crawling_file_path2, 'r', encoding='utf-8') as __work_file:
-            __buff = __work_file.readlines()
-            __site_url = json.loads(__buff[0].rstrip('\n'))
-            # TODO: site_selectors
-            # del __buff[0]
-            # __selectors = json.loads(__buff[0].rstrip('\n'))
-            del __buff[0]
-            __crawling_file_path = json.loads(__buff[0].rstrip('\n'))
-            del __buff[0]
-            __crawling_items = json.loads(__buff[0].rstrip('\n'))
-            del __buff[0]
-            if __crawling_items2:
-                # TODO: タイトルとか、前回と値が違うと、マージで増殖するかも
-                __crawling_items = self.dict_merge(__crawling_items, __crawling_items2)
-            self.value_object = CrawlingValue(__site_url2, __selectors2, __crawling_items, __crawling_file_path2)
+        if os.path.exists(crawling_file_path):
+            with open(crawling_file_path, 'r', encoding='utf-8') as __work_file:
+                __buff = __work_file.readlines()
+                __site_url = json.loads(__buff[0].rstrip('\n'))
+                # TODO: site_selectors
+                # del __buff[0]
+                # __selectors = json.loads(__buff[0].rstrip('\n'))
+                del __buff[0]
+                __crawling_file_path = json.loads(__buff[0].rstrip('\n'))
+                del __buff[0]
+                __crawling_items = json.loads(__buff[0].rstrip('\n'))
+                del __buff[0]
+                __selectors = selectors
+                __crawling_items2 = None
+                if self.value_object:
+                    __site_url = self.get_site_url()
+                    __selectors = self.get_site_selectors()
+                    __crawling_items2 = self.get_crawling_items()
+                if __crawling_items2:
+                    __crawling_items = self.dict_merge(__crawling_items, __crawling_items2)
+                __crawling_file_path = crawling_file_path
+                self.value_object = CrawlingValue(__site_url, __selectors, __crawling_items, __crawling_file_path)
             return True
+        return False
 
     def is_url_included_exclusion_list(self, url):
         """除外リストに含まれるURLならTrueを返す
@@ -262,6 +280,20 @@ class Crawling:
                 crawling_items['page_urls'].remove(url)
         self.value_object = CrawlingValue(site_url, selectors, crawling_items, crawling_file_path)
         self.save_text()
+
+    def marge_crawling_items(self):
+        """crawling_itemsのpage_urlsにexclusion_urlsがあったら削除する
+        :return:
+        """
+        crawling_items = self.get_crawling_items()
+        page_urls = []
+        if 'page_urls' in crawling_items:
+            page_urls = crawling_items['page_urls']
+        for page_url in page_urls:
+            print(page_url)
+            if self.is_url_included_exclusion_list(page_url):
+                self.move_url_from_page_urls_to_exclusion_urls(page_url)
+                continue
 
     def crawling_url_deployment(self, page_selectors, image_selectors):
         """各ページをスクレイピングして、末尾画像のナンバーから、URLを予測して、画像ファイルをダウンロード＆圧縮する

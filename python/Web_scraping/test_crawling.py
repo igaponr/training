@@ -15,6 +15,7 @@ class MyTestCase(unittest.TestCase):
                  ),
             ]
         }
+        self.crawling_items = {"page_urls": [], "exclusion_urls": []}
         self.crawling_file_path = './crawling_list_test.txt'
 
     def tearDown(self):
@@ -24,12 +25,12 @@ class MyTestCase(unittest.TestCase):
 
     def test___init___01(self):
         """引数無コンストラクタ"""
-        with self.assertRaisesRegex(ValueError, '^Crawling.__init__引数エラー:value_object'):
+        with self.assertRaisesRegex(ValueError, '^Crawling.test___init___01引数エラー:value_object=None'):
             test_target = Crawling()
 
     def test___init___02(self):
         """引数無コンストラクタ"""
-        with self.assertRaisesRegex(ValueError, '^Crawling.__init__引数エラー:site_selectors'):
+        with self.assertRaisesRegex(ValueError, '^Crawling.test___init___02引数エラー:site_selectors=None'):
             test_target = Crawling(self.site_url)
 
     def test___init___03(self):
@@ -41,7 +42,7 @@ class MyTestCase(unittest.TestCase):
 
     def test___init___04(self):
         """引数無コンストラクタ"""
-        test_target = Crawling(self.site_url, self.site_selectors, self.crawling_file_path)
+        test_target = Crawling(self.site_url, self.site_selectors, self.crawling_items, self.crawling_file_path)
         self.assertTrue(isinstance(test_target, Crawling))
         self.assertNotEqual(Crawling.value_object, test_target.value_object)
 
@@ -70,9 +71,9 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(Crawling.crawling_file_path, test_target.get_crawling_file_path())
 
     def test_get_crawling_file_path_02(self):
-        test_target = Crawling(self.site_url, self.site_selectors, self.crawling_file_path)
+        test_target = Crawling(self.site_url, self.site_selectors, self.crawling_items, self.crawling_file_path)
         self.assertTrue(isinstance(test_target.get_crawling_file_path(), str))
-        self.assertNotEqual(Crawling.crawling_file_path, test_target.get_crawling_file_path())
+        self.assertEqual(Crawling.crawling_file_path, test_target.get_crawling_file_path())
 
     def test_save_text(self):
         test_target = Crawling(self.site_url, self.site_selectors)
