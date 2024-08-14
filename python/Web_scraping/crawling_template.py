@@ -4,7 +4,8 @@
 ヘルプ参照のこと
 site_selectors, page_selectors, image_selectorsをサイトに合わせて変更すること
 
-page_root_urlに、クローリングするページのURLを指定する。
+例. site_urlを指定して、クローリングして、チェックして、ダウンロードする
+> python crawling_template.py -u https://*/?page= -a add=True -c check=True -d download=True
 例. 開始ページの指定
 > python crawling_template.py -s start=1
 例. 終了ページの指定
@@ -66,7 +67,7 @@ def get_option():
                             help='urlリスト[crawling_list.txt]のurlをスクレイピングする')
     arg_parser.add_argument('-s', '--start', type=int, default=1,
                             help='クローリング開始ページ数')
-    arg_parser.add_argument('-e', '--end', type=int, default=2,
+    arg_parser.add_argument('-e', '--end', type=int, default=11,
                             help='クローリング終了ページ数')
     arg_parser.add_argument('-u', '--url', type=str, default="http://*/?page=",
                             help='クローリング基準URL(http://*/?page=)')
@@ -91,9 +92,6 @@ if __name__ == '__main__':  # インポート時には動かない
         crawling = Crawling(site_selectors)
         crawling.marge_crawling_items()
     if arg.download:
-        # crawling = Crawling(site_selectors)
-        page_root_url = arg.url
-        site_url = page_root_url + str(1)
         crawling = Crawling(site_selectors)
         if 'image_url' in image_selectors:
             crawling.crawling_url_deployment(page_selectors, image_selectors)
