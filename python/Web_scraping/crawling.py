@@ -281,6 +281,37 @@ class Crawling:
         self.value_object = CrawlingValue(site_url, selectors, crawling_items, crawling_file_path)
         self.save_text()
 
+    def is_url_included_failure_list(self, url):
+        """失敗リストに含まれるURLならTrueを返す
+        :param url:
+        :return:
+        """
+        crawling_items = self.get_crawling_items()
+        if 'failure_urls' in crawling_items:
+            if url in crawling_items['failure_urls']:
+                return True
+        return False
+
+    def move_url_from_page_urls_to_failure_urls(self, url):
+        """ターゲットリスト(page_urls)から失敗リスト(failure_urls)にURLを移動する
+        :param url:
+        :return:
+        """
+        site_url = self.get_site_url()
+        selectors = self.get_site_selectors()
+        crawling_file_path = self.get_crawling_file_path()
+        crawling_items = self.get_crawling_items()
+        if 'failure_urls' in crawling_items:
+            if url not in crawling_items['failure_urls']:
+                crawling_items['failure_urls'].append(url)
+        else:
+            crawling_items['failure_urls'] = [url]
+        if 'page_urls' in crawling_items:
+            if url in crawling_items['page_urls']:
+                crawling_items['page_urls'].remove(url)
+        self.value_object = CrawlingValue(site_url, selectors, crawling_items, crawling_file_path)
+        self.save_text()
+
     def marge_crawling_items(self):
         """crawling_itemsのpage_urlsにexclusion_urlsがあったら削除する
         :return:
@@ -293,6 +324,9 @@ class Crawling:
             print(page_url)
             if self.is_url_included_exclusion_list(page_url):
                 self.move_url_from_page_urls_to_exclusion_urls(page_url)
+                continue
+            if self.is_url_included_failure_list(page_url):
+                self.move_url_from_page_urls_to_failure_urls(page_url)
                 continue
 
     def crawling_url_deployment(self, page_selectors, image_selectors):
@@ -314,6 +348,9 @@ class Crawling:
             print(page_url)
             if self.is_url_included_exclusion_list(page_url):
                 self.move_url_from_page_urls_to_exclusion_urls(page_url)
+                continue
+            if self.is_url_included_failure_list(page_url):
+                self.move_url_from_page_urls_to_failure_urls(page_url)
                 continue
             items = self.scraping(page_url, page_selectors)
             languages = self.take_out(items, 'languages')
@@ -345,15 +382,20 @@ class Crawling:
                     web_file_list.rename_url_ext_shift()
                     web_file_list.download_irvine()
                 if not web_file_list.make_zip_file():
-                    sys.exit()
+                    web_file_list.delete_local_files()
+                    self.move_url_from_page_urls_to_failure_urls(page_url)
+                    continue
                 if not web_file_list.rename_zip_file(title):
                     if not web_file_list.rename_zip_file(f'{title}：{url_title}'):
                         sys.exit()
                 web_file_list.delete_local_files()
                 # 成功したらチェック用ファイルを残す
                 ChromeDriverHelper().save_source(target_file_name)
-            # page_urlsからexclusion_urlsにURLを移して保存する
-            self.move_url_from_page_urls_to_exclusion_urls(page_url)
+                # page_urlsからexclusion_urlsにURLを移して保存する
+                self.move_url_from_page_urls_to_exclusion_urls(page_url)
+            else:
+                # page_urlsからexclusion_urlsにURLを移して保存する
+                self.move_url_from_page_urls_to_exclusion_urls(page_url)
 
     def crawling_urls(self, page_selectors, image_selectors):
         """各ページをスクレイピングして、画像ファイルをダウンロード＆圧縮する
@@ -374,6 +416,9 @@ class Crawling:
             print(page_url)
             if self.is_url_included_exclusion_list(page_url):
                 self.move_url_from_page_urls_to_exclusion_urls(page_url)
+                continue
+            if self.is_url_included_failure_list(page_url):
+                self.move_url_from_page_urls_to_failure_urls(page_url)
                 continue
             items = self.scraping(page_url, page_selectors)
             title = Crawling.validate_title(items, 'title_jp', 'title_en')
