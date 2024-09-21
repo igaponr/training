@@ -48,6 +48,8 @@ import datetime
 import time
 import pyperclip  # クリップボード
 from urllib.parse import urlparse  # URLパーサー
+import psutil
+import socket
 
 from selenium import webdriver
 from selenium.webdriver import Chrome
@@ -170,6 +172,32 @@ class ChromeDriverHelper:
                                  f"引数エラー:value_objectが不正[{value_object}]")
 
     @staticmethod
+    def is_chrome_running_in_debug_mode():
+        """chrome.exeが起動していて、9222ポートに応答することを確認する
+        :return: bool 全ての条件を満たす場合True、そうでない場合False
+        """
+        # chrome.exeが起動しているか確認
+        chrome_running = False
+        for proc in psutil.process_iter():
+            try:
+                if 'chrome.exe' in proc.name():
+                    chrome_running = True
+                    break
+            except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
+                pass
+        if not chrome_running:
+            print("chrome見つからず。")
+            return False
+        # 9222ポートに応答しているか確認
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            try:
+                s.connect(('127.0.0.1', int(ChromeDriverHelper.__port)))
+                return True
+            except ConnectionRefusedError:
+                print("chrome見つかるが、9222に応答せず。")
+                return False
+
+    @staticmethod
     def fixed_path(file_path):
         """フォルダ名の禁止文字を全角文字に置き換える
         :param file_path: str 置き換えたいフォルダパス
@@ -256,11 +284,14 @@ class ChromeDriverHelper:
         for args in self.__chrome_add_experimental_option:
             print(*args)
             self.__add_options(*args)
+        if not self.is_chrome_running_in_debug_mode():
+            print("Chromeに繋がらなかったので、起動して接続する。")
+            self.__create()
         try:
             # NOTE: タイムアウト長いので、なるべくChrome起動してから呼び出したい
             self.__connection()
         except Exception as e:
-            print(e, "Chromeが起動していなかったので、起動して接続する。")
+            print(e, "Chromeに繋がらなかったので、起動して接続する。")
             self.__create()
             self.__connection()
         self.__start_window_handle = self.__driver.current_window_handle
