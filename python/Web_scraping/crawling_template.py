@@ -18,7 +18,7 @@ from argparse import ArgumentParser
 from crawling import *
 
 site_selectors = {
-    'page_urls': [
+    Crawling.URLS_TARGET: [
         (By.XPATH,
          '//body/div[2]/div/div/a',
          lambda el: el.get_attribute("href")

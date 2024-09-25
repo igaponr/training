@@ -58,9 +58,12 @@ class CrawlingValue:
 
 class Crawling:
     """クローリング"""
+    URLS_TARGET = "page_urls"
+    URLS_EXCLUSION = "exclusion_urls"
+    URLS_FAILURE = "failure_urls"
     value_object: CrawlingValue = None
     site_selectors: dict = None
-    crawling_items: dict = {"page_urls": [], "exclusion_urls": []}
+    crawling_items: dict = {URLS_TARGET: [], URLS_EXCLUSION: [], URLS_FAILURE: []}
     crawling_file_path: str = './crawling_list.txt'
 
     def __init__(self,
@@ -256,8 +259,8 @@ class Crawling:
         :return:
         """
         crawling_items = self.get_crawling_items()
-        if 'exclusion_urls' in crawling_items:
-            if url in crawling_items['exclusion_urls']:
+        if self.URLS_EXCLUSION in crawling_items:
+            if url in crawling_items[self.URLS_EXCLUSION]:
                 return True
         return False
 
@@ -270,14 +273,14 @@ class Crawling:
         selectors = self.get_site_selectors()
         crawling_file_path = self.get_crawling_file_path()
         crawling_items = self.get_crawling_items()
-        if 'exclusion_urls' in crawling_items:
-            if url not in crawling_items['exclusion_urls']:
-                crawling_items['exclusion_urls'].append(url)
+        if self.URLS_EXCLUSION in crawling_items:
+            if url not in crawling_items[self.URLS_EXCLUSION]:
+                crawling_items[self.URLS_EXCLUSION].append(url)
         else:
-            crawling_items['exclusion_urls'] = [url]
-        if 'page_urls' in crawling_items:
-            if url in crawling_items['page_urls']:
-                crawling_items['page_urls'].remove(url)
+            crawling_items[self.URLS_EXCLUSION] = [url]
+        if self.URLS_TARGET in crawling_items:
+            if url in crawling_items[self.URLS_TARGET]:
+                crawling_items[self.URLS_TARGET].remove(url)
         self.value_object = CrawlingValue(site_url, selectors, crawling_items, crawling_file_path)
         self.save_text()
 
@@ -287,8 +290,8 @@ class Crawling:
         :return:
         """
         crawling_items = self.get_crawling_items()
-        if 'failure_urls' in crawling_items:
-            if url in crawling_items['failure_urls']:
+        if self.URLS_FAILURE in crawling_items:
+            if url in crawling_items[self.URLS_FAILURE]:
                 return True
         return False
 
@@ -301,14 +304,14 @@ class Crawling:
         selectors = self.get_site_selectors()
         crawling_file_path = self.get_crawling_file_path()
         crawling_items = self.get_crawling_items()
-        if 'failure_urls' in crawling_items:
-            if url not in crawling_items['failure_urls']:
-                crawling_items['failure_urls'].append(url)
+        if self.URLS_FAILURE in crawling_items:
+            if url not in crawling_items[self.URLS_FAILURE]:
+                crawling_items[self.URLS_FAILURE].append(url)
         else:
-            crawling_items['failure_urls'] = [url]
-        if 'page_urls' in crawling_items:
-            if url in crawling_items['page_urls']:
-                crawling_items['page_urls'].remove(url)
+            crawling_items[self.URLS_FAILURE] = [url]
+        if self.URLS_TARGET in crawling_items:
+            if url in crawling_items[self.URLS_TARGET]:
+                crawling_items[self.URLS_TARGET].remove(url)
         self.value_object = CrawlingValue(site_url, selectors, crawling_items, crawling_file_path)
         self.save_text()
 
@@ -318,8 +321,8 @@ class Crawling:
         """
         crawling_items = self.get_crawling_items()
         page_urls = []
-        if 'page_urls' in crawling_items:
-            page_urls = crawling_items['page_urls']
+        if self.URLS_TARGET in crawling_items:
+            page_urls = crawling_items[self.URLS_TARGET]
         for page_url in page_urls:
             print(page_url)
             if self.is_url_included_exclusion_list(page_url):
@@ -342,8 +345,8 @@ class Crawling:
         """
         crawling_items = self.get_crawling_items()
         page_urls = []
-        if 'page_urls' in crawling_items:
-            page_urls = crawling_items['page_urls']
+        if self.URLS_TARGET in crawling_items:
+            page_urls = crawling_items[self.URLS_TARGET]
         for page_url in page_urls:
             print(page_url)
             if self.is_url_included_exclusion_list(page_url):
@@ -410,8 +413,8 @@ class Crawling:
         """
         crawling_items = self.get_crawling_items()
         page_urls = []
-        if 'page_urls' in crawling_items:
-            page_urls = crawling_items['page_urls']
+        if self.URLS_TARGET in crawling_items:
+            page_urls = crawling_items[self.URLS_TARGET]
         for page_url in page_urls:
             print(page_url)
             if self.is_url_included_exclusion_list(page_url):

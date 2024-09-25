@@ -110,6 +110,30 @@ class WebFileListHelper:
             raise ValueError(f"{self.__class__.__name__}.{inspect.stack()[1].function}"
                              f"引数エラー:value_object=None")
 
+    @staticmethod
+    def flatten_zip(zip_filepath, output_filepath):
+        """zip ファイル内のフォルダを削除し、すべてのファイルをルートに移動した新しい zip ファイルを作成します。
+        :param: zip_filepath: 処理対象の zip ファイルのパス
+        :param: output_filepath: 出力先の zip ファイルのパス
+        :return: なし
+        """
+        # 一時フォルダを作成
+        temp_dir = "temp_zip_extract"
+        os.makedirs(temp_dir, exist_ok=True)
+        # zip ファイルを一時フォルダに展開
+        with zipfile.ZipFile(zip_filepath, 'r') as zip_ref:
+            zip_ref.extractall(temp_dir)
+        # 新しい zip ファイルを作成
+        with zipfile.ZipFile(output_filepath, 'w') as new_zip:
+            # 一時フォルダ内のファイルを走査
+            for root, _, files in os.walk(temp_dir):
+                for file in files:
+                    # ファイルをルートに追加 (フォルダ構造を無視)
+                    filepath = os.path.join(root, file)
+                    new_zip.write(filepath, arcname=file)
+        # 一時フォルダを削除
+        shutil.rmtree(temp_dir)
+
     def get_web_file_list(self):
         """webファイルリストを得る
         :return: list[WebFileHelper]
@@ -239,7 +263,8 @@ class WebFileListHelper:
             print(f'圧縮ファイル{zip_path.name}が既に存在したので{zip_path.name}{now_str}.zipに変名しました')
         with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zip_file:
             for __web_file_helper in self.get_web_file_list():
-                zip_file.write(__web_file_helper.get_path())
+                file_path = __web_file_helper.get_path()
+                zip_file.write(file_path, arcname=os.path.basename(file_path))
         return True
 
     def rename_zip_file(self, zip_filename):

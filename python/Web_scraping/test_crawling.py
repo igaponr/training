@@ -8,14 +8,14 @@ class MyTestCase(unittest.TestCase):
         # テスト　若者 | かわいいフリー素材集 いらすとや
         self.site_url = 'https://www.irasutoya.com/p/figure.html'
         self.site_selectors = {
-            'page_urls': [
+            Crawling.URLS_TARGET: [
                 (By.XPATH,
                  '//*[@id="banners"]/a/img',
                  lambda el: el.get_attribute("src")
                  ),
             ]
         }
-        self.crawling_items = {"page_urls": [], "exclusion_urls": []}
+        self.crawling_items = {Crawling.URLS_TARGET: [], Crawling.URLS_EXCLUSION: []}
         self.crawling_file_path = './crawling_list_test.txt'
 
     def tearDown(self):
