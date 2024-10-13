@@ -224,11 +224,17 @@ class Crawling:
     def load_text(self, selectors=None, crawling_file_path=crawling_file_path):
         """独自フォーマットなファイルからデータを読み込み、value_objectを作り直す
         作成されるvalue_objectは、引数を最優先して、次にvalue_objectの値を優先して、最後にファイルの値を適用する
+        ファイルがなかったり、ファイルが空だったらFalseを返す。
+        読み込みに失敗したらファイル名に日時分を付けてバックアップしてFalseを返す。
         crawling_file_pathで指定したファイルを読み込む
         crawling_itemsはマージする
         :return: bool 成功/失敗=True/False
         """
-        if os.path.exists(crawling_file_path):
+        if not os.path.exists(crawling_file_path):
+            return False
+        if os.stat(crawling_file_path).st_size == 0:
+            return False
+        try:
             with open(crawling_file_path, 'r', encoding='utf-8') as __work_file:
                 __buff = __work_file.readlines()
                 __site_url = json.loads(__buff[0].rstrip('\n'))
@@ -250,8 +256,15 @@ class Crawling:
                     __crawling_items = self.dict_merge(__crawling_items, __crawling_items2)
                 __crawling_file_path = crawling_file_path
                 self.value_object = CrawlingValue(__site_url, __selectors, __crawling_items, __crawling_file_path)
-            return True
-        return False
+        except Exception as e:
+            now = datetime.datetime.now().strftime('%Y%m%d%H%M')
+            file_name, ext = os.path.splitext(crawling_file_path)
+            backup_file_path = f"{file_name}_{now}{ext}"
+            os.rename(crawling_file_path, backup_file_path)
+            print(f"ファイルの読み込みに失敗しました。バックアップを作成しました: {backup_file_path}")
+            print(f"エラー内容: {e}")
+            return False
+        return True
 
     def is_url_included_exclusion_list(self, url):
         """除外リストに含まれるURLならTrueを返す
