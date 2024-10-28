@@ -97,7 +97,7 @@ if __name__ == '__main__':  # インポート時には動かない
     if arg.download:
         crawling = Crawling(site_selectors)
         if 'image_url' in image_selectors:
-            crawling.crawling_url_deployment(page_selectors, image_selectors)
+            crawling.crawling_url_deployment(page_selectors, image_selectors, arg.user_id)
         if 'image_urls' in image_selectors:
             crawling.crawling_urls(page_selectors, image_selectors)
     print('crawling-end')

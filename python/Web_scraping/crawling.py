@@ -14,6 +14,7 @@ import subprocess
 import json
 from chromeDriverHelper import *
 from webFileListHelper import *
+from line_message_api import *
 
 
 @dataclass(frozen=True)
@@ -345,7 +346,7 @@ class Crawling:
                 self.move_url_from_page_urls_to_failure_urls(page_url)
                 continue
 
-    def crawling_url_deployment(self, page_selectors, image_selectors):
+    def crawling_url_deployment(self, page_selectors, image_selectors, user_id=""):
         """各ページをスクレイピングして、末尾画像のナンバーから、URLを予測して、画像ファイルをダウンロード＆圧縮する
             # crawling_itemsに、page_urlsがあり、各page_urlをpage_selectorsでスクレイピングする
             # タイトルとURLでダウンロード除外または済みかをチェックして、
@@ -354,13 +355,17 @@ class Crawling:
             # 画像URLリストをirvineHelperでダウンロードして、zipファイルにする
         :param page_selectors:
         :param image_selectors:
+        :param user_id:
         :return:
         """
         crawling_items = self.get_crawling_items()
         page_urls = []
         if self.URLS_TARGET in crawling_items:
             page_urls = crawling_items[self.URLS_TARGET]
-        for page_url in page_urls:
+        total_pages = len(page_urls)
+        for i, page_url in enumerate(page_urls):
+            current_page = i + 1
+            remaining_pages = total_pages - current_page
             print(page_url)
             if self.is_url_included_exclusion_list(page_url):
                 self.move_url_from_page_urls_to_exclusion_urls(page_url)
@@ -377,6 +382,8 @@ class Crawling:
             os.makedirs(WebFileListHelper.work_path, exist_ok=True)
             target_file_name = os.path.join(WebFileListHelper.work_path, f'{title}：{url_title}.html')
             print(title, languages)
+            _line_message_api = LineMessageAPI(access_token="", channel_secret="")
+            _line_message_api.send_message(user_id, f'crawling :現在{current_page}ページ目 / 全{total_pages}ページ中 (残り{remaining_pages}ページ)')
             if languages and languages == 'japanese' and not os.path.exists(target_file_name):
                 image_items = self.scraping(page_url, image_selectors)
                 image_urls = self.take_out(image_items, 'image_urls')
