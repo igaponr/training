@@ -72,6 +72,8 @@ def get_option():
                             help='クローリング終了ページ数')
     arg_parser.add_argument('-u', '--url', type=str, default="http://*/?page=",
                             help='クローリング基準URL(http://*/?page=)')
+    arg_parser.add_argument('-i', '--user_id', type=str, default="",
+                            help='メッセージを送るUserIDを指定する')
     return arg_parser.parse_args()
 
 

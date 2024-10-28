@@ -99,7 +99,7 @@ def get_option():
                             help='LINE Notifyのアクセストークンを指定する')
     arg_parser.add_argument('-c', '--channel_secret', type=str, default="",
                             help='LINE Messege APIのチャンネルシークレットを指定する')
-    arg_parser.add_argument('-u', '--user_id', type=str, default="",
+    arg_parser.add_argument('-i', '--user_id', type=str, default="",
                             help='メッセージを送るUserIDを指定する')
     return arg_parser.parse_args()
 
