@@ -16,6 +16,7 @@ import copy
 from argparse import ArgumentParser
 
 from crawling import *
+from line_message_api import *
 
 site_selectors = {
     Crawling.URLS_TARGET: [
@@ -98,3 +99,9 @@ if __name__ == '__main__':  # インポート時には動かない
         if 'image_urls' in image_selectors:
             crawling.crawling_urls(page_selectors, image_selectors)
     print('crawling-end')
+    # アクセストークン指定なしでインスタンス作成
+    line_message_api = LineMessageAPI(access_token="", channel_secret="")
+    if line_message_api.send_message(arg.user_id, "crawling-end"):
+        print("メッセージを送信しました。")
+    else:
+        print("メッセージの送信に失敗しました。")
