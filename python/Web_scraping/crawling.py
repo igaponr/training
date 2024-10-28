@@ -382,9 +382,12 @@ class Crawling:
             os.makedirs(WebFileListHelper.work_path, exist_ok=True)
             target_file_name = os.path.join(WebFileListHelper.work_path, f'{title}：{url_title}.html')
             print(title, languages)
-            _line_message_api = LineMessageAPI(access_token="", channel_secret="")
-            _line_message_api.send_message(user_id, f'crawling :現在{current_page}ページ目 / 全{total_pages}ページ中 (残り{remaining_pages}ページ)')
             if languages and languages == 'japanese' and not os.path.exists(target_file_name):
+                # ダウンロードするときだけ通知する
+                _line_message_api = LineMessageAPI(access_token="", channel_secret="")
+                _line_message_api.send_message(
+                    user_id,
+                    f'crawling :現在{current_page}ページ目 / 全{total_pages}ページ中 (残り{remaining_pages}ページ)')
                 image_items = self.scraping(page_url, image_selectors)
                 image_urls = self.take_out(image_items, 'image_urls')
                 last_image_url = self.take_out(image_items, 'image_url')
