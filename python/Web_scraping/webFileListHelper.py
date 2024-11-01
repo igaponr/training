@@ -28,11 +28,11 @@ class WebFileListHelperValue:
                  ):
         """完全コンストラクタパターン"""
         if not web_file_list:
-            raise ValueError(f"{self.__class__.__name__}.{sys._getframe().f_code.co_name}"
+            raise ValueError(f"{self.__class__.__name__}.{inspect.stack()[1].function}"
                              f"引数エラー:web_file_list=None")
         for count, item in enumerate(web_file_list):
             if not isinstance(item, WebFileHelper):
-                raise ValueError(f"{self.__class__.__name__}.{sys._getframe().f_code.co_name}"
+                raise ValueError(f"{self.__class__.__name__}.{inspect.stack()[1].function}"
                                  f"引数エラー:web_file_listの{count}個目がWebFileHelperで無い")
         object.__setattr__(self, "web_file_list", web_file_list)
         object.__setattr__(self, "work_path", work_path)
@@ -65,13 +65,13 @@ class WebFileListHelper:
                 self.value_object = value_object
             elif isinstance(value_object, list):
                 if not download_path:
-                    raise ValueError(f"{self.__class__.__name__}.{sys._getframe().f_code.co_name}"
+                    raise ValueError(f"{self.__class__.__name__}.{inspect.stack()[1].function}"
                                      f"引数エラー:download_path=None")
                 if not work_path:
-                    raise ValueError(f"{self.__class__.__name__}.{sys._getframe().f_code.co_name}"
+                    raise ValueError(f"{self.__class__.__name__}.{inspect.stack()[1].function}"
                                      f"引数エラー:work_path=None")
                 if not archive_path:
-                    raise ValueError(f"{self.__class__.__name__}.{sys._getframe().f_code.co_name}"
+                    raise ValueError(f"{self.__class__.__name__}.{inspect.stack()[1].function}"
                                      f"引数エラー:archive_path=None")
                 value_object = copy.deepcopy(value_object)
                 web_file_list = []
@@ -79,13 +79,13 @@ class WebFileListHelper:
                 isinstance_str = [isinstance(val, str) for val in value_object]
                 if sum(isinstance_list):
                     if sum(isinstance_list) != len(isinstance_list):
-                        raise ValueError(f"{self.__class__.__name__}.{sys._getframe().f_code.co_name}"
+                        raise ValueError(f"{self.__class__.__name__}.{inspect.stack()[1].function}"
                                          f"引数エラー:value_objectの型list[WebFileHelper]ではない")
                     else:
                         web_file_list = value_object
                 elif sum(isinstance_str):
                     if sum(isinstance_str) != len(isinstance_str):
-                        raise ValueError(f"{self.__class__.__name__}.{sys._getframe().f_code.co_name}"
+                        raise ValueError(f"{self.__class__.__name__}.{inspect.stack()[1].function}"
                                          f"引数エラー:value_objectの型list[str]ではない")
                     else:
                         # TODO: urlには、DataURIやURLが混ざってくる。URLには、ファイル名がない場合もある
@@ -98,17 +98,41 @@ class WebFileListHelper:
                             web_file = WebFileHelper(uri, download_file_name, __start_ext, download_path)
                             web_file_list.append(web_file)
                 else:
-                    raise ValueError(f"{self.__class__.__name__}.{sys._getframe().f_code.co_name}"
+                    raise ValueError(f"{self.__class__.__name__}.{inspect.stack()[1].function}"
                                      f"引数エラー:value_objectの型")
                 self.value_object = WebFileListHelperValue(web_file_list,
                                                            work_path,
                                                            archive_path)
             else:
-                raise ValueError(f"{self.__class__.__name__}.{sys._getframe().f_code.co_name}"
+                raise ValueError(f"{self.__class__.__name__}.{inspect.stack()[1].function}"
                                  f"引数エラー:value_objectの型")
         else:
-            raise ValueError(f"{self.__class__.__name__}.{sys._getframe().f_code.co_name}"
+            raise ValueError(f"{self.__class__.__name__}.{inspect.stack()[1].function}"
                              f"引数エラー:value_object=None")
+
+    @staticmethod
+    def flatten_zip(zip_filepath, output_filepath):
+        """zip ファイル内のフォルダを削除し、すべてのファイルをルートに移動した新しい zip ファイルを作成します。
+        :param: zip_filepath: 処理対象の zip ファイルのパス
+        :param: output_filepath: 出力先の zip ファイルのパス
+        :return: なし
+        """
+        # 一時フォルダを作成
+        temp_dir = "temp_zip_extract"
+        os.makedirs(temp_dir, exist_ok=True)
+        # zip ファイルを一時フォルダに展開
+        with zipfile.ZipFile(zip_filepath, 'r') as zip_ref:
+            zip_ref.extractall(temp_dir)
+        # 新しい zip ファイルを作成
+        with zipfile.ZipFile(output_filepath, 'w') as new_zip:
+            # 一時フォルダ内のファイルを走査
+            for root, _, files in os.walk(temp_dir):
+                for file in files:
+                    # ファイルをルートに追加 (フォルダ構造を無視)
+                    filepath = os.path.join(root, file)
+                    new_zip.write(filepath, arcname=file)
+        # 一時フォルダを削除
+        shutil.rmtree(temp_dir)
 
     def get_web_file_list(self):
         """webファイルリストを得る
@@ -239,7 +263,8 @@ class WebFileListHelper:
             print(f'圧縮ファイル{zip_path.name}が既に存在したので{zip_path.name}{now_str}.zipに変名しました')
         with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zip_file:
             for __web_file_helper in self.get_web_file_list():
-                zip_file.write(__web_file_helper.get_path())
+                file_path = __web_file_helper.get_path()
+                zip_file.write(file_path, arcname=os.path.basename(file_path))
         return True
 
     def rename_zip_file(self, zip_filename):
