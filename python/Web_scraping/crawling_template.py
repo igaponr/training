@@ -77,33 +77,41 @@ def get_option():
     return arg_parser.parse_args()
 
 
-if __name__ == '__main__':  # インポート時には動かない
-    arg = get_option()
-    print(arg)
-    if arg.add:
-        start_page_number = arg.start
-        end_page_number = arg.end
-        page_root_url = arg.url
-        site_url_list = [page_root_url + str(x) for x in range(start_page_number, end_page_number)]
-        crawling = None
-        for site_url in site_url_list:
-            crawling_items = Crawling.scraping(site_url, site_selectors)
-            crawling = Crawling(site_url, site_selectors, crawling_items)
-            crawling.load_text(site_selectors, Crawling.crawling_file_path)
-            crawling.save_text()
-    if arg.check:
-        crawling = Crawling(site_selectors)
-        crawling.marge_crawling_items()
-    if arg.download:
-        crawling = Crawling(site_selectors)
-        if 'image_url' in image_selectors:
-            crawling.crawling_url_deployment(page_selectors, image_selectors, arg.user_id)
-        if 'image_urls' in image_selectors:
-            crawling.crawling_urls(page_selectors, image_selectors)
-    print('crawling-end')
-    # アクセストークン指定なしでインスタンス作成
-    line_message_api = LineMessageAPI(access_token="", channel_secret="")
-    if line_message_api.send_message(arg.user_id, "crawling-end"):
+def send_notification(user_id, message):
+    """LINEにメッセージを送信する関数。"""
+    _line_message_api = LineMessageAPI(access_token="", channel_secret="")
+    if _line_message_api.send_message(user_id, message):
         print("メッセージを送信しました。")
     else:
         print("メッセージの送信に失敗しました。")
+
+
+if __name__ == '__main__':  # インポート時には動かない
+    arg = get_option()
+    print(arg)
+    try:
+        if arg.add:
+            start_page_number = arg.start
+            end_page_number = arg.end
+            page_root_url = arg.url
+            site_url_list = [page_root_url + str(x) for x in range(start_page_number, end_page_number)]
+            crawling = None
+            for site_url in site_url_list:
+                crawling_items = Crawling.scraping(site_url, site_selectors)
+                crawling = Crawling(site_url, site_selectors, crawling_items)
+                crawling.load_text(site_selectors, Crawling.crawling_file_path)
+                crawling.save_text()
+        if arg.check:
+            crawling = Crawling(site_selectors)
+            crawling.marge_crawling_items()
+        if arg.download:
+            crawling = Crawling(site_selectors)
+            if 'image_url' in image_selectors:
+                crawling.crawling_url_deployment(page_selectors, image_selectors, arg.user_id)
+            if 'image_urls' in image_selectors:
+                crawling.crawling_urls(page_selectors, image_selectors)
+        print('crawling-end')
+        send_notification(arg.user_id, "crawling-end")
+    except Exception as e:
+        print(f"エラー終了しました: {e}")
+        send_notification(arg.user_id, "crawling-error")
