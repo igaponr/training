@@ -15,6 +15,7 @@ import json
 from chromeDriverHelper import *
 from webFileListHelper import *
 from line_message_api import *
+from slack_message_api import *
 
 
 @dataclass(frozen=True)
@@ -346,7 +347,7 @@ class Crawling:
                 self.move_url_from_page_urls_to_failure_urls(page_url)
                 continue
 
-    def crawling_url_deployment(self, page_selectors, image_selectors, user_id=""):
+    def crawling_url_deployment(self, page_selectors, image_selectors, notification_id=""):
         """各ページをスクレイピングして、末尾画像のナンバーから、URLを予測して、画像ファイルをダウンロード＆圧縮する
             # crawling_itemsに、page_urlsがあり、各page_urlをpage_selectorsでスクレイピングする
             # タイトルとURLでダウンロード除外または済みかをチェックして、
@@ -355,7 +356,7 @@ class Crawling:
             # 画像URLリストをirvineHelperでダウンロードして、zipファイルにする
         :param page_selectors:
         :param image_selectors:
-        :param user_id:
+        :param notification_id:
         :return:
         """
         crawling_items = self.get_crawling_items()
@@ -384,9 +385,13 @@ class Crawling:
             print(title, languages)
             if languages and languages == 'japanese' and not os.path.exists(target_file_name):
                 # ダウンロードするときだけ通知する
-                _line_message_api = LineMessageAPI(access_token="", channel_secret="")
-                _line_message_api.send_message(
-                    user_id,
+                # _line_message_api = LineMessageAPI(access_token="", channel_secret="")
+                # _line_message_api.send_message(
+                #     notification_id,
+                #     f'crawling :現在{current_page}ページ目 / 全{total_pages}ページ中 (残り{remaining_pages}ページ)')
+                _slack_message_api = SlackMessageAPI(access_token="")
+                _slack_message_api.send_message(
+                    notification_id,
                     f'crawling :現在{current_page}ページ目 / 全{total_pages}ページ中 (残り{remaining_pages}ページ)')
                 image_items = self.scraping(page_url, image_selectors)
                 image_urls = self.take_out(image_items, 'image_urls')

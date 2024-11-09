@@ -17,6 +17,7 @@ from argparse import ArgumentParser
 
 from crawling import *
 from line_message_api import *
+from slack_message_api import *
 
 site_selectors = {
     Crawling.URLS_TARGET: [
@@ -72,8 +73,8 @@ def get_option():
                             help='クローリング終了ページ数')
     arg_parser.add_argument('-u', '--url', type=str, default="http://*/?page=",
                             help='クローリング基準URL(http://*/?page=)')
-    arg_parser.add_argument('-i', '--user_id', type=str, default="",
-                            help='メッセージを送るUserIDを指定する')
+    arg_parser.add_argument('-i', '--notification_id', type=str, default="",
+                            help='メッセージを送る(slack)ChannelIDや(LINE)UserIDを指定する')
     return arg_parser.parse_args()
 
 
@@ -99,12 +100,14 @@ if __name__ == '__main__':  # インポート時には動かない
         if arg.download:
             crawling = Crawling(site_selectors)
             if 'image_url' in image_selectors:
-                crawling.crawling_url_deployment(page_selectors, image_selectors, arg.user_id)
+                crawling.crawling_url_deployment(page_selectors, image_selectors, arg.notification_id)
             if 'image_urls' in image_selectors:
                 crawling.crawling_urls(page_selectors, image_selectors)
         print('crawling-end')
     except Exception as e:
         print(f"エラー終了しました: {e}")
         message = "crawling-error"
-    line_message_api = LineMessageAPI(access_token="", channel_secret="")
-    line_message_api.send_message(arg.user_id, message)
+    # line_message_api = LineMessageAPI(access_token="", channel_secret="")
+    # line_message_api.send_message(arg.user_id, message)
+    slack_message_api = SlackMessageAPI(access_token="")
+    slack_message_api.send_message(arg.notification_id, message)
