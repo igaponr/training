@@ -19,6 +19,25 @@
 <!-- CREATED_BY_LEADYOU_README_GENERATOR -->
 
 # 開発環境
+## Python
+- Pythonの3.9系を使用する
+- 対象のPythonインストーラーをダウンロードしてインストールする
+- PycharmにPythonインタープリターで3.9.12を設定する
+  - 以下のパッケージを入れた
+  - selenium
+  - webdriver-manager
+  - webdrivermanager
+  - pyperclip
+
+### 参考
+- [Python Windows環境でseleniumを動かすまで](https://qiita.com/yoshi-kin/items/e0a7336a288188913097)
+- [Pythonで動作させるSelenium初期設定時の詰まりポイント](https://regardie.dev/post-3034)
+- [webdriver_managerで自動的にSeleniumとChromeバージョンを一致させる](https://scr.marketing-wizard.biz/dev/webdriver-manager-selenium-chrome)
+- [pip installでエラーになりインストールできない場合（Windows）](https://gammasoft.jp/support/pip-install-error/)
+- [「WARNING: Failed to write executable ? trying to use .deleteme logic」という警告が発生しインストールに失敗する](https://yusu79.com/pip-install-failure-fix/)
+- [【streamlit】windowsマシン上でpip install streamlit時、subprocess-exited-with-error発生時の対応方法](https://technoxs-stacker.hatenablog.com/entry/2023/04/28/000000)
+- [pip listのWARNINGを消す](https://qiita.com/ti104110/items/c6e344df3f2d8285646c)
+
 ## Chocolaty
 
 - Windowsキーを押す
@@ -177,6 +196,8 @@ pip install numpy
 
 使い方はユニットテスト（例えば、test_crawling.py）を参照のこと
 
+以下は「新しい」
+
 - chromeDriverHelper: selenium chromeドライバーのヘルパークラス
 - crawling: クローリングヘルパークラス
   - web巡回して、スクレイピングして、ファイルダウンロードして、zipファイルにまとめる
@@ -189,7 +210,7 @@ pip install numpy
 - webFileListHelper: webファイルリストのヘルパークラス
   - URLリストから、webFileHelperのリストを作って、操作する。まとめてだウンロードしたり、zipファイルにする
 
-以下は古い
+以下は「古い」
 
 - imgdl：クリップボードからURLを読み込み、urllib.requestでWeb情報を取得し、スクレイピングして、画像URLリストを作り、その画像をダウンロードして、ファイル名をナンバリングして、zipファイルに保存する
 - HTML2zip：画像のダウンロード処理だけ行わない他はimgdlと同じ(ダウンロードは外部ツールを使う)
@@ -211,7 +232,8 @@ pip install numpy
 
 # python/selenium
 [python/Web_scraping](https://github.com/igapon50/training/tree/develop#pythonweb_scraping)
-では、Web情報の取得にurllib.requestを使用したが、ここではseleniumを使用する
+の「古い」では、Web情報の取得にurllib.requestを使用したが、ここではseleniumを使用する。seleniumを使用した結果[python/Web_scraping](https://github.com/igapon50/training/tree/develop#pythonweb_scraping)
+の「新しい」になった。
 
 - imgdl：クリップボードからURLを読み込み、FireFoxでWeb情報を取得し、スクレイピングして、画像URLリストを作り、その画像をダウンロードして、ファイル名をナンバリングして、zipファイルに保存する
 

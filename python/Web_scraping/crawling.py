@@ -2,14 +2,20 @@
 # -*- coding: utf-8 -*-
 """
 クローリング
-    * ChromeDriverHelperを使って、指定サイト(site_url)をセレクタ(site_selectors)でクローリングする
-    * 指定サイトのクローリング結果を、crawling_file_pathに保持する
-    * crawling_file_pathのpage_urlsに対して、スクレイピングして末尾画像URLの展開URLでダウンロードして、zipに保存する
+    * 指定サイト(site_url)をセレクタ(site_selectors)でクローリングする(ChromeDriverHelperを使用)
+    * クローリング結果を、crawling_file_pathに保存する
+    * crawling_file_pathのpage_urlsは、スクレイピングする対象urlリストである
+    * crawling_file_pathのexclusion_urlsは、スクレイピングの除外urlリストである
+    * zip保存まで終わると、page_urlsからexclusion_urlsにurlを移す
+    * セレクタを、image_urlで定義すると、crawling_url_deploymentでスクレイピングして末尾画像URLの展開URLでダウンロードして、zipに保存する
+    * セレクタを、image_urlsで定義すると、crawling_urlsでスクレイピングしてダウンロードして、zipに保存する
 """
 import subprocess
 import json
 from chromeDriverHelper import *
 from webFileListHelper import *
+from line_message_api import *
+from slack_message_api import *
 
 
 @dataclass(frozen=True)
@@ -18,33 +24,33 @@ class CrawlingValue:
     site_url: str = None
     site_selectors: dict = None
     crawling_items: dict = None
-    crawling_file_path: str = './crawling_list.txt'
+    crawling_file_path: str = None
 
-    def __init__(self, site_url, site_selectors, crawling_items, crawling_file_path=crawling_file_path):
+    def __init__(self, site_url, site_selectors, crawling_items, crawling_file_path):
         """完全コンストラクタパターン"""
         if not site_url:
-            raise ValueError(f"{self.__class__.__name__}.{sys._getframe().f_code.co_name}"
+            raise ValueError(f"{self.__class__.__name__}.{inspect.stack()[1].function}"
                              f"引数エラー:site_url=None")
         if not site_selectors:
-            raise ValueError(f"{self.__class__.__name__}.{sys._getframe().f_code.co_name}"
+            raise ValueError(f"{self.__class__.__name__}.{inspect.stack()[1].function}"
                              f"引数エラー:site_selectors=None")
         if crawling_items is None:
-            raise ValueError(f"{self.__class__.__name__}.{sys._getframe().f_code.co_name}"
+            raise ValueError(f"{self.__class__.__name__}.{inspect.stack()[1].function}"
                              f"引数エラー:crawling_items=None")
         if not crawling_file_path:
-            raise ValueError(f"{self.__class__.__name__}.{sys._getframe().f_code.co_name}"
+            raise ValueError(f"{self.__class__.__name__}.{inspect.stack()[1].function}"
                              f"引数エラー:crawling_file_path=None")
         if not isinstance(site_url, str):
-            raise ValueError(f"{self.__class__.__name__}.{sys._getframe().f_code.co_name}"
+            raise ValueError(f"{self.__class__.__name__}.{inspect.stack()[1].function}"
                              f"引数エラー:site_urlがstrではない")
         if not isinstance(site_selectors, dict):
-            raise ValueError(f"{self.__class__.__name__}.{sys._getframe().f_code.co_name}"
+            raise ValueError(f"{self.__class__.__name__}.{inspect.stack()[1].function}"
                              f"引数エラー:site_selectorsがdictではない")
         if not isinstance(crawling_items, dict):
-            raise ValueError(f"{self.__class__.__name__}.{sys._getframe().f_code.co_name}"
+            raise ValueError(f"{self.__class__.__name__}.{inspect.stack()[1].function}"
                              f"引数エラー:crawling_itemsがdictではない")
         if not isinstance(crawling_file_path, str):
-            raise ValueError(f"{self.__class__.__name__}.{sys._getframe().f_code.co_name}"
+            raise ValueError(f"{self.__class__.__name__}.{inspect.stack()[1].function}"
                              f"引数エラー:crawling_file_pathがstrではない")
         object.__setattr__(self, "site_url", site_url)
         object.__setattr__(self, "site_selectors", site_selectors)
@@ -54,11 +60,19 @@ class CrawlingValue:
 
 class Crawling:
     """クローリング"""
+    URLS_TARGET = "page_urls"
+    URLS_EXCLUSION = "exclusion_urls"
+    URLS_FAILURE = "failure_urls"
     value_object: CrawlingValue = None
     site_selectors: dict = None
-    crawling_file_path: str = CrawlingValue.crawling_file_path
+    crawling_items: dict = {URLS_TARGET: [], URLS_EXCLUSION: [], URLS_FAILURE: []}
+    crawling_file_path: str = './crawling_list.txt'
 
-    def __init__(self, value_object=None, site_selectors=None, crawling_file_path=crawling_file_path):
+    def __init__(self,
+                 value_object=None,
+                 site_selectors=None,
+                 crawling_items=None,
+                 crawling_file_path=crawling_file_path):
         if value_object:
             if isinstance(value_object, CrawlingValue):
                 value_object = copy.deepcopy(value_object)
@@ -69,7 +83,8 @@ class Crawling:
                 if site_selectors:
                     site_selectors = copy.deepcopy(site_selectors)
                     site_url = value_object
-                    crawling_items = self.scraping(site_url, site_selectors)
+                    if crawling_items is None:
+                        crawling_items = Crawling.crawling_items
                     self.value_object = CrawlingValue(site_url,
                                                       site_selectors,
                                                       crawling_items,
@@ -77,13 +92,17 @@ class Crawling:
                     self.load_text()
                     self.save_text()
                 else:
-                    raise ValueError(f"{self.__class__.__name__}.{sys._getframe().f_code.co_name}"
+                    raise ValueError(f"{self.__class__.__name__}.{inspect.stack()[1].function}"
                                      f"引数エラー:site_selectors=None")
+            elif isinstance(value_object, dict):
+                site_selectors = copy.deepcopy(value_object)
+                self.load_text(site_selectors, crawling_file_path)
+                self.save_text()
             else:
-                raise ValueError(f"{self.__class__.__name__}.{sys._getframe().f_code.co_name}"
-                                 f"引数エラー:value_objectの型")
+                raise ValueError(f"{self.__class__.__name__}.{inspect.stack()[1].function}"
+                                 f"引数エラー:value_objectが無効な型")
         else:
-            raise ValueError(f"{self.__class__.__name__}.{sys._getframe().f_code.co_name}"
+            raise ValueError(f"{self.__class__.__name__}.{inspect.stack()[1].function}"
                              f"引数エラー:value_object=None")
 
     @staticmethod
@@ -144,35 +163,35 @@ class Crawling:
         """値オブジェクトを取得する"""
         if self.value_object:
             return copy.deepcopy(self.value_object)
-        raise ValueError(f"{self.__class__.__name__}.{sys._getframe().f_code.co_name}"
+        raise ValueError(f"{self.__class__.__name__}.{inspect.stack()[1].function}"
                          f"オブジェクトエラー:value_object")
 
     def get_site_url(self):
         """値オブジェクトのプロパティsite_url取得"""
         if self.get_value_object().site_url:
             return copy.deepcopy(self.get_value_object().site_url)
-        raise ValueError(f"{self.__class__.__name__}.{sys._getframe().f_code.co_name}"
+        raise ValueError(f"{self.__class__.__name__}.{inspect.stack()[1].function}"
                          f"オブジェクトエラー:site_url")
 
     def get_site_selectors(self):
         """値オブジェクトのプロパティsite_selectors取得"""
         if self.get_value_object().site_selectors:
             return copy.deepcopy(self.get_value_object().site_selectors)
-        raise ValueError(f"{self.__class__.__name__}.{sys._getframe().f_code.co_name}"
+        raise ValueError(f"{self.__class__.__name__}.{inspect.stack()[1].function}"
                          f"オブジェクトエラー:site_selectors")
 
     def get_crawling_items(self):
         """値オブジェクトのプロパティcrawling_items取得"""
         if self.get_value_object().crawling_items:
             return copy.deepcopy(self.get_value_object().crawling_items)
-        raise ValueError(f"{self.__class__.__name__}.{sys._getframe().f_code.co_name}"
+        raise ValueError(f"{self.__class__.__name__}.{inspect.stack()[1].function}"
                          f"オブジェクトエラー:crawling_items")
 
     def get_crawling_file_path(self):
         """値オブジェクトのプロパティcrawling_file_path取得"""
         if self.get_value_object().crawling_file_path:
             return copy.deepcopy(self.get_value_object().crawling_file_path)
-        raise ValueError(f"{self.__class__.__name__}.{sys._getframe().f_code.co_name}"
+        raise ValueError(f"{self.__class__.__name__}.{inspect.stack()[1].function}"
                          f"オブジェクトエラー:crawling_file_path")
 
     def create_save_text(self):
@@ -204,33 +223,50 @@ class Crawling:
             __work_file.write(__buff)
         return True
 
-    def load_text(self):
-        """独自フォーマットなファイルからデータを読み込み、value_objectを更新する
-        TODO: site_urlやselectorsが変わるときは、crawling_file_pathを初期化してから実行すべきか？
+    def load_text(self, selectors=None, crawling_file_path=crawling_file_path):
+        """独自フォーマットなファイルからデータを読み込み、value_objectを作り直す
+        作成されるvalue_objectは、引数を最優先して、次にvalue_objectの値を優先して、最後にファイルの値を適用する
+        ファイルがなかったり、ファイルが空だったらFalseを返す。
+        読み込みに失敗したらファイル名に日時分を付けてバックアップしてFalseを返す。
+        crawling_file_pathで指定したファイルを読み込む
+        crawling_itemsはマージする
         :return: bool 成功/失敗=True/False
         """
-        __site_url2 = self.get_site_url()
-        __selectors2 = self.get_site_selectors()
-        __crawling_file_path2 = self.get_crawling_file_path()
-        __crawling_items2 = self.get_crawling_items()
-        if not os.path.exists(__crawling_file_path2):
+        if not os.path.exists(crawling_file_path):
             return False
-        with open(__crawling_file_path2, 'r', encoding='utf-8') as __work_file:
-            __buff = __work_file.readlines()
-            __site_url = json.loads(__buff[0].rstrip('\n'))
-            # TODO: site_selectors
-            # del __buff[0]
-            # __selectors = json.loads(__buff[0].rstrip('\n'))
-            del __buff[0]
-            __crawling_file_path = json.loads(__buff[0].rstrip('\n'))
-            del __buff[0]
-            __crawling_items = json.loads(__buff[0].rstrip('\n'))
-            del __buff[0]
-            if __crawling_items2:
-                # TODO: タイトルとか、前回と値が違うと、マージで増殖するかも
-                __crawling_items = self.dict_merge(__crawling_items, __crawling_items2)
-            self.value_object = CrawlingValue(__site_url2, __selectors2, __crawling_items, __crawling_file_path2)
-            return True
+        if os.stat(crawling_file_path).st_size == 0:
+            return False
+        try:
+            with open(crawling_file_path, 'r', encoding='utf-8') as __work_file:
+                __buff = __work_file.readlines()
+                __site_url = json.loads(__buff[0].rstrip('\n'))
+                # TODO: site_selectors
+                # del __buff[0]
+                # __selectors = json.loads(__buff[0].rstrip('\n'))
+                del __buff[0]
+                __crawling_file_path = json.loads(__buff[0].rstrip('\n'))
+                del __buff[0]
+                __crawling_items = json.loads(__buff[0].rstrip('\n'))
+                del __buff[0]
+                __selectors = selectors
+                __crawling_items2 = None
+                if self.value_object:
+                    __site_url = self.get_site_url()
+                    __selectors = self.get_site_selectors()
+                    __crawling_items2 = self.get_crawling_items()
+                if __crawling_items2:
+                    __crawling_items = self.dict_merge(__crawling_items, __crawling_items2)
+                __crawling_file_path = crawling_file_path
+                self.value_object = CrawlingValue(__site_url, __selectors, __crawling_items, __crawling_file_path)
+        except Exception as e:
+            now = datetime.datetime.now().strftime('%Y%m%d%H%M')
+            file_name, ext = os.path.splitext(crawling_file_path)
+            backup_file_path = f"{file_name}_{now}{ext}"
+            os.rename(crawling_file_path, backup_file_path)
+            print(f"ファイルの読み込みに失敗しました。バックアップを作成しました: {backup_file_path}")
+            print(f"エラー内容: {e}")
+            return False
+        return True
 
     def is_url_included_exclusion_list(self, url):
         """除外リストに含まれるURLならTrueを返す
@@ -238,8 +274,8 @@ class Crawling:
         :return:
         """
         crawling_items = self.get_crawling_items()
-        if 'exclusion_urls' in crawling_items:
-            if url in crawling_items['exclusion_urls']:
+        if self.URLS_EXCLUSION in crawling_items:
+            if url in crawling_items[self.URLS_EXCLUSION]:
                 return True
         return False
 
@@ -252,17 +288,66 @@ class Crawling:
         selectors = self.get_site_selectors()
         crawling_file_path = self.get_crawling_file_path()
         crawling_items = self.get_crawling_items()
-        if 'exclusion_urls' in crawling_items:
-            if url not in crawling_items['exclusion_urls']:
-                crawling_items['exclusion_urls'].append(url)
+        if self.URLS_EXCLUSION in crawling_items:
+            if url not in crawling_items[self.URLS_EXCLUSION]:
+                crawling_items[self.URLS_EXCLUSION].append(url)
         else:
-            crawling_items['exclusion_urls'] = [url]
-        if 'page_urls' in crawling_items:
-            if url in crawling_items['page_urls']:
-                crawling_items['page_urls'].remove(url)
+            crawling_items[self.URLS_EXCLUSION] = [url]
+        if self.URLS_TARGET in crawling_items:
+            if url in crawling_items[self.URLS_TARGET]:
+                crawling_items[self.URLS_TARGET].remove(url)
         self.value_object = CrawlingValue(site_url, selectors, crawling_items, crawling_file_path)
+        self.save_text()
 
-    def crawling_url_deployment(self, page_selectors, image_selectors):
+    def is_url_included_failure_list(self, url):
+        """失敗リストに含まれるURLならTrueを返す
+        :param url:
+        :return:
+        """
+        crawling_items = self.get_crawling_items()
+        if self.URLS_FAILURE in crawling_items:
+            if url in crawling_items[self.URLS_FAILURE]:
+                return True
+        return False
+
+    def move_url_from_page_urls_to_failure_urls(self, url):
+        """ターゲットリスト(page_urls)から失敗リスト(failure_urls)にURLを移動する
+        :param url:
+        :return:
+        """
+        site_url = self.get_site_url()
+        selectors = self.get_site_selectors()
+        crawling_file_path = self.get_crawling_file_path()
+        crawling_items = self.get_crawling_items()
+        if self.URLS_FAILURE in crawling_items:
+            if url not in crawling_items[self.URLS_FAILURE]:
+                crawling_items[self.URLS_FAILURE].append(url)
+        else:
+            crawling_items[self.URLS_FAILURE] = [url]
+        if self.URLS_TARGET in crawling_items:
+            if url in crawling_items[self.URLS_TARGET]:
+                crawling_items[self.URLS_TARGET].remove(url)
+        self.value_object = CrawlingValue(site_url, selectors, crawling_items, crawling_file_path)
+        self.save_text()
+
+    def marge_crawling_items(self):
+        """crawling_itemsのpage_urlsにexclusion_urlsがあったら削除する
+        :return:
+        """
+        crawling_items = self.get_crawling_items()
+        page_urls = []
+        if self.URLS_TARGET in crawling_items:
+            page_urls = crawling_items[self.URLS_TARGET]
+        for page_url in page_urls:
+            print(page_url)
+            if self.is_url_included_exclusion_list(page_url):
+                self.move_url_from_page_urls_to_exclusion_urls(page_url)
+                continue
+            if self.is_url_included_failure_list(page_url):
+                self.move_url_from_page_urls_to_failure_urls(page_url)
+                continue
+
+    def crawling_url_deployment(self, page_selectors, image_selectors, notification_id=""):
         """各ページをスクレイピングして、末尾画像のナンバーから、URLを予測して、画像ファイルをダウンロード＆圧縮する
             # crawling_itemsに、page_urlsがあり、各page_urlをpage_selectorsでスクレイピングする
             # タイトルとURLでダウンロード除外または済みかをチェックして、
@@ -271,17 +356,23 @@ class Crawling:
             # 画像URLリストをirvineHelperでダウンロードして、zipファイルにする
         :param page_selectors:
         :param image_selectors:
+        :param notification_id:
         :return:
         """
         crawling_items = self.get_crawling_items()
         page_urls = []
-        if 'page_urls' in crawling_items:
-            page_urls = crawling_items['page_urls']
-        for page_url in page_urls:
+        if self.URLS_TARGET in crawling_items:
+            page_urls = crawling_items[self.URLS_TARGET]
+        total_pages = len(page_urls)
+        for i, page_url in enumerate(page_urls):
+            current_page = i + 1
+            remaining_pages = total_pages - current_page
             print(page_url)
             if self.is_url_included_exclusion_list(page_url):
                 self.move_url_from_page_urls_to_exclusion_urls(page_url)
-                self.save_text()
+                continue
+            if self.is_url_included_failure_list(page_url):
+                self.move_url_from_page_urls_to_failure_urls(page_url)
                 continue
             items = self.scraping(page_url, page_selectors)
             languages = self.take_out(items, 'languages')
@@ -293,6 +384,15 @@ class Crawling:
             target_file_name = os.path.join(WebFileListHelper.work_path, f'{title}：{url_title}.html')
             print(title, languages)
             if languages and languages == 'japanese' and not os.path.exists(target_file_name):
+                # ダウンロードするときだけ通知する
+                # _line_message_api = LineMessageAPI(access_token="", channel_secret="")
+                # _line_message_api.send_message(
+                #     notification_id,
+                #     f'crawling :現在{current_page}ページ目 / 全{total_pages}ページ中 (残り{remaining_pages}ページ)')
+                _slack_message_api = SlackMessageAPI(access_token="")
+                _slack_message_api.send_message(
+                    notification_id,
+                    f'crawling :現在{current_page}ページ目 / 全{total_pages}ページ中 (残り{remaining_pages}ページ)')
                 image_items = self.scraping(page_url, image_selectors)
                 image_urls = self.take_out(image_items, 'image_urls')
                 last_image_url = self.take_out(image_items, 'image_url')
@@ -313,16 +413,20 @@ class Crawling:
                     web_file_list.rename_url_ext_shift()
                     web_file_list.download_irvine()
                 if not web_file_list.make_zip_file():
-                    sys.exit()
+                    web_file_list.delete_local_files()
+                    self.move_url_from_page_urls_to_failure_urls(page_url)
+                    continue
                 if not web_file_list.rename_zip_file(title):
                     if not web_file_list.rename_zip_file(f'{title}：{url_title}'):
                         sys.exit()
                 web_file_list.delete_local_files()
                 # 成功したらチェック用ファイルを残す
                 ChromeDriverHelper().save_source(target_file_name)
-            # page_urlsからexclusion_urlsにURLを移して保存する
-            self.move_url_from_page_urls_to_exclusion_urls(page_url)
-            self.save_text()
+                # page_urlsからexclusion_urlsにURLを移して保存する
+                self.move_url_from_page_urls_to_exclusion_urls(page_url)
+            else:
+                # page_urlsからexclusion_urlsにURLを移して保存する
+                self.move_url_from_page_urls_to_exclusion_urls(page_url)
 
     def crawling_urls(self, page_selectors, image_selectors):
         """各ページをスクレイピングして、画像ファイルをダウンロード＆圧縮する
@@ -337,13 +441,15 @@ class Crawling:
         """
         crawling_items = self.get_crawling_items()
         page_urls = []
-        if 'page_urls' in crawling_items:
-            page_urls = crawling_items['page_urls']
+        if self.URLS_TARGET in crawling_items:
+            page_urls = crawling_items[self.URLS_TARGET]
         for page_url in page_urls:
             print(page_url)
             if self.is_url_included_exclusion_list(page_url):
                 self.move_url_from_page_urls_to_exclusion_urls(page_url)
-                self.save_text()
+                continue
+            if self.is_url_included_failure_list(page_url):
+                self.move_url_from_page_urls_to_failure_urls(page_url)
                 continue
             items = self.scraping(page_url, page_selectors)
             title = Crawling.validate_title(items, 'title_jp', 'title_en')
@@ -375,7 +481,6 @@ class Crawling:
                 ChromeDriverHelper().save_source(target_file_name)
             # page_urlsからexclusion_urlsにURLを移して保存する
             self.move_url_from_page_urls_to_exclusion_urls(page_url)
-            self.save_text()
 
 
 # 検証コード
