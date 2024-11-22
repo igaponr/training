@@ -96,11 +96,13 @@ class LineMessageAPI:
 def get_option():
     arg_parser = ArgumentParser()
     arg_parser.add_argument('-a', '--access_token', type=str, default="",
-                            help='LINE Notifyのアクセストークンを指定する')
+                            help='LINE Messege APIのアクセストークンを指定する')
     arg_parser.add_argument('-c', '--channel_secret', type=str, default="",
                             help='LINE Messege APIのチャンネルシークレットを指定する')
     arg_parser.add_argument('-i', '--user_id', type=str, default="",
                             help='メッセージを送るUserIDを指定する')
+    arg_parser.add_argument('-m', '--message', type=str, default="Hello from Python!",
+                            help='送るメッセージを指定する')
     return arg_parser.parse_args()
 
 
@@ -113,7 +115,7 @@ if __name__ == '__main__':  # インポート時には動かない
         line_message_api = LineMessageAPI(access_token=arg.access_token, channel_secret=arg.channel_secret)
     else:
         line_message_api = LineMessageAPI(access_token="", channel_secret="")
-    if line_message_api.send_message(arg.user_id, "Hello from Python!"):
+    if line_message_api.send_message(arg.user_id, arg.message):
         print("メッセージを送信しました。")
     else:
         print("メッセージの送信に失敗しました。")
