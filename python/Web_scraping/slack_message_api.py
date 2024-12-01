@@ -89,8 +89,6 @@ def get_option():
                             help='Slack Notifyのアクセストークンを指定する')
     arg_parser.add_argument('-c', '--channel_id', type=str, default="#general",
                             help='Slack Notifayを送るチャンネルのIDを指定する')
-    arg_parser.add_argument('-i', '--channel_id', type=str, default="#General",
-                            help='メッセージを送るUserIDを指定する')
     arg_parser.add_argument('-m', '--message', type=str, default="Hello from SlackMessageAPI!",
                             help='送るメッセージを指定する')
     return arg_parser.parse_args()
