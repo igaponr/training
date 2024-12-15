@@ -95,6 +95,14 @@ class Spreadsheet:
                                                                  self.data,
                                                                  )
 
+    def __eq__(self, other):
+        if not isinstance(other, Spreadsheet):
+            return False
+        return (self.json_keyfile_name == other.json_keyfile_name and
+                self.workbook_name == other.workbook_name and
+                self.worksheet_name == other.worksheet_name and
+                self.data == other.data) # self.dataはSpreadsheetクラスが持つデータ属性を想定
+
     def open(self):
         """
         spreadsheetにアクセスして、spreadsheet_valueを更新する

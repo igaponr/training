@@ -18,7 +18,7 @@ requests-htmlのGitHub
 https://github.com/kennethreitz/requests-html
 """
 from requests_html import HTMLSession
-from spreadsheet import *
+from spreadsheet.spreadsheet.spreadsheet import *
 
 
 def is_num(s):
@@ -202,90 +202,37 @@ class Tenki:
                 pre_sp_key = counters[sp_key][index]
 
         # 天気、湿度、降水量列作成
-        target_key = 'forecast_item'
-        data[target_key] = []
-        pre_target_key = 0
-        for index in range(len(counters[sp_key])):
-            num = counters[target_key][index] - pre_target_key
-            start = pre_target_key
-            end = counters[target_key][index]
-            if num:
-                for i in range(start, end):
-                    _buff = forecasts[target_key][i]
-                    data[target_key].append(_buff)
-                pre_target_key = counters[target_key][index]
-
-        target_key = 'prob_precip_item'
-        data[target_key] = []
-        pre_target_key = 0
-        for index in range(len(counters[sp_key])):
-            num = counters[target_key][index] - pre_target_key
-            start = pre_target_key
-            end = counters[target_key][index]
-            if num:
-                for i in range(start, end):
-                    _buff = forecasts[target_key][i]
-                    data[target_key].append(_buff)
-                pre_target_key = counters[target_key][index]
-
-        target_key = 'precip_item'
-        data[target_key] = []
-        pre_target_key = 0
-        for index in range(len(counters[sp_key])):
-            num = counters[target_key][index] - pre_target_key
-            start = pre_target_key
-            end = counters[target_key][index]
-            if num:
-                for i in range(start, end):
-                    _buff = forecasts[target_key][i]
-                    data[target_key].append(_buff)
-                pre_target_key = counters[target_key][index]
+        target_keys = {'天気': 'forecast_item', '温度': 'prob_precip_item', '降水量': 'precip_item'}
+        for target_key in target_keys.values():
+            data[target_key] = []
+            pre_target_key = 0
+            for index in range(len(counters[sp_key])):
+                num = counters[target_key][index] - pre_target_key
+                start = pre_target_key
+                end = counters[target_key][index]
+                if num:
+                    for i in range(start, end):
+                        _buff = forecasts[target_key][i]
+                        data[target_key].append(_buff)
+                    pre_target_key = counters[target_key][index]
 
         # 気温、風向、風力列作成
-        target_key = 'temp_item'
-        data[target_key] = []
-        pre_sp_key = 0
-        pre_target_key = 0
-        for index in range(len(counters[sp_key])):
-            num = counters[sp_key][index] - pre_sp_key
-            start = pre_target_key
-            end = counters[target_key][index] - 1
-            if num:
-                for i in range(start, end):
-                    _buff = forecasts[target_key][i] + '-' + forecasts[target_key][i + 1]
-                    data[target_key].append(_buff)
-                pre_target_key = counters[target_key][index]
-                pre_sp_key = counters[sp_key][index]
+        target_keys = {'気温': 'temp_item', '風向': 'wind_item_blow', '風力': 'wind_item_speed'}
+        for target_key in target_keys.values():
+            data[target_key] = []
+            pre_sp_key = 0
+            pre_target_key = 0
+            for index in range(len(counters[sp_key])):
+                num = counters[sp_key][index] - pre_sp_key
+                start = pre_target_key
+                end = counters[target_key][index] - 1
+                if num:
+                    for i in range(start, end):
+                        _buff = forecasts[target_key][i] + '-' + forecasts[target_key][i + 1]
+                        data[target_key].append(_buff)
+                    pre_target_key = counters[target_key][index]
+                    pre_sp_key = counters[sp_key][index]
 
-        target_key = 'wind_item_blow'
-        data[target_key] = []
-        pre_sp_key = 0
-        pre_target_key = 0
-        for index in range(len(counters[sp_key])):
-            num = counters[sp_key][index] - pre_sp_key
-            start = pre_target_key
-            end = counters[target_key][index] - 1
-            if num:
-                for i in range(start, end):
-                    _buff = forecasts[target_key][i] + '-' + forecasts[target_key][i + 1]
-                    data[target_key].append(_buff)
-                pre_target_key = counters[target_key][index]
-                pre_sp_key = counters[sp_key][index]
-
-        target_key = 'wind_item_speed'
-        data[target_key] = []
-        pre_sp_key = 0
-        pre_target_key = 0
-        for index in range(len(counters[sp_key])):
-            num = counters[sp_key][index] - pre_sp_key
-            start = pre_target_key
-            end = counters[target_key][index] - 1
-            if num:
-                for i in range(start, end):
-                    _buff = forecasts[target_key][i] + '-' + forecasts[target_key][i + 1]
-                    data[target_key].append(_buff)
-                pre_target_key = counters[target_key][index]
-                pre_sp_key = counters[sp_key][index]
         return data
 
     def get_value_objects(self):
