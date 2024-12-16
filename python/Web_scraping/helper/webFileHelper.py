@@ -3,12 +3,10 @@
 """webファイルのヘルパー
 """
 import os
-
 # 3rd party packages
 import requests  # HTTP通信
 import shutil
-
-from uriHelper import *
+from helper.uriHelper import *
 
 
 @dataclass(frozen=True)
@@ -18,7 +16,7 @@ class WebFileHelperValue:
     download_file_name: str = None
     start_ext: str = '.jpg'
     download_path: str = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                                      'download').replace(os.sep, '/')
+                                      '../download').replace(os.sep, '/')
 
     def __init__(self,
                  url: UriHelper = url,

@@ -11,12 +11,17 @@ irvineが終了したらダウンロードファイルをチェックする。
 失敗している時は、拡張子を変えて、ファイルに保存して、irvineに渡す。
 成功している時は、リネームしてzipして削除する。
 """
-import urllib.parse
+import sys
+import copy
+import inspect
+import datetime
 from dataclasses import dataclass
-
-from irvineHelper import *
-from chromeDriverHelper import *
-from webFileListHelper import *
+from urllib.parse import urlparse  # URLパーサー
+from urllib.parse import urlunparse
+import pyperclip  # クリップボード
+from helper import chromeDriverHelper
+from helper import webFileListHelper
+from helper import webFileHelper
 
 # local source
 from const import *
@@ -85,12 +90,12 @@ class UrlDeployment:
                 else:
                     __selectors = selectors_or_title
                     page_url = value_object
-                    __driver = ChromeDriverHelper(value_object, __selectors)
+                    __driver = chromeDriverHelper.ChromeDriverHelper(value_object, __selectors)
                     items = __driver.get_items()
 
-                    title = None
+                    _title = None
                     if 'title_jp' in items:
-                        title = items['title_jp']
+                        _title = items['title_jp']
                     title_sub = None
                     if 'title_en' in items:
                         title_sub = items['title_en']
@@ -100,9 +105,9 @@ class UrlDeployment:
                     last_image_url = None
                     if 'image_url' in items:
                         last_image_url = items['image_url']
-                    print(title, title_sub, last_image_url, image_urls)
-                    if title and isinstance(title, list):
-                        title = title[0]
+                    print(_title, title_sub, last_image_url, image_urls)
+                    if _title and isinstance(_title, list):
+                        _title = _title[0]
                     if title_sub and isinstance(title_sub, list):
                         title_sub = title_sub[0]
                     if last_image_url and isinstance(last_image_url, list):
@@ -111,14 +116,14 @@ class UrlDeployment:
                         last_image_url = image_urls[0]
                     if not last_image_url:
                         raise ValueError(f"エラー:last_image_urlが不正[{last_image_url}]")
-                    if not title:
+                    if not _title:
                         if not title_sub:
                             # タイトルが得られない時は、タイトルを日時文字列にする
                             now = datetime.datetime.now()
-                            title = f'{now:%Y%m%d_%H%M%S}'
+                            _title = f'{now:%Y%m%d_%H%M%S}'
                         else:
-                            title = title_sub
-                    __title = __driver.fixed_file_name(title)
+                            _title = title_sub
+                    __title = __driver.fixed_file_name(_title)
                     url_title = __driver.fixed_file_name(page_url)
                     target_path = f'{__title}：{url_title}.html'
                     __driver.save_source(target_path)
@@ -138,7 +143,7 @@ class UrlDeployment:
         if not image_url:
             print('引数が不正です。空です。')
             sys.exit(1)
-        __parse = urllib.parse.urlparse(image_url)
+        __parse = urlparse(image_url)
         if not __parse.scheme:
             print('引数が不正です。URLではない？')
             sys.exit(1)
@@ -157,12 +162,12 @@ class UrlDeployment:
             sys.exit(1)
         __count = int(__base_name)
         for d_count in range(__count):
-            self.url_list.append(urllib.parse.urlunparse((__parse.scheme,
-                                                          __parse.netloc,
-                                                          __path_before_name + str(d_count + 1) + __extend_name,
-                                                          __parse.params,
-                                                          __parse.query,
-                                                          __parse.fragment)))
+            self.url_list.append(urlunparse((__parse.scheme,
+                                             __parse.netloc,
+                                             __path_before_name + str(d_count + 1) + __extend_name,
+                                             __parse.params,
+                                             __parse.query,
+                                             __parse.fragment)))
         return self.url_list
 
     def get_title(self):
@@ -183,7 +188,7 @@ if __name__ == '__main__':  # インポート時には動かない
     folder_path = OUTPUT_FOLDER_PATH
     url_list: list = []
     main_title = '[] a'
-    list_file_path = './irvine_download_list.txt'
+    list_file_path = '../irvine_download_list.txt'
     # 引数チェック
     if 3 == len(sys.argv):
         # Pythonに以下の3つ引数を渡す想定
@@ -207,12 +212,12 @@ if __name__ == '__main__':  # インポート時には動かない
     # スクレイピングして末尾画像のナンバーから全ての画像URLを推測して展開する
     url_deployment = UrlDeployment(paste_str, SELECTORS)
     title = url_deployment.get_title()
-    url_title = ChromeDriverHelper.fixed_file_name(paste_str)
+    url_title = chromeDriverHelper.ChromeDriverHelper.fixed_file_name(paste_str)
     url_list = url_deployment.get_image_urls()
     print(url_list)
-    web_file_list = WebFileListHelper(url_list)
+    web_file_list = webFileListHelper.WebFileListHelper(url_list)
     web_file_list.download_irvine()
-    for count in enumerate(WebFileHelper.ext_list):
+    for count in enumerate(webFileHelper.WebFileHelper.ext_list):
         if web_file_list.is_exist():
             break
         # ダウンロードに失敗しているときは、失敗しているファイルの拡張子を変えてダウンロードしなおす

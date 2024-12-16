@@ -11,13 +11,9 @@ site_selectors, page_selectors, image_selectorsをサイトに合わせて変更
 例. 終了ページの指定
 > python crawling_template.py -e end=10
 """
-import copy
 
-from argparse import ArgumentParser
-
-from crawling import *
-from line_message_api import *
-from slack_message_api import *
+from helper.crawling import *
+from helper.slack_message_api import *
 
 site_selectors = {
     Crawling.URLS_TARGET: [

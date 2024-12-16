@@ -17,7 +17,8 @@ class TestSpreadsheet(unittest.TestCase):
 
     def setUp(self):
         print("setUp")
-        self.json_keyfile_name = (os.path.dirname(__file__) + r"\..\..\..\json\tenki-347610-1bc0fec79f90.json")
+        self.json_keyfile_name = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                              '../../../json/tenki-347610-1bc0fec79f90.json').replace(os.sep, '/')
         self.workbook_name = '天気予報'
         self.worksheet_name = '七尾市和倉町data'
         self.spreadsheet = spreadsheet.Spreadsheet(self.json_keyfile_name,

@@ -22,7 +22,7 @@ class LineMessageAPI:
     """
     access_token: str
     channel_secret: str
-    json_path: str = "line_message_api_config.json"
+    json_path: str = (os.path.dirname(__file__) + r"\..\json\line_message_api_config.json")
     line_bot_api: LineBotApi = None  # 型ヒントを追加
     handler: WebhookHandler = None  # 型ヒントを追加
 

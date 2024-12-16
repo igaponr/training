@@ -2,14 +2,19 @@
 # -*- coding: utf-8 -*-
 """webファイルリストのヘルパー
 """
-import datetime
+import os
+import copy
+import inspect
+import shutil
+from dataclasses import dataclass
 import zipfile  # zipファイル
 import pathlib
-from distutils.util import strtobool
+import datetime
 
-from irvineHelper import *
-from chromeDriverHelper import *
-from webFileHelper import *
+from helper import uriHelper
+from helper import chromeDriverHelper
+from helper import webFileHelper
+from helper import irvineHelper
 
 
 @dataclass(frozen=True)
@@ -17,9 +22,9 @@ class WebFileListHelperValue:
     """値オブジェクト"""
     web_file_list: list = None
     work_path: str = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                                  'work').replace(os.sep, '/')
+                                  '../work').replace(os.sep, '/')
     archive_path: str = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                                     'archive').replace(os.sep, '/')
+                                     '../archive').replace(os.sep, '/')
 
     def __init__(self,
                  web_file_list: list = None,
@@ -31,7 +36,7 @@ class WebFileListHelperValue:
             raise ValueError(f"{self.__class__.__name__}.{inspect.stack()[1].function}"
                              f"引数エラー:web_file_list=None")
         for count, item in enumerate(web_file_list):
-            if not isinstance(item, WebFileHelper):
+            if not isinstance(item, webFileHelper.WebFileHelper):
                 raise ValueError(f"{self.__class__.__name__}.{inspect.stack()[1].function}"
                                  f"引数エラー:web_file_listの{count}個目がWebFileHelperで無い")
         object.__setattr__(self, "web_file_list", web_file_list)
@@ -42,9 +47,9 @@ class WebFileListHelperValue:
 class WebFileListHelper:
     """webファイルリスト"""
     value_object: WebFileListHelperValue or list = None
-    start_ext: str = WebFileHelper.start_ext
+    start_ext: str = webFileHelper.WebFileHelper.start_ext
     download_path: str = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                                      'download').replace(os.sep, '/')
+                                      '../download').replace(os.sep, '/')
     work_path: str = WebFileListHelperValue.work_path
     archive_path: str = WebFileListHelperValue.archive_path
 
@@ -75,7 +80,7 @@ class WebFileListHelper:
                                      f"引数エラー:archive_path=None")
                 value_object = copy.deepcopy(value_object)
                 web_file_list = []
-                isinstance_list = [isinstance(val, WebFileHelper) for val in value_object]
+                isinstance_list = [isinstance(val, webFileHelper.WebFileHelper) for val in value_object]
                 isinstance_str = [isinstance(val, str) for val in value_object]
                 if sum(isinstance_list):
                     if sum(isinstance_list) != len(isinstance_list):
@@ -90,12 +95,12 @@ class WebFileListHelper:
                     else:
                         # TODO: urlには、DataURIやURLが混ざってくる。URLには、ファイル名がない場合もある
                         for index, url in enumerate(value_object):
-                            uri = UriHelper(url)
+                            uri = uriHelper.UriHelper(url)
                             download_file_name = '{:04d}'.format(index)
                             __start_ext = start_ext
                             if not __start_ext:
                                 __start_ext = uri.get_ext()
-                            web_file = WebFileHelper(uri, download_file_name, __start_ext, download_path)
+                            web_file = webFileHelper.WebFileHelper(uri, download_file_name, __start_ext, download_path)
                             web_file_list.append(web_file)
                 else:
                     raise ValueError(f"{self.__class__.__name__}.{inspect.stack()[1].function}"
@@ -213,17 +218,17 @@ class WebFileListHelper:
         """irvineを用いて、ファイルリストをダウンロードする
         :return:
         """
-        __irvine = IrvineHelper(self.get_only_url_of_file_not_exist(),
-                                self.get_download_path_from_1st_element(),
-                                self.get_only_file_name_of_file_not_exist(),
-                                )
+        __irvine = irvineHelper.IrvineHelper(self.get_only_url_of_file_not_exist(),
+                                             self.get_download_path_from_1st_element(),
+                                             self.get_only_file_name_of_file_not_exist(),
+                                             )
         __irvine.download()
 
     def download_chrome_driver(self):
         """selenium chromeDriverを用いて、画像をデフォルトダウンロードフォルダにダウンロードして、指定のフォルダに移動する
         :return:
         """
-        chromedriver = ChromeDriverHelper()
+        chromedriver = chromeDriverHelper.ChromeDriverHelper()
         for url, web_file in zip(self.get_url_list(), self.get_web_file_list()):
             chromedriver.download_image(url, web_file.get_path())
 
@@ -276,7 +281,7 @@ class WebFileListHelper:
         archive_path = pathlib.Path(self.archive_path)
         zip_path = pathlib.Path(os.path.join(archive_path, zip_file_name))
         if zip_path.is_file():
-            new_zip_filename = WebFileHelper.fixed_file_name(zip_filename)
+            new_zip_filename = webFileHelper.WebFileHelper.fixed_file_name(zip_filename)
             new_zip_path = zip_path.with_name(f'{new_zip_filename}.zip')
             if os.path.isfile(new_zip_path):
                 print(f'圧縮リネームファイル{new_zip_filename}.zipが既に存在しています')
@@ -326,12 +331,12 @@ class WebFileListHelper:
         download_path = self.get_download_path_from_1st_element()
         __web_file_list = []
         for index, url in enumerate(url_list):
-            uri = UriHelper(url)
+            uri = uriHelper.UriHelper(url)
             download_file_name = '{:04d}'.format(index)
             __start_ext = self.start_ext
             if not __start_ext:
                 __start_ext = uri.get_ext()
-            web_file = WebFileHelper(uri, download_file_name, __start_ext, download_path)
+            web_file = webFileHelper.WebFileHelper(uri, download_file_name, __start_ext, download_path)
             __web_file_list.append(web_file)
         self.value_object = WebFileListHelperValue(__web_file_list,
                                                    self.value_object.work_path,

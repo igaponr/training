@@ -41,32 +41,27 @@ https://kurozumi.github.io/selenium-python/index.html
 """
 import os
 import copy
-import sys
-
-import subprocess
-import datetime
-import time
-import pyperclip  # クリップボード
-from urllib.parse import urlparse  # URLパーサー
-import psutil
 import socket
+import subprocess
+from datetime import time
+import inspect
 
-from selenium import webdriver
-from selenium.webdriver import Chrome
-from selenium.webdriver import ChromeOptions
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.common.by import By
-from selenium.webdriver.common.action_chains import ActionChains
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import NoSuchElementException
-from webdrivermanager import ChromeDriverManager
-from webdriver_manager.chrome import ChromeDriverManager
+import psutil
+from urllib.parse import urlparse
+
 from dataclasses import dataclass
+from selenium.common import NoSuchElementException
+from selenium.webdriver import ActionChains
+from selenium.webdriver import ChromeOptions
+from selenium.webdriver.chrome import webdriver
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from webdriver_manager.chrome import ChromeDriverManager
 
-from webFileHelper import *
-from webFileListHelper import *
+from helper import uriHelper
+from helper import webFileListHelper
+from helper import webFileHelper
 
 
 @dataclass(frozen=True)
@@ -450,7 +445,7 @@ class ChromeDriverHelper:
         :param download_path:
         :return:
         """
-        uri = UriHelper(url)
+        uri = uriHelper.UriHelper(url)
         if uri.is_data_uri(url):
             uri.save_data_uri(download_path)
         else:
@@ -523,7 +518,7 @@ class ChromeDriverHelper:
         """
         __image_url = self.__driver.current_url
         downloads_path = os.path.join(os.getenv("HOMEDRIVE"), os.getenv("HOMEPATH"), "downloads")
-        __web_file = WebFileHelper(__image_url, download_file_name, download_ext, downloads_path)
+        __web_file = webFileHelper.WebFileHelper(__image_url, download_file_name, download_ext, downloads_path)
         __filename = __web_file.get_filename() + __web_file.get_ext()
         script_str = """
         window.URL = window.URL || window.webkitURL;

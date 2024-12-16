@@ -16,7 +16,7 @@ class SlackMessageAPI:
     JSONファイルがなければエラー表示で終了します。
     """
     access_token: str
-    json_path: str = "slack_message_api_config.json"
+    json_path: str = (os.path.dirname(__file__) + r"\..\json\slack_message_api_config.json")
     client: WebClient = None
 
     def __post_init__(self):

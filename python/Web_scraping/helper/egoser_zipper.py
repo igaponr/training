@@ -1,7 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from chromeDriverHelper import *
-from crawling import *
+import os
+import sys
+import pyperclip  # クリップボード
+from selenium.webdriver.common.by import By
+from helper import crawling
+from helper import chromeDriverHelper
+from helper import webFileListHelper
 
 
 if __name__ == '__main__':  # インポート時には動かない
@@ -45,7 +50,7 @@ if __name__ == '__main__':  # インポート時には動かない
                         lambda el: el.get_attribute("src")),
                        ],
     }
-    crawling = Crawling(site_url, site_selectors, 'egoser_zipper.txt')
+    crawling = crawling.Crawling(site_url, site_selectors, 'egoser_zipper.txt')
     crawling_items = crawling.get_crawling_items()
     page_urls = []
     if 'page_urls' in crawling_items:
@@ -57,16 +62,16 @@ if __name__ == '__main__':  # インポート時には動かない
             continue
         items = crawling.scraping(page_url, page_selectors)
         image_urls = crawling.take_out(items, 'image_urls')[0:20]  # 先頭の20個は、DataURIで表示される
-        title = Crawling.validate_title(items, 'title_jp', 'title_en')
-        url_title = ChromeDriverHelper.fixed_file_name(page_url)
+        title = crawling.Crawling.validate_title(items, 'title_jp', 'title_en')
+        url_title = chromeDriverHelper.ChromeDriverHelper.fixed_file_name(page_url)
         # フォルダがなかったらフォルダを作る
-        os.makedirs(WebFileListHelper.work_path, exist_ok=True)
-        target_file_name = os.path.join(WebFileListHelper.work_path, f'{title}：{url_title}.html')
+        os.makedirs(webFileListHelper.WebFileListHelper.work_path, exist_ok=True)
+        target_file_name = os.path.join(webFileListHelper.WebFileListHelper.work_path, f'{title}：{url_title}.html')
         print(title)
         if not os.path.exists(target_file_name):
             if image_urls:
                 print(image_urls)
-                web_file_list = WebFileListHelper(image_urls)
+                web_file_list = webFileListHelper.WebFileListHelper(image_urls)
                 crawling.download_chrome_driver(web_file_list)
                 if not web_file_list.make_zip_file():
                     sys.exit()
@@ -75,7 +80,7 @@ if __name__ == '__main__':  # インポート時には動かない
                         sys.exit()
                 web_file_list.delete_local_files()
                 # 成功したらチェック用ファイルを残す
-                ChromeDriverHelper().save_source(target_file_name)
+                chromeDriverHelper.ChromeDriverHelper().save_source(target_file_name)
             # page_urlsからexclusion_urlsにURLを移して保存する
         crawling.move_url_from_page_urls_to_exclusion_urls(page_url)
     print('crawling-end')

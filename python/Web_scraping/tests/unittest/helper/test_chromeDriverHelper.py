@@ -1,6 +1,6 @@
 import unittest
-from chromeDriverHelper import *
-from webFileListHelper import *
+from helper.chromeDriverHelper import *
+from helper.webFileListHelper import *
 
 
 class MyTestCase(unittest.TestCase):

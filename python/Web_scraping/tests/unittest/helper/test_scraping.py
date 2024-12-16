@@ -1,5 +1,5 @@
 import unittest
-from scraping import *
+from helper.scraping import *
 
 
 class MyTestCase(unittest.TestCase):

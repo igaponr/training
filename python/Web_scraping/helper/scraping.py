@@ -6,15 +6,15 @@
 """
 # standard library
 # 3rd party packages
-import pickle
 import sys
 import copy
-import pyperclip  # クリップボード
 from dataclasses import dataclass
+import pickle
+import pyperclip  # クリップボード
 import json
-from selenium.webdriver.common.by import By
+import inspect
 # local source
-from chromeDriverHelper import *
+from helper import chromeDriverHelper
 
 # 最大再起回数を1万回にする
 sys.setrecursionlimit(10000)
@@ -77,7 +77,7 @@ class Scraping:
         :return:
         """
         __value_object = self.get_value_object()
-        __chrome_driver = ChromeDriverHelper(__value_object.site_url, __value_object.selectors)
+        __chrome_driver = chromeDriverHelper.ChromeDriverHelper(__value_object.site_url, __value_object.selectors)
         return {'title': __chrome_driver.get_title(), 'last_image_url': __chrome_driver.get_last_image_url()}
 
     def create_save_text(self):

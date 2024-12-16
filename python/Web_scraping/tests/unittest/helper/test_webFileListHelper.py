@@ -1,5 +1,5 @@
 import unittest
-from webFileListHelper import *
+from helper.webFileListHelper import *
 
 
 class MyTestCase(unittest.TestCase):
