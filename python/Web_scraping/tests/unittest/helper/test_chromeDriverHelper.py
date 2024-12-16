@@ -1,6 +1,11 @@
+import os
+import time
+import inspect
 import unittest
-from helper.chromeDriverHelper import *
-from helper.webFileListHelper import *
+from selenium.webdriver.common.by import By
+from helper import chromeDriverHelper
+from helper import webFileListHelper
+from helper import uriHelper
 
 
 class MyTestCase(unittest.TestCase):
@@ -43,75 +48,75 @@ class MyTestCase(unittest.TestCase):
 
     def test___init___01(self):
         """引数無コンストラクタ"""
-        test_target = ChromeDriverHelper()
-        self.assertTrue(isinstance(test_target, ChromeDriverHelper))
-        self.assertFalse(isinstance(test_target.value_object, ChromeDriverHelperValue))
-        self.assertEqual(ChromeDriverHelper.root_path, test_target.root_path)
-        self.assertEqual(ChromeDriverHelper.driver_path, test_target.driver_path)
-        self.assertEqual(ChromeDriverHelper.chrome_path, test_target.chrome_path)
-        self.assertEqual(ChromeDriverHelper.profile_path, test_target.profile_path)
+        test_target = chromeDriverHelper.ChromeDriverHelper()
+        self.assertTrue(isinstance(test_target, chromeDriverHelper.ChromeDriverHelper))
+        self.assertFalse(isinstance(test_target.value_object, chromeDriverHelper.ChromeDriverHelperValue))
+        self.assertEqual(chromeDriverHelper.ChromeDriverHelper.root_path, test_target.root_path)
+        self.assertEqual(chromeDriverHelper.ChromeDriverHelper.driver_path, test_target.driver_path)
+        self.assertEqual(chromeDriverHelper.ChromeDriverHelper.chrome_path, test_target.chrome_path)
+        self.assertEqual(chromeDriverHelper.ChromeDriverHelper.profile_path, test_target.profile_path)
 
     def test___init___02(self):
         """引数有コンストラクタ"""
-        test_target = ChromeDriverHelper("", self.selectors)
-        self.assertTrue(isinstance(test_target, ChromeDriverHelper))
-        self.assertFalse(isinstance(test_target.value_object, ChromeDriverHelperValue))
-        self.assertEqual(ChromeDriverHelper.root_path, test_target.root_path)
-        self.assertEqual(ChromeDriverHelper.driver_path, test_target.driver_path)
-        self.assertEqual(ChromeDriverHelper.chrome_path, test_target.chrome_path)
-        self.assertEqual(ChromeDriverHelper.profile_path, test_target.profile_path)
+        test_target = chromeDriverHelper.ChromeDriverHelper("", self.selectors)
+        self.assertTrue(isinstance(test_target, chromeDriverHelper.ChromeDriverHelper))
+        self.assertFalse(isinstance(test_target.value_object, chromeDriverHelper.ChromeDriverHelperValue))
+        self.assertEqual(chromeDriverHelper.ChromeDriverHelper.root_path, test_target.root_path)
+        self.assertEqual(chromeDriverHelper.ChromeDriverHelper.driver_path, test_target.driver_path)
+        self.assertEqual(chromeDriverHelper.ChromeDriverHelper.chrome_path, test_target.chrome_path)
+        self.assertEqual(chromeDriverHelper.ChromeDriverHelper.profile_path, test_target.profile_path)
 
     def test___init___03(self):
         """引数有コンストラクタ"""
-        with self.assertRaisesRegex(ValueError, '^ChromeDriverHelper.__init__引数エラー:'):
-            test_target = ChromeDriverHelper("test")
+        with self.assertRaisesRegex(ValueError, '^ChromeDriverHelper.test___init___03引数エラー:'):
+            test_target = chromeDriverHelper.ChromeDriverHelper("test")
 
     def test___init___04(self):
         """引数有コンストラクタ"""
         with self.assertRaises(ValueError):
-            test_target = ChromeDriverHelper(self.url, "")
+            test_target = chromeDriverHelper.ChromeDriverHelper(self.url, "")
 
     def test___init___05(self):
         """引数有コンストラクタ"""
-        test_target = ChromeDriverHelper(self.url, self.selectors)
-        self.assertTrue(isinstance(test_target, ChromeDriverHelper))
-        self.assertTrue(isinstance(test_target.value_object, ChromeDriverHelperValue))
-        self.assertNotEqual(ChromeDriverHelper.value_object, test_target.value_object)
-        self.assertEqual(ChromeDriverHelper.root_path, test_target.root_path)
-        self.assertEqual(ChromeDriverHelper.driver_path, test_target.driver_path)
-        self.assertEqual(ChromeDriverHelper.chrome_path, test_target.chrome_path)
-        self.assertEqual(ChromeDriverHelper.profile_path, test_target.profile_path)
+        test_target = chromeDriverHelper.ChromeDriverHelper(self.url, self.selectors)
+        self.assertTrue(isinstance(test_target, chromeDriverHelper.ChromeDriverHelper))
+        self.assertTrue(isinstance(test_target.value_object, chromeDriverHelper.ChromeDriverHelperValue))
+        self.assertNotEqual(chromeDriverHelper.ChromeDriverHelper.value_object, test_target.value_object)
+        self.assertEqual(chromeDriverHelper.ChromeDriverHelper.root_path, test_target.root_path)
+        self.assertEqual(chromeDriverHelper.ChromeDriverHelper.driver_path, test_target.driver_path)
+        self.assertEqual(chromeDriverHelper.ChromeDriverHelper.chrome_path, test_target.chrome_path)
+        self.assertEqual(chromeDriverHelper.ChromeDriverHelper.profile_path, test_target.profile_path)
 
     def test___init___06(self):
         """引数有コンストラクタ"""
-        __web_file_list_helper = ChromeDriverHelper(self.url, self.selectors)
-        test_target = ChromeDriverHelper(__web_file_list_helper.value_object)
-        self.assertTrue(isinstance(test_target, ChromeDriverHelper))
-        self.assertTrue(isinstance(test_target.value_object, ChromeDriverHelperValue))
-        self.assertNotEqual(ChromeDriverHelper.value_object, test_target.value_object)
-        self.assertEqual(ChromeDriverHelper.root_path, test_target.root_path)
-        self.assertEqual(ChromeDriverHelper.driver_path, test_target.driver_path)
-        self.assertEqual(ChromeDriverHelper.chrome_path, test_target.chrome_path)
-        self.assertEqual(ChromeDriverHelper.profile_path, test_target.profile_path)
+        __web_file_list_helper = chromeDriverHelper.ChromeDriverHelper(self.url, self.selectors)
+        test_target = chromeDriverHelper.ChromeDriverHelper(__web_file_list_helper.value_object)
+        self.assertTrue(isinstance(test_target, chromeDriverHelper.ChromeDriverHelper))
+        self.assertTrue(isinstance(test_target.value_object, chromeDriverHelper.ChromeDriverHelperValue))
+        self.assertNotEqual(chromeDriverHelper.ChromeDriverHelper.value_object, test_target.value_object)
+        self.assertEqual(chromeDriverHelper.ChromeDriverHelper.root_path, test_target.root_path)
+        self.assertEqual(chromeDriverHelper.ChromeDriverHelper.driver_path, test_target.driver_path)
+        self.assertEqual(chromeDriverHelper.ChromeDriverHelper.chrome_path, test_target.chrome_path)
+        self.assertEqual(chromeDriverHelper.ChromeDriverHelper.profile_path, test_target.profile_path)
 
     def test_get_value_object_01(self):
-        test_target = ChromeDriverHelper(self.url, self.selectors)
-        self.assertTrue(isinstance(test_target.get_value_object(), ChromeDriverHelperValue))
+        test_target = chromeDriverHelper.ChromeDriverHelper(self.url, self.selectors)
+        self.assertTrue(isinstance(test_target.get_value_object(), chromeDriverHelper.ChromeDriverHelperValue))
 
     def test_get_url_01(self):
-        test_target = ChromeDriverHelper(self.url, self.selectors)
+        test_target = chromeDriverHelper.ChromeDriverHelper(self.url, self.selectors)
         self.assertTrue(isinstance(test_target.get_url(), str))
         self.assertEqual(test_target.get_url(), self.url)
 
     def test_get_selectors_01(self):
-        test_target = ChromeDriverHelper(self.url, self.selectors)
+        test_target = chromeDriverHelper.ChromeDriverHelper(self.url, self.selectors)
         self.assertTrue(isinstance(test_target.get_selectors(), dict))
         # NOTE: 何故か以下がfailする
         self.assertEqual(test_target.get_selectors(), self.selectors)
 
     def test_get_items_01(self):
         """スクレイピング結果を得る"""
-        test_target = ChromeDriverHelper(self.url, self.selectors)
+        test_target = chromeDriverHelper.ChromeDriverHelper(self.url, self.selectors)
         items = test_target.get_items()
         self.assertTrue(isinstance(items, dict))
         self.assertEqual(items['title_jp'], ['カテゴリー「若者」'])
@@ -120,10 +125,10 @@ class MyTestCase(unittest.TestCase):
 
     def test_open_tabs(self):
         """open_new_tabs/save_image/next_tab/previous_tab/closeメソッドのテスト"""
-        __driver = ChromeDriverHelper()
+        __driver = chromeDriverHelper.ChromeDriverHelper()
         __driver.open_new_tabs(self.image_url_list)
         for __url in self.image_url_list:
-            uri = UriHelper(__url)
+            uri = uriHelper.UriHelper(__url)
             __driver.save_image(uri.get_filename(), uri.get_ext())
             __driver.next_tab()
             time.sleep(1)
@@ -133,9 +138,9 @@ class MyTestCase(unittest.TestCase):
         for _ in self.image_url_list:
             __driver.close()
             time.sleep(1)
-        __web_file_list = WebFileListHelper(self.image_url_list,
-                                            '.png',
-                                            )
+        __web_file_list = webFileListHelper.WebFileListHelper(self.image_url_list,
+                                                              '.png',
+                                                              )
         self.assertTrue(__web_file_list.is_exist())
         # 後処理
         __web_file_list.delete_local_files()
@@ -143,13 +148,13 @@ class MyTestCase(unittest.TestCase):
 
     def test_download_image01(self):
         """download_imageメソッドのテスト"""
-        __driver = ChromeDriverHelper()
+        __driver = chromeDriverHelper.ChromeDriverHelper()
         for __url in self.image_url_list:
             __driver.download_image(__url)
             time.sleep(1)
-        __web_file_list = WebFileListHelper(self.image_url_list,
-                                            '.png',
-                                            )
+        __web_file_list = webFileListHelper.WebFileListHelper(self.image_url_list,
+                                                              '.png',
+                                                              )
         self.assertTrue(__web_file_list.is_exist())
         # 後処理
         __web_file_list.delete_local_files()
@@ -157,10 +162,10 @@ class MyTestCase(unittest.TestCase):
 
     def test_download_image02(self):
         """download_imageメソッドのテスト"""
-        __driver = ChromeDriverHelper()
-        __web_file_list = WebFileListHelper([self.image_data_uri],
-                                            '.jpg',
-                                            )
+        __driver = chromeDriverHelper.ChromeDriverHelper()
+        __web_file_list = webFileListHelper.WebFileListHelper([self.image_data_uri],
+                                                              '.jpg',
+                                                              )
         test_download_path = os.path.join(__driver.download_path,
                                           __web_file_list.get_path_list()[0]).replace(os.sep, '/')
         __driver.download_image(self.image_data_uri, test_download_path)
