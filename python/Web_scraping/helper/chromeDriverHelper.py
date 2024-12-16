@@ -50,10 +50,10 @@ import psutil
 from urllib.parse import urlparse
 
 from dataclasses import dataclass
+from selenium import webdriver
 from selenium.common import NoSuchElementException
 from selenium.webdriver import ActionChains
 from selenium.webdriver import ChromeOptions
-from selenium.webdriver.chrome import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
