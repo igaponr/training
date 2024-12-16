@@ -17,8 +17,13 @@ https://requests.readthedocs.io/projects/requests-html/en/latest/
 requests-htmlのGitHub
 https://github.com/kennethreitz/requests-html
 """
+import copy
+import json
+import os
+from dataclasses import dataclass
+import pyperclip
 from requests_html import HTMLSession
-from spreadsheet.spreadsheet.spreadsheet import *
+from helper import spreadsheet
 
 
 def is_num(s):
@@ -424,41 +429,41 @@ if __name__ == '__main__':  # インポート時には動かない
                   "wind_item_blow": "alt",
                   "wind_item_speed": "",
                   }
-    tenki = Tenki(main_url,
-                  main_css_root,
-                  main_css_selectors,
-                  main_attrs,
-                  )
-    tenki.save_text(RESULT_FILE_PATH + 'tenki1.txt')
+    tenki1 = Tenki(main_url,
+                   main_css_root,
+                   main_css_selectors,
+                   main_attrs,
+                   )
+    tenki1.save_text(RESULT_FILE_PATH + 'tenki1.txt')
 
-    json_keyfile_name = 'C:\\Git\\igapon50\\traning\\python\\Web_scraping\\tenki-347610-1bc0fec79f90.json'
+    json_keyfile_name = (os.path.dirname(__file__) + r"\..\..\..\json\tenki-347610-1bc0fec79f90.json")
     workbook_name = '天気予報'
     worksheet_name = '七尾市和倉町data'
-    spreadsheet = Spreadsheet(json_keyfile_name,
-                              workbook_name,
-                              worksheet_name,
-                              )
-    spreadsheet.save_text(RESULT_FILE_PATH + 'spreadsheet1.txt')
-    spreadsheet.clear_worksheet()
-    spreadsheet.write_dict_columns(tenki.get_result_forecasts(), (1, 1))
-    main_num = len(tenki.get_result_forecasts())
-    spreadsheet.write_dict_columns(tenki.get_result_counters(), (1, 1 + main_num))
+    spreadsheet1 = spreadsheet.Spreadsheet(json_keyfile_name,
+                                           workbook_name,
+                                           worksheet_name,
+                                           )
+    spreadsheet1.save_text(RESULT_FILE_PATH + 'spreadsheet1.txt')
+    spreadsheet1.clear_worksheet()
+    spreadsheet1.write_dict_columns(tenki1.get_result_forecasts(), (1, 1))
+    main_num = len(tenki1.get_result_forecasts())
+    spreadsheet1.write_dict_columns(tenki1.get_result_counters(), (1, 1 + main_num))
     worksheet_name = '七尾市和倉町conv'
-    spreadsheet = Spreadsheet(json_keyfile_name,
-                              workbook_name,
-                              worksheet_name,
-                              )
-    spreadsheet.save_text(RESULT_FILE_PATH + 'spreadsheet2.txt')
-    tenki.special_func_temp()
-    spreadsheet.clear_worksheet()
-    spreadsheet.write_dict_columns(tenki.get_result_forecasts(), (1, 1))
-    main_num = len(tenki.get_result_forecasts())
-    spreadsheet.write_dict_columns(tenki.get_result_counters(), (1, 1 + main_num))
+    spreadsheet1 = spreadsheet.Spreadsheet(json_keyfile_name,
+                                           workbook_name,
+                                           worksheet_name,
+                                           )
+    spreadsheet1.save_text(RESULT_FILE_PATH + 'spreadsheet2.txt')
+    tenki1.special_func_temp()
+    spreadsheet1.clear_worksheet()
+    spreadsheet1.write_dict_columns(tenki1.get_result_forecasts(), (1, 1))
+    main_num = len(tenki1.get_result_forecasts())
+    spreadsheet1.write_dict_columns(tenki1.get_result_counters(), (1, 1 + main_num))
     worksheet_name = '七尾市和倉町'
-    spreadsheet = Spreadsheet(json_keyfile_name,
-                              workbook_name,
-                              worksheet_name,
-                              )
-    spreadsheet.save_text(RESULT_FILE_PATH + 'spreadsheet3.txt')
-    spreadsheet.clear_worksheet()
-    spreadsheet.write_dict_columns(tenki.create_LINE_BOT_TOBA_format(), (1, 1))
+    spreadsheet1 = spreadsheet.Spreadsheet(json_keyfile_name,
+                                           workbook_name,
+                                           worksheet_name,
+                                           )
+    spreadsheet1.save_text(RESULT_FILE_PATH + 'spreadsheet3.txt')
+    spreadsheet1.clear_worksheet()
+    spreadsheet1.write_dict_columns(tenki1.create_LINE_BOT_TOBA_format(), (1, 1))
