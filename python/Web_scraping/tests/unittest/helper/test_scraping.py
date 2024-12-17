@@ -1,5 +1,6 @@
 import unittest
-from helper.scraping import *
+from selenium.webdriver.common.by import By
+from helper import scraping
 
 
 class MyTestCase(unittest.TestCase):
@@ -25,23 +26,23 @@ class MyTestCase(unittest.TestCase):
     def test___init___01(self):
         """引数無コンストラクタ"""
         with self.assertRaises(ValueError):
-            test_target = Scraping()
+            test_target = scraping.Scraping()
 
     def test___init___02(self):
         """引数無コンストラクタ"""
         with self.assertRaises(ValueError):
-            test_target = Scraping(self.site_url)
+            test_target = scraping.Scraping(self.site_url)
 
     def test___init___03(self):
         """引数有コンストラクタ"""
-        test_target = Scraping(self.site_url, self.selectors)
-        self.assertTrue(isinstance(test_target, Scraping))
-        self.assertNotEqual(Scraping.value_object, test_target.value_object)
+        test_target = scraping.Scraping(self.site_url, self.selectors)
+        self.assertTrue(isinstance(test_target, scraping.Scraping))
+        self.assertNotEqual(scraping.Scraping.value_object, test_target.value_object)
         self.assertEqual(self.site_url, test_target.value_object.site_url)
 
     def test_scraping_chrome_driver(self):
         """スクレイピング結果"""
-        test_target = Scraping(self.site_url, self.selectors)
+        test_target = scraping.Scraping(self.site_url, self.selectors)
         # TODO: 以下に対応させたい。selectorsのkeysとvaluesをスクレイピングして、結果をdictでvalue_objectに保持させる
         # test_target.scraping_chrome_driver()
 

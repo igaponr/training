@@ -43,7 +43,7 @@ import os
 import copy
 import socket
 import subprocess
-from datetime import time
+import time
 import inspect
 
 import psutil
@@ -112,7 +112,7 @@ class ChromeDriverHelper:
     """
     value_object: ChromeDriverHelperValue = None
     download_path: str = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                                      'download').replace(os.sep, '/')
+                                      '../download').replace(os.sep, '/')
 
     __driver = None
     __wait = None

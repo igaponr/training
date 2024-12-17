@@ -1,5 +1,5 @@
 import unittest
-from helper.uriHelper import *
+from helper import uriHelper
 
 
 class MyTestCase(unittest.TestCase):
@@ -21,83 +21,83 @@ class MyTestCase(unittest.TestCase):
     def test___init___01(self):
         """引数無コンストラクタ"""
         with self.assertRaises(ValueError):
-            UriHelper()
+            uriHelper.UriHelper()
 
     def test___init___02(self):
         """引数有コンストラクタ"""
         with self.assertRaises(ValueError):
-            UriHelper("test")
+            uriHelper.UriHelper("test")
 
     def test___init___03(self):
         """引数有コンストラクタ"""
-        test_target = UriHelper(self.image_url)
-        self.assertTrue(isinstance(test_target, UriHelper))
-        self.assertTrue(isinstance(test_target.value_object, UriHelperValue))
-        self.assertEqual(UriHelper.value_object, None)
-        self.assertNotEqual(UriHelper.value_object, test_target.value_object)
-        self.assertEqual(UriHelperValue.uri, None)
+        test_target = uriHelper.UriHelper(self.image_url)
+        self.assertTrue(isinstance(test_target, uriHelper.UriHelper))
+        self.assertTrue(isinstance(test_target.value_object, uriHelper.UriHelperValue))
+        self.assertEqual(uriHelper.UriHelper.value_object, None)
+        self.assertNotEqual(uriHelper.UriHelper.value_object, test_target.value_object)
+        self.assertEqual(uriHelper.UriHelperValue.uri, None)
         self.assertEqual(test_target.value_object.uri, self.image_url)
 
     def test___init___04(self):
         """引数有コンストラクタ"""
-        test_target = UriHelper(self.data_uri)
-        self.assertTrue(isinstance(test_target, UriHelper))
-        self.assertTrue(isinstance(test_target.value_object, UriHelperValue))
-        self.assertEqual(UriHelper.value_object, None)
-        self.assertNotEqual(UriHelper.value_object, test_target.value_object)
-        self.assertEqual(UriHelperValue.uri, None)
+        test_target = uriHelper.UriHelper(self.data_uri)
+        self.assertTrue(isinstance(test_target, uriHelper.UriHelper))
+        self.assertTrue(isinstance(test_target.value_object, uriHelper.UriHelperValue))
+        self.assertEqual(uriHelper.UriHelper.value_object, None)
+        self.assertNotEqual(uriHelper.UriHelper.value_object, test_target.value_object)
+        self.assertEqual(uriHelper.UriHelperValue.uri, None)
         self.assertEqual(test_target.value_object.uri, self.data_uri)
 
     def test_is_data_uri_01(self):
         """対象URLはData URIである"""
-        test_target = UriHelper(self.image_url)
+        test_target = uriHelper.UriHelper(self.image_url)
         self.assertFalse(test_target.is_data_uri(self.image_url))
 
     def test_is_data_uri_02(self):
         """対象URLはData URIである"""
-        test_target = UriHelper(self.data_uri)
+        test_target = uriHelper.UriHelper(self.data_uri)
         self.assertTrue(test_target.is_data_uri(self.data_uri))
 
     def test_is_jpeg_data_uri_01(self):
         """対象URLはData URIである"""
-        test_target = UriHelper(self.image_url)
+        test_target = uriHelper.UriHelper(self.image_url)
         self.assertFalse(test_target.is_jpeg_data_uri(self.image_url))
 
     def test_is_jpeg_data_uri_02(self):
         """対象URLはData URIである"""
-        test_target = UriHelper(self.data_uri)
+        test_target = uriHelper.UriHelper(self.data_uri)
         self.assertTrue(test_target.is_jpeg_data_uri(self.data_uri))
 
     def test_get_uri_01(self):
-        test_target = UriHelper(self.image_url)
+        test_target = uriHelper.UriHelper(self.image_url)
         self.assertEqual(test_target.get_uri(), self.image_url)
 
     def test_get_uri_02(self):
-        test_target = UriHelper(self.data_uri)
+        test_target = uriHelper.UriHelper(self.data_uri)
         self.assertEqual(test_target.get_uri(), self.data_uri)
 
     def test_is_enable_filename_01(self):
-        test_target = UriHelper(self.image_url)
+        test_target = uriHelper.UriHelper(self.image_url)
         self.assertTrue(test_target.is_enable_filename())
 
     def test_is_enable_filename_02(self):
-        test_target = UriHelper(self.data_uri)
+        test_target = uriHelper.UriHelper(self.data_uri)
         self.assertFalse(test_target.is_enable_filename())
 
     def test_get_filename_01(self):
-        test_target = UriHelper(self.image_url)
+        test_target = uriHelper.UriHelper(self.image_url)
         self.assertEqual(test_target.get_filename(), 'fashion_dekora')
 
     def test_get_filename_02(self):
-        test_target = UriHelper(self.data_uri)
+        test_target = uriHelper.UriHelper(self.data_uri)
         self.assertEqual(test_target.get_filename(), None)
 
     def test_get_ext_01(self):
-        test_target = UriHelper(self.image_url)
+        test_target = uriHelper.UriHelper(self.image_url)
         self.assertEqual(test_target.get_ext(), '.png')
 
     def test_get_ext_02(self):
-        test_target = UriHelper(self.data_uri)
+        test_target = uriHelper.UriHelper(self.data_uri)
         self.assertEqual(test_target.get_ext(), '.jpg')
 
 

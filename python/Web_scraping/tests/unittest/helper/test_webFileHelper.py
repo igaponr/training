@@ -1,5 +1,6 @@
+import os
 import unittest
-from helper.webFileHelper import *
+from helper import webFileHelper
 
 
 class MyTestCase(unittest.TestCase):
@@ -33,73 +34,73 @@ class MyTestCase(unittest.TestCase):
     def test___init___01(self):
         """引数無コンストラクタ"""
         with self.assertRaises(ValueError):
-            WebFileHelper()
+            webFileHelper.WebFileHelper()
 
     def test___init___02(self):
         """引数有コンストラクタ"""
         with self.assertRaises(ValueError):
-            WebFileHelper(self.image_url_list)
+            webFileHelper.WebFileHelper(self.image_url_list)
 
     def test___init___03(self):
         """引数有コンストラクタ"""
-        test_target = WebFileHelper(self.image_url)
-        self.assertTrue(isinstance(test_target, WebFileHelper))
-        self.assertEqual(WebFileHelper.ext_list, test_target.ext_list)
-        self.assertEqual(WebFileHelper.value_object, None)
-        self.assertNotEqual(WebFileHelper.value_object, test_target.value_object)
-        self.assertEqual(WebFileHelper.download_file_name, None)
-        self.assertNotEqual(WebFileHelper.download_file_name, test_target.get_download_file_name())
-        self.assertNotEqual(WebFileHelper.start_ext, None)
-        self.assertEqual(WebFileHelper.start_ext, test_target.get_start_ext())
-        self.assertNotEqual(WebFileHelper.download_path, None)
-        self.assertEqual(WebFileHelper.download_path, test_target.get_download_path())
+        test_target = webFileHelper.WebFileHelper(self.image_url)
+        self.assertTrue(isinstance(test_target, webFileHelper.WebFileHelper))
+        self.assertEqual(webFileHelper.WebFileHelper.ext_list, test_target.ext_list)
+        self.assertEqual(webFileHelper.WebFileHelper.value_object, None)
+        self.assertNotEqual(webFileHelper.WebFileHelper.value_object, test_target.value_object)
+        self.assertEqual(webFileHelper.WebFileHelper.download_file_name, None)
+        self.assertNotEqual(webFileHelper.WebFileHelper.download_file_name, test_target.get_download_file_name())
+        self.assertNotEqual(webFileHelper.WebFileHelper.start_ext, None)
+        self.assertEqual(webFileHelper.WebFileHelper.start_ext, test_target.get_start_ext())
+        self.assertNotEqual(webFileHelper.WebFileHelper.download_path, None)
+        self.assertEqual(webFileHelper.WebFileHelper.download_path, test_target.get_download_path())
         self.assertEqual(self.image_url, test_target.get_url())
 
     def test___init___04(self):
         """引数有コンストラクタ"""
-        test_target = WebFileHelper(self.data_uri, self.file_name)
-        self.assertTrue(isinstance(test_target, WebFileHelper))
-        self.assertEqual(WebFileHelper.ext_list, test_target.ext_list)
-        self.assertEqual(WebFileHelper.value_object, None)
-        self.assertNotEqual(WebFileHelper.value_object, test_target.value_object)
-        self.assertEqual(WebFileHelper.download_file_name, None)
-        self.assertEqual(WebFileHelper.download_file_name, test_target.download_file_name)
-        self.assertNotEqual(WebFileHelper.start_ext, None)
-        self.assertEqual(WebFileHelper.start_ext, test_target.start_ext)
-        self.assertNotEqual(WebFileHelper.download_path, None)
-        self.assertEqual(WebFileHelper.download_path, test_target.download_path)
+        test_target = webFileHelper.WebFileHelper(self.data_uri, self.file_name)
+        self.assertTrue(isinstance(test_target, webFileHelper.WebFileHelper))
+        self.assertEqual(webFileHelper.WebFileHelper.ext_list, test_target.ext_list)
+        self.assertEqual(webFileHelper.WebFileHelper.value_object, None)
+        self.assertNotEqual(webFileHelper.WebFileHelper.value_object, test_target.value_object)
+        self.assertEqual(webFileHelper.WebFileHelper.download_file_name, None)
+        self.assertEqual(webFileHelper.WebFileHelper.download_file_name, test_target.download_file_name)
+        self.assertNotEqual(webFileHelper.WebFileHelper.start_ext, None)
+        self.assertEqual(webFileHelper.WebFileHelper.start_ext, test_target.start_ext)
+        self.assertNotEqual(webFileHelper.WebFileHelper.download_path, None)
+        self.assertEqual(webFileHelper.WebFileHelper.download_path, test_target.download_path)
         self.assertEqual(self.data_uri, test_target.get_url())
 
     def test_is_image(self):
         """対象URLは画像ファイルである"""
-        test_target = WebFileHelper(self.image_url)
+        test_target = webFileHelper.WebFileHelper(self.image_url)
         self.assertTrue(test_target.is_image())
 
     def test_is_exist(self):
         """対象URLのファイルはローカルに存在する"""
-        test_target = WebFileHelper(self.image_url)
+        test_target = webFileHelper.WebFileHelper(self.image_url)
         self.assertFalse(test_target.is_exist())
 
     def test_get_url(self):
         """対象URLを取得する"""
-        test_target = WebFileHelper(self.image_url)
+        test_target = webFileHelper.WebFileHelper(self.image_url)
         self.assertEqual(test_target.get_url(), self.image_url)
 
     def test_get_path(self):
         """ファイルのフルパスを得る"""
-        test_target = WebFileHelper(self.image_url)
+        test_target = webFileHelper.WebFileHelper(self.image_url)
         self.assertEqual(test_target.get_path(), os.path.join(test_target.get_download_path(),
                                                               test_target.get_filename() + test_target.get_ext(),
                                                               ).replace(os.sep, '/'))
 
     def test_get_folder_path(self):
         """フォルダーパスを得る"""
-        test_target = WebFileHelper(self.image_url)
+        test_target = webFileHelper.WebFileHelper(self.image_url)
         self.assertEqual(test_target.get_download_path(), test_target.value_object.download_path)
 
     def test_download_requests(self):
         """フォルダーパスを得る"""
-        test_target = WebFileHelper(self.image_url)
+        test_target = webFileHelper.WebFileHelper(self.image_url)
         test_target.download_requests()
         self.assertTrue(test_target.is_exist())
         # 後処理
