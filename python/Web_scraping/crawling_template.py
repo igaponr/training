@@ -14,6 +14,7 @@ site_selectors, page_selectors, image_selectorsをサイトに合わせて変更
 
 from helper.crawling import *
 from helper.slack_message_api import *
+from selenium.webdriver.common.by import By
 
 site_selectors = {
     Crawling.URLS_TARGET: [
