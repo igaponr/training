@@ -77,7 +77,9 @@ sys.setrecursionlimit(10000)
 class IrvineHelperValue:
     """Irvineのヘルパーオブジェクト"""
     exe_path: str = r'c:\Program1\irvine1_3_0\irvine.exe'.replace(os.sep, '/')
-    list_path: str = r'../../irvine_download_list.txt'
+    # list_path: str = r'../../irvine_download_list.txt'
+    list_path: str = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                  '../irvine_download_list.txt').replace(os.sep, '/')
 
     def __init__(self, exe_path=exe_path, list_path=list_path):
         """完全コンストラクタパターン

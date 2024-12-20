@@ -73,7 +73,9 @@ class Crawling:
     value_object: CrawlingValue = None
     site_selectors: dict = None
     crawling_items: dict = {URLS_TARGET: [], URLS_EXCLUSION: [], URLS_FAILURE: []}
-    crawling_file_path: str = '../crawling_list.txt'
+    # crawling_file_path: str = '../crawling_list.txt'
+    crawling_file_path: str = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                           '../crawling_list.txt').replace(os.sep, '/')
 
     def __init__(self,
                  value_object=None,
