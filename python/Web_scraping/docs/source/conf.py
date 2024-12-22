@@ -8,7 +8,8 @@
 import os
 import sys
 
-sys.path.insert(0, os.path.abspath('../'))
+sys.path.insert(0, os.path.abspath('../../'))
+# print(sys.path)
 project = 'Web_scraping'
 copyright = '2024, Ryosuke Igarashi'
 author = 'Ryosuke Igarashi'
@@ -25,12 +26,10 @@ extensions = [
 templates_path = ['_templates']
 exclude_patterns = []
 
-
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
 # html_theme = 'alabaster'
 html_theme = 'sphinx_rtd_theme'
 # html_theme = 'sphinx_material'
-# html_theme = 'pydata-sphinx-theme'
 html_static_path = ['_static']
