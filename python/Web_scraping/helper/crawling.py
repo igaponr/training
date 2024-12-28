@@ -23,11 +23,12 @@ from helper import webFileListHelper
 from helper import webFileHelper
 from helper import line_message_api
 from helper import slack_message_api
+from helper.status import Status
 
 
 @dataclass(frozen=True)
 class CrawlingValue:
-    """値オブジェクト"""
+    """Crawlingの値オブジェクトクラス"""
     site_url: str = None
     site_selectors: dict = None
     crawling_items: dict = None
@@ -66,7 +67,7 @@ class CrawlingValue:
 
 
 class Crawling:
-    """クローリング"""
+    """クローリングクラス"""
     URLS_TARGET = "page_urls"
     URLS_EXCLUSION = "exclusion_urls"
     URLS_FAILURE = "failure_urls"
@@ -374,6 +375,9 @@ class Crawling:
             page_urls = crawling_items[self.URLS_TARGET]
         total_pages = len(page_urls)
         for i, page_url in enumerate(page_urls):
+            status = Status()
+            if status is not None and not status.is_running():
+                break
             current_page = i + 1
             remaining_pages = total_pages - current_page
             print(page_url)
@@ -453,6 +457,9 @@ class Crawling:
         if self.URLS_TARGET in crawling_items:
             page_urls = crawling_items[self.URLS_TARGET]
         for page_url in page_urls:
+            status = Status()
+            if status is not None and not status.is_running():
+                break
             print(page_url)
             if self.is_url_included_exclusion_list(page_url):
                 self.move_url_from_page_urls_to_exclusion_urls(page_url)
