@@ -377,6 +377,7 @@ class Crawling:
         for i, page_url in enumerate(page_urls):
             status = Status()
             if status is not None and not status.is_running():
+                print("stop status")
                 break
             current_page = i + 1
             remaining_pages = total_pages - current_page
@@ -459,6 +460,7 @@ class Crawling:
         for page_url in page_urls:
             status = Status()
             if status is not None and not status.is_running():
+                print("stop status")
                 break
             print(page_url)
             if self.is_url_included_exclusion_list(page_url):
