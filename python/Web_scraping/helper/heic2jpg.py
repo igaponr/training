@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-指定path以下を再帰的に検索して、見つかったHEICファイルからJPEGファイルを生成する
+HEICファイルをJPGファイルを生成する
 """
 import os
 import argparse
@@ -9,27 +9,35 @@ from PIL import Image
 import imagecodecs
 
 
-def heic_to_jpg(heic_path, jpg_path):
-    """HEIC画像をJPG画像に変換します。"""
+def heic_to_jpg(heic_path: str, _jpg_path: str) -> None:
+    """HEIC画像からJPG画像を生成する
+
+    Returns:
+        object: None
+    """
     try:
         with open(heic_path, 'rb') as f:
             data = f.read()
         decoded_image = imagecodecs.imread(data, 'heif')
         image = Image.fromarray(decoded_image)
-        image.save(jpg_path, "JPEG")
-        print(f"{heic_path} を {jpg_path} に変換しました。")
+        image.save(_jpg_path, "JPEG")
+        print(f"{heic_path} を {_jpg_path} に変換しました。")
     except Exception as e:
         print(f"変換エラー: {e}: {heic_path}")
 
 
-def convert_all_heic_to_jpg(folder_path):
-    """指定されたフォルダ内のすべてのHEICファイルをJPGに変換します。"""
+def convert_all_heic_to_jpg(folder_path: str) -> None:
+    """指定されたフォルダ以下を再帰的に検索して、見つかったHEICファイルからJPEGファイルを生成する
+
+    Returns:
+        object: None
+    """
     for root, _, files in os.walk(folder_path):  # サブディレクトリも処理
         for filename in files:
             if filename.lower().endswith(".heic"):
                 heic_path = os.path.join(root, filename)
-                jpg_path = os.path.join(root, filename[:-5] + ".jpg")
-                heic_to_jpg(heic_path, jpg_path)
+                _jpg_path = os.path.join(root, filename[:-5] + ".jpg")
+                heic_to_jpg(heic_path, _jpg_path)
 
 
 if __name__ == "__main__":
