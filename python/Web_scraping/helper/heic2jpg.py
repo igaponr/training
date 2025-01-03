@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-HEICファイルをJPGファイルを生成する
+HEICファイルからJPGファイルを生成する
 """
 import os
 import argparse
