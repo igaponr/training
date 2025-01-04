@@ -6,6 +6,7 @@ HEICファイルからJPGファイルを生成する
 import os
 import argparse
 from PIL import Image
+import pyheif
 import imagecodecs
 
 

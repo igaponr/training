@@ -1,0 +1,1824 @@
+<?xml version="1.0" standalone="no"?>
+<mlt LC_NUMERIC="C" version="7.28.0" title="Shotcut version 24.11.17" producer="main_bin">
+  <profile description="automatic" width="1920" height="1080" progressive="1" sample_aspect_num="1" sample_aspect_den="1" display_aspect_num="1920" display_aspect_den="1080" frame_rate_num="18750" frame_rate_den="937" colorspace="601"/>
+  <producer id="producer1" in="00:00:00.000" out="00:00:18.140">
+    <property name="length">00:00:18.190</property>
+    <property name="eof">pause</property>
+    <property name="resource">D:/git/igaponr/training/python/Movie/せんちゃんネル/Clouds - 35573.mp4</property>
+    <property name="audio_index">1</property>
+    <property name="video_index">0</property>
+    <property name="mute_on_pause">0</property>
+    <property name="mlt_service">avformat-novalidate</property>
+    <property name="seekable">1</property>
+    <property name="aspect_ratio">1</property>
+    <property name="creation_time">2021-03-06T02:06:49</property>
+    <property name="global_feed">1</property>
+    <property name="xml">was here</property>
+    <property name="shotcut:hash">97e8d19532c15b7954398111c39c8a01</property>
+  </producer>
+  <producer id="producer2" in="00:00:00.000" out="00:00:59.968">
+    <property name="length">00:01:00.050</property>
+    <property name="eof">pause</property>
+    <property name="resource">D:/git/igaponr/training/python/Movie/せんちゃんネル/晴れの日.mp3</property>
+    <property name="audio_index">0</property>
+    <property name="video_index">-1</property>
+    <property name="mute_on_pause">0</property>
+    <property name="mlt_service">avformat-novalidate</property>
+    <property name="seekable">1</property>
+    <property name="global_feed">1</property>
+    <property name="xml">was here</property>
+    <property name="shotcut:hash">7dee00bd26e8d992717d3efd70fa3d2b</property>
+  </producer>
+  <chain id="chain0" out="00:00:01.149">
+    <property name="length">00:00:01.199</property>
+    <property name="eof">pause</property>
+    <property name="resource">001_四国めたん（ノーマル）_せんチャンネルです.wav</property>
+    <property name="mlt_service">avformat-novalidate</property>
+    <property name="meta.media.nb_streams">1</property>
+    <property name="meta.media.0.stream.type">audio</property>
+    <property name="meta.media.0.codec.sample_fmt">s16</property>
+    <property name="meta.media.0.codec.sample_rate">24000</property>
+    <property name="meta.media.0.codec.channels">1</property>
+    <property name="meta.media.0.codec.layout">mono</property>
+    <property name="meta.media.0.codec.name">pcm_s16le</property>
+    <property name="meta.media.0.codec.long_name">PCM signed 16-bit little-endian</property>
+    <property name="meta.media.0.codec.bit_rate">384000</property>
+    <property name="seekable">1</property>
+    <property name="audio_index">0</property>
+    <property name="video_index">-1</property>
+    <property name="creation_time">2025-01-03T09:24:26</property>
+    <property name="astream">0</property>
+    <property name="shotcut:skipConvert">1</property>
+    <property name="xml">was here</property>
+    <property name="shotcut:hash">5f372f149343159c528a5e2f573cd232</property>
+  </chain>
+  <chain id="chain1" out="00:00:07.796">
+    <property name="length">00:00:07.846</property>
+    <property name="eof">pause</property>
+    <property name="resource">002_四国めたん（ノーマル）_2024年末に、デ….wav</property>
+    <property name="mlt_service">avformat-novalidate</property>
+    <property name="meta.media.nb_streams">1</property>
+    <property name="meta.media.0.stream.type">audio</property>
+    <property name="meta.media.0.codec.sample_fmt">s16</property>
+    <property name="meta.media.0.codec.sample_rate">24000</property>
+    <property name="meta.media.0.codec.channels">1</property>
+    <property name="meta.media.0.codec.layout">mono</property>
+    <property name="meta.media.0.codec.name">pcm_s16le</property>
+    <property name="meta.media.0.codec.long_name">PCM signed 16-bit little-endian</property>
+    <property name="meta.media.0.codec.bit_rate">384000</property>
+    <property name="seekable">1</property>
+    <property name="audio_index">0</property>
+    <property name="video_index">-1</property>
+    <property name="creation_time">2025-01-03T09:24:26</property>
+    <property name="astream">0</property>
+    <property name="shotcut:skipConvert">1</property>
+    <property name="xml">was here</property>
+    <property name="shotcut:hash">bcfe6491e071bb042ce5227594a1495f</property>
+  </chain>
+  <chain id="chain2" out="00:00:05.947">
+    <property name="length">00:00:05.997</property>
+    <property name="eof">pause</property>
+    <property name="resource">003_四国めたん（ノーマル）_ディスカバリーワー….wav</property>
+    <property name="mlt_service">avformat-novalidate</property>
+    <property name="meta.media.nb_streams">1</property>
+    <property name="meta.media.0.stream.type">audio</property>
+    <property name="meta.media.0.codec.sample_fmt">s16</property>
+    <property name="meta.media.0.codec.sample_rate">24000</property>
+    <property name="meta.media.0.codec.channels">1</property>
+    <property name="meta.media.0.codec.layout">mono</property>
+    <property name="meta.media.0.codec.name">pcm_s16le</property>
+    <property name="meta.media.0.codec.long_name">PCM signed 16-bit little-endian</property>
+    <property name="meta.media.0.codec.bit_rate">384000</property>
+    <property name="seekable">1</property>
+    <property name="audio_index">0</property>
+    <property name="video_index">-1</property>
+    <property name="creation_time">2025-01-03T09:24:26</property>
+    <property name="astream">0</property>
+    <property name="shotcut:skipConvert">1</property>
+    <property name="xml">was here</property>
+    <property name="shotcut:hash">92409343100e12ec2f41c66c1a7bdd27</property>
+  </chain>
+  <chain id="chain3" out="00:00:03.648">
+    <property name="length">00:00:03.698</property>
+    <property name="eof">pause</property>
+    <property name="resource">004_四国めたん（ノーマル）_そのご、へいじょう….wav</property>
+    <property name="mlt_service">avformat-novalidate</property>
+    <property name="meta.media.nb_streams">1</property>
+    <property name="meta.media.0.stream.type">audio</property>
+    <property name="meta.media.0.codec.sample_fmt">s16</property>
+    <property name="meta.media.0.codec.sample_rate">24000</property>
+    <property name="meta.media.0.codec.channels">1</property>
+    <property name="meta.media.0.codec.layout">mono</property>
+    <property name="meta.media.0.codec.name">pcm_s16le</property>
+    <property name="meta.media.0.codec.long_name">PCM signed 16-bit little-endian</property>
+    <property name="meta.media.0.codec.bit_rate">384000</property>
+    <property name="seekable">1</property>
+    <property name="audio_index">0</property>
+    <property name="video_index">-1</property>
+    <property name="creation_time">2025-01-03T09:24:26</property>
+    <property name="astream">0</property>
+    <property name="shotcut:skipConvert">1</property>
+    <property name="xml">was here</property>
+    <property name="shotcut:hash">69904d4e4d47e79bf385add09cf04982</property>
+  </chain>
+  <chain id="chain4" out="00:00:02.699">
+    <property name="length">00:00:02.749</property>
+    <property name="eof">pause</property>
+    <property name="resource">005_四国めたん（ノーマル）_朱雀門が大きくて印….wav</property>
+    <property name="mlt_service">avformat-novalidate</property>
+    <property name="meta.media.nb_streams">1</property>
+    <property name="meta.media.0.stream.type">audio</property>
+    <property name="meta.media.0.codec.sample_fmt">s16</property>
+    <property name="meta.media.0.codec.sample_rate">24000</property>
+    <property name="meta.media.0.codec.channels">1</property>
+    <property name="meta.media.0.codec.layout">mono</property>
+    <property name="meta.media.0.codec.name">pcm_s16le</property>
+    <property name="meta.media.0.codec.long_name">PCM signed 16-bit little-endian</property>
+    <property name="meta.media.0.codec.bit_rate">384000</property>
+    <property name="seekable">1</property>
+    <property name="audio_index">0</property>
+    <property name="video_index">-1</property>
+    <property name="creation_time">2025-01-03T09:24:26</property>
+    <property name="astream">0</property>
+    <property name="shotcut:skipConvert">1</property>
+    <property name="xml">was here</property>
+    <property name="shotcut:hash">2067ff595d067eb71a17bdb7c97ecda6</property>
+  </chain>
+  <chain id="chain5" out="00:00:03.548">
+    <property name="length">00:00:03.598</property>
+    <property name="eof">pause</property>
+    <property name="resource">006_四国めたん（ノーマル）_カービーカフェでは….wav</property>
+    <property name="mlt_service">avformat-novalidate</property>
+    <property name="meta.media.nb_streams">1</property>
+    <property name="meta.media.0.stream.type">audio</property>
+    <property name="meta.media.0.codec.sample_fmt">s16</property>
+    <property name="meta.media.0.codec.sample_rate">24000</property>
+    <property name="meta.media.0.codec.channels">1</property>
+    <property name="meta.media.0.codec.layout">mono</property>
+    <property name="meta.media.0.codec.name">pcm_s16le</property>
+    <property name="meta.media.0.codec.long_name">PCM signed 16-bit little-endian</property>
+    <property name="meta.media.0.codec.bit_rate">384000</property>
+    <property name="seekable">1</property>
+    <property name="audio_index">0</property>
+    <property name="video_index">-1</property>
+    <property name="creation_time">2025-01-03T09:24:26</property>
+    <property name="astream">0</property>
+    <property name="shotcut:skipConvert">1</property>
+    <property name="xml">was here</property>
+    <property name="shotcut:hash">9141beeeada94fee544852230fe1e386</property>
+  </chain>
+  <chain id="chain6" out="00:00:02.099">
+    <property name="length">00:00:02.149</property>
+    <property name="eof">pause</property>
+    <property name="resource">007_四国めたん（ノーマル）_楽しかったです。ま….wav</property>
+    <property name="mlt_service">avformat-novalidate</property>
+    <property name="meta.media.nb_streams">1</property>
+    <property name="meta.media.0.stream.type">audio</property>
+    <property name="meta.media.0.codec.sample_fmt">s16</property>
+    <property name="meta.media.0.codec.sample_rate">24000</property>
+    <property name="meta.media.0.codec.channels">1</property>
+    <property name="meta.media.0.codec.layout">mono</property>
+    <property name="meta.media.0.codec.name">pcm_s16le</property>
+    <property name="meta.media.0.codec.long_name">PCM signed 16-bit little-endian</property>
+    <property name="meta.media.0.codec.bit_rate">384000</property>
+    <property name="seekable">1</property>
+    <property name="audio_index">0</property>
+    <property name="video_index">-1</property>
+    <property name="creation_time">2025-01-03T09:24:26</property>
+    <property name="astream">0</property>
+    <property name="shotcut:skipConvert">1</property>
+    <property name="xml">was here</property>
+    <property name="shotcut:hash">1d718fc72d011187d49084adc7ad063e</property>
+  </chain>
+  <producer id="producer0" in="00:00:00.000" out="03:60:00.000">
+    <property name="length">04:00:00.050</property>
+    <property name="eof">pause</property>
+    <property name="resource">C:/Users/igapon/Downloads/1229/002.jpg</property>
+    <property name="ttl">1</property>
+    <property name="aspect_ratio">1</property>
+    <property name="meta.media.progressive">1</property>
+    <property name="seekable">1</property>
+    <property name="format">1</property>
+    <property name="meta.media.width">4284</property>
+    <property name="meta.media.height">5712</property>
+    <property name="mlt_service">qimage</property>
+    <property name="creation_time">2025-01-03T07:54:56</property>
+    <property name="shotcut:skipConvert">1</property>
+    <property name="xml">was here</property>
+    <property name="shotcut:hash">2fb86cffdd214cefafa7b2622e8ce2d8</property>
+  </producer>
+  <producer id="producer3" in="00:00:00.000" out="03:60:00.000">
+    <property name="length">04:00:00.050</property>
+    <property name="eof">pause</property>
+    <property name="resource">C:/Users/igapon/Downloads/1229/003.jpg</property>
+    <property name="ttl">1</property>
+    <property name="aspect_ratio">1</property>
+    <property name="meta.media.progressive">1</property>
+    <property name="seekable">1</property>
+    <property name="format">1</property>
+    <property name="meta.media.width">4284</property>
+    <property name="meta.media.height">5712</property>
+    <property name="mlt_service">qimage</property>
+    <property name="creation_time">2025-01-03T07:54:57</property>
+    <property name="shotcut:skipConvert">1</property>
+    <property name="xml">was here</property>
+    <property name="shotcut:hash">1b08333b299ebc8f5d3ef0964090c3b5</property>
+  </producer>
+  <producer id="producer4" in="00:00:00.000" out="03:60:00.000">
+    <property name="length">04:00:00.050</property>
+    <property name="eof">pause</property>
+    <property name="resource">C:/Users/igapon/Downloads/1229/006.jpg</property>
+    <property name="ttl">1</property>
+    <property name="aspect_ratio">1</property>
+    <property name="meta.media.progressive">1</property>
+    <property name="seekable">1</property>
+    <property name="format">1</property>
+    <property name="meta.media.width">4284</property>
+    <property name="meta.media.height">5712</property>
+    <property name="mlt_service">qimage</property>
+    <property name="creation_time">2025-01-03T07:55:00</property>
+    <property name="shotcut:skipConvert">1</property>
+    <property name="xml">was here</property>
+    <property name="shotcut:hash">42ff0774f9ce12a7add676d5b9f40c07</property>
+  </producer>
+  <producer id="producer5" in="00:00:00.000" out="03:60:00.000">
+    <property name="length">04:00:00.050</property>
+    <property name="eof">pause</property>
+    <property name="resource">C:/Users/igapon/Downloads/1229/008.jpg</property>
+    <property name="ttl">1</property>
+    <property name="aspect_ratio">1</property>
+    <property name="meta.media.progressive">1</property>
+    <property name="seekable">1</property>
+    <property name="format">1</property>
+    <property name="meta.media.width">5712</property>
+    <property name="meta.media.height">4284</property>
+    <property name="mlt_service">qimage</property>
+    <property name="creation_time">2025-01-03T07:55:01</property>
+    <property name="shotcut:skipConvert">1</property>
+    <property name="xml">was here</property>
+    <property name="shotcut:hash">f057e6a26572c6d5e92e010a090a6745</property>
+  </producer>
+  <producer id="producer6" in="00:00:00.000" out="03:60:00.000">
+    <property name="length">04:00:00.050</property>
+    <property name="eof">pause</property>
+    <property name="resource">C:/Users/igapon/Downloads/1229/009.jpg</property>
+    <property name="ttl">1</property>
+    <property name="aspect_ratio">1</property>
+    <property name="meta.media.progressive">1</property>
+    <property name="seekable">1</property>
+    <property name="format">1</property>
+    <property name="meta.media.width">5712</property>
+    <property name="meta.media.height">4284</property>
+    <property name="mlt_service">qimage</property>
+    <property name="creation_time">2025-01-03T07:55:02</property>
+    <property name="shotcut:skipConvert">1</property>
+    <property name="xml">was here</property>
+    <property name="shotcut:hash">0ff8024c2d15b264db92967e427423ca</property>
+  </producer>
+  <producer id="producer7" in="00:00:00.000" out="03:60:00.000">
+    <property name="length">04:00:00.050</property>
+    <property name="eof">pause</property>
+    <property name="resource">C:/Users/igapon/Downloads/1229/010.jpg</property>
+    <property name="ttl">1</property>
+    <property name="aspect_ratio">1</property>
+    <property name="meta.media.progressive">1</property>
+    <property name="seekable">1</property>
+    <property name="format">1</property>
+    <property name="meta.media.width">4284</property>
+    <property name="meta.media.height">5712</property>
+    <property name="mlt_service">qimage</property>
+    <property name="creation_time">2025-01-03T07:55:04</property>
+    <property name="shotcut:skipConvert">1</property>
+    <property name="xml">was here</property>
+    <property name="shotcut:hash">90421ea8a3e7660bba55080d84a4b570</property>
+  </producer>
+  <producer id="producer8" in="00:00:00.000" out="03:60:00.000">
+    <property name="length">04:00:00.050</property>
+    <property name="eof">pause</property>
+    <property name="resource">C:/Users/igapon/Downloads/1229/011.jpg</property>
+    <property name="ttl">1</property>
+    <property name="aspect_ratio">1</property>
+    <property name="meta.media.progressive">1</property>
+    <property name="seekable">1</property>
+    <property name="format">1</property>
+    <property name="meta.media.width">4284</property>
+    <property name="meta.media.height">5712</property>
+    <property name="mlt_service">qimage</property>
+    <property name="creation_time">2025-01-03T07:55:05</property>
+    <property name="shotcut:skipConvert">1</property>
+    <property name="xml">was here</property>
+    <property name="shotcut:hash">3ce606570243e61117c74e5337d51b9e</property>
+  </producer>
+  <producer id="producer9" in="00:00:00.000" out="03:60:00.000">
+    <property name="length">04:00:00.050</property>
+    <property name="eof">pause</property>
+    <property name="resource">C:/Users/igapon/Downloads/1229/012.jpg</property>
+    <property name="ttl">1</property>
+    <property name="aspect_ratio">1</property>
+    <property name="meta.media.progressive">1</property>
+    <property name="seekable">1</property>
+    <property name="format">1</property>
+    <property name="meta.media.width">5712</property>
+    <property name="meta.media.height">4284</property>
+    <property name="mlt_service">qimage</property>
+    <property name="creation_time">2025-01-03T07:55:06</property>
+    <property name="shotcut:skipConvert">1</property>
+    <property name="xml">was here</property>
+    <property name="shotcut:hash">d95f04e1ed2b4f36072c7474dbce87dd</property>
+  </producer>
+  <producer id="producer10" in="00:00:00.000" out="03:60:00.000">
+    <property name="length">04:00:00.050</property>
+    <property name="eof">pause</property>
+    <property name="resource">C:/Users/igapon/Downloads/1229/013.jpg</property>
+    <property name="ttl">1</property>
+    <property name="aspect_ratio">1</property>
+    <property name="meta.media.progressive">1</property>
+    <property name="seekable">1</property>
+    <property name="format">1</property>
+    <property name="meta.media.width">4284</property>
+    <property name="meta.media.height">5712</property>
+    <property name="mlt_service">qimage</property>
+    <property name="creation_time">2025-01-03T07:55:08</property>
+    <property name="shotcut:skipConvert">1</property>
+    <property name="xml">was here</property>
+    <property name="shotcut:hash">55460f08a83906a69956d8ce88817bfc</property>
+  </producer>
+  <producer id="producer11" in="00:00:00.000" out="03:60:00.000">
+    <property name="length">04:00:00.050</property>
+    <property name="eof">pause</property>
+    <property name="resource">C:/Users/igapon/Downloads/1229/014.jpg</property>
+    <property name="ttl">1</property>
+    <property name="aspect_ratio">1</property>
+    <property name="meta.media.progressive">1</property>
+    <property name="seekable">1</property>
+    <property name="format">1</property>
+    <property name="meta.media.width">4284</property>
+    <property name="meta.media.height">5712</property>
+    <property name="mlt_service">qimage</property>
+    <property name="creation_time">2025-01-03T07:55:08</property>
+    <property name="shotcut:skipConvert">1</property>
+    <property name="xml">was here</property>
+    <property name="shotcut:hash">ae0ec5eb3595aa438f8ba585793be828</property>
+  </producer>
+  <producer id="producer12" in="00:00:00.000" out="03:60:00.000">
+    <property name="length">04:00:00.050</property>
+    <property name="eof">pause</property>
+    <property name="resource">C:/Users/igapon/Downloads/1229/016.jpg</property>
+    <property name="ttl">1</property>
+    <property name="aspect_ratio">1</property>
+    <property name="meta.media.progressive">1</property>
+    <property name="seekable">1</property>
+    <property name="format">1</property>
+    <property name="meta.media.width">5712</property>
+    <property name="meta.media.height">4284</property>
+    <property name="mlt_service">qimage</property>
+    <property name="creation_time">2025-01-03T07:55:09</property>
+    <property name="shotcut:skipConvert">1</property>
+    <property name="xml">was here</property>
+    <property name="shotcut:hash">750b010c386376940ed822244bac4bc3</property>
+  </producer>
+  <producer id="producer13" in="00:00:00.000" out="03:60:00.000">
+    <property name="length">04:00:00.050</property>
+    <property name="eof">pause</property>
+    <property name="resource">C:/Users/igapon/Downloads/1229/017.jpg</property>
+    <property name="ttl">1</property>
+    <property name="aspect_ratio">1</property>
+    <property name="meta.media.progressive">1</property>
+    <property name="seekable">1</property>
+    <property name="format">1</property>
+    <property name="meta.media.width">5712</property>
+    <property name="meta.media.height">4284</property>
+    <property name="mlt_service">qimage</property>
+    <property name="creation_time">2025-01-03T07:55:11</property>
+    <property name="shotcut:skipConvert">1</property>
+    <property name="xml">was here</property>
+    <property name="shotcut:hash">22285c011937d94640889732bdad8c02</property>
+  </producer>
+  <producer id="producer14" in="00:00:00.000" out="03:60:00.000">
+    <property name="length">04:00:00.050</property>
+    <property name="eof">pause</property>
+    <property name="resource">C:/Users/igapon/Downloads/1229/018.jpg</property>
+    <property name="ttl">1</property>
+    <property name="aspect_ratio">1</property>
+    <property name="meta.media.progressive">1</property>
+    <property name="seekable">1</property>
+    <property name="format">1</property>
+    <property name="meta.media.width">4284</property>
+    <property name="meta.media.height">5712</property>
+    <property name="mlt_service">qimage</property>
+    <property name="creation_time">2025-01-03T07:55:11</property>
+    <property name="shotcut:skipConvert">1</property>
+    <property name="xml">was here</property>
+    <property name="shotcut:hash">687bddc51bf37449220740a348449952</property>
+  </producer>
+  <producer id="producer15" in="00:00:00.000" out="03:60:00.000">
+    <property name="length">04:00:00.050</property>
+    <property name="eof">pause</property>
+    <property name="resource">C:/Users/igapon/Downloads/1229/019.jpg</property>
+    <property name="ttl">1</property>
+    <property name="aspect_ratio">1</property>
+    <property name="meta.media.progressive">1</property>
+    <property name="seekable">1</property>
+    <property name="format">1</property>
+    <property name="meta.media.width">4284</property>
+    <property name="meta.media.height">5712</property>
+    <property name="mlt_service">qimage</property>
+    <property name="creation_time">2025-01-03T07:55:13</property>
+    <property name="shotcut:skipConvert">1</property>
+    <property name="xml">was here</property>
+    <property name="shotcut:hash">70e085ac665bd5499369ce0c8a8e172d</property>
+  </producer>
+  <producer id="producer16" in="00:00:00.000" out="03:60:00.000">
+    <property name="length">04:00:00.050</property>
+    <property name="eof">pause</property>
+    <property name="resource">C:/Users/igapon/Downloads/1229/023.jpg</property>
+    <property name="ttl">1</property>
+    <property name="aspect_ratio">1</property>
+    <property name="meta.media.progressive">1</property>
+    <property name="seekable">1</property>
+    <property name="format">1</property>
+    <property name="meta.media.width">5712</property>
+    <property name="meta.media.height">4284</property>
+    <property name="mlt_service">qimage</property>
+    <property name="creation_time">2025-01-03T07:55:14</property>
+    <property name="shotcut:skipConvert">1</property>
+    <property name="xml">was here</property>
+    <property name="shotcut:hash">5e9a5730dbe91838e64a4b904c193d49</property>
+  </producer>
+  <producer id="producer17" in="00:00:00.000" out="03:60:00.000">
+    <property name="length">04:00:00.050</property>
+    <property name="eof">pause</property>
+    <property name="resource">C:/Users/igapon/Downloads/1230/001.jpg</property>
+    <property name="ttl">1</property>
+    <property name="aspect_ratio">1</property>
+    <property name="meta.media.progressive">1</property>
+    <property name="seekable">1</property>
+    <property name="format">1</property>
+    <property name="meta.media.width">4284</property>
+    <property name="meta.media.height">5712</property>
+    <property name="mlt_service">qimage</property>
+    <property name="creation_time">2025-01-03T07:52:15</property>
+    <property name="shotcut:skipConvert">1</property>
+    <property name="xml">was here</property>
+    <property name="shotcut:hash">64898c54de5eaec0b9c602eb9c9afb26</property>
+  </producer>
+  <producer id="producer18" in="00:00:00.000" out="03:60:00.000">
+    <property name="length">04:00:00.050</property>
+    <property name="eof">pause</property>
+    <property name="resource">C:/Users/igapon/Downloads/1230/002.jpg</property>
+    <property name="ttl">1</property>
+    <property name="aspect_ratio">1</property>
+    <property name="meta.media.progressive">1</property>
+    <property name="seekable">1</property>
+    <property name="format">1</property>
+    <property name="meta.media.width">5712</property>
+    <property name="meta.media.height">4284</property>
+    <property name="mlt_service">qimage</property>
+    <property name="creation_time">2025-01-03T07:52:16</property>
+    <property name="shotcut:skipConvert">1</property>
+    <property name="xml">was here</property>
+    <property name="shotcut:hash">9ef9a338b99d3eed6f1988a91c6ff306</property>
+  </producer>
+  <producer id="producer19" in="00:00:00.000" out="03:60:00.000">
+    <property name="length">04:00:00.050</property>
+    <property name="eof">pause</property>
+    <property name="resource">C:/Users/igapon/Downloads/1230/003.jpg</property>
+    <property name="ttl">1</property>
+    <property name="aspect_ratio">1</property>
+    <property name="meta.media.progressive">1</property>
+    <property name="seekable">1</property>
+    <property name="format">1</property>
+    <property name="meta.media.width">4032</property>
+    <property name="meta.media.height">3024</property>
+    <property name="mlt_service">qimage</property>
+    <property name="creation_time">2025-01-03T07:52:17</property>
+    <property name="shotcut:skipConvert">1</property>
+    <property name="xml">was here</property>
+    <property name="shotcut:hash">c15ed4451679cdac90a63993cfa6cb33</property>
+  </producer>
+  <producer id="producer20" in="00:00:00.000" out="03:60:00.000">
+    <property name="length">04:00:00.050</property>
+    <property name="eof">pause</property>
+    <property name="resource">C:/Users/igapon/Downloads/1230/004.jpg</property>
+    <property name="ttl">1</property>
+    <property name="aspect_ratio">1</property>
+    <property name="meta.media.progressive">1</property>
+    <property name="seekable">1</property>
+    <property name="format">1</property>
+    <property name="meta.media.width">4284</property>
+    <property name="meta.media.height">5712</property>
+    <property name="mlt_service">qimage</property>
+    <property name="creation_time">2025-01-03T07:52:18</property>
+    <property name="shotcut:skipConvert">1</property>
+    <property name="xml">was here</property>
+    <property name="shotcut:hash">8471cc909ee858308641f944528b5366</property>
+  </producer>
+  <producer id="producer21" in="00:00:00.000" out="03:60:00.000">
+    <property name="length">04:00:00.050</property>
+    <property name="eof">pause</property>
+    <property name="resource">C:/Users/igapon/Downloads/1230/005.jpg</property>
+    <property name="ttl">1</property>
+    <property name="aspect_ratio">1</property>
+    <property name="meta.media.progressive">1</property>
+    <property name="seekable">1</property>
+    <property name="format">1</property>
+    <property name="meta.media.width">5712</property>
+    <property name="meta.media.height">4284</property>
+    <property name="mlt_service">qimage</property>
+    <property name="creation_time">2025-01-03T07:52:19</property>
+    <property name="shotcut:skipConvert">1</property>
+    <property name="xml">was here</property>
+    <property name="shotcut:hash">9da5cbdcc462efd859de4e5d11576df7</property>
+  </producer>
+  <producer id="producer22" in="00:00:00.000" out="03:60:00.000">
+    <property name="length">04:00:00.050</property>
+    <property name="eof">pause</property>
+    <property name="resource">C:/Users/igapon/Downloads/1230/006.jpg</property>
+    <property name="ttl">1</property>
+    <property name="aspect_ratio">1</property>
+    <property name="meta.media.progressive">1</property>
+    <property name="seekable">1</property>
+    <property name="format">1</property>
+    <property name="meta.media.width">3024</property>
+    <property name="meta.media.height">4032</property>
+    <property name="mlt_service">qimage</property>
+    <property name="creation_time">2025-01-03T07:52:19</property>
+    <property name="shotcut:skipConvert">1</property>
+    <property name="xml">was here</property>
+    <property name="shotcut:hash">1b4dcb892fdf1dfc588c35cd0761f429</property>
+  </producer>
+  <producer id="producer23" in="00:00:00.000" out="03:60:00.000">
+    <property name="length">04:00:00.050</property>
+    <property name="eof">pause</property>
+    <property name="resource">C:/Users/igapon/Downloads/1230/007.jpg</property>
+    <property name="ttl">1</property>
+    <property name="aspect_ratio">1</property>
+    <property name="meta.media.progressive">1</property>
+    <property name="seekable">1</property>
+    <property name="format">1</property>
+    <property name="meta.media.width">4284</property>
+    <property name="meta.media.height">5712</property>
+    <property name="mlt_service">qimage</property>
+    <property name="creation_time">2025-01-03T07:52:20</property>
+    <property name="shotcut:skipConvert">1</property>
+    <property name="xml">was here</property>
+    <property name="shotcut:hash">e21de8b98814f92ee7aaa0f95900e632</property>
+  </producer>
+  <producer id="producer24" in="00:00:00.000" out="03:60:00.000">
+    <property name="length">04:00:00.050</property>
+    <property name="eof">pause</property>
+    <property name="resource">C:/Users/igapon/Downloads/1230/008.jpg</property>
+    <property name="ttl">1</property>
+    <property name="aspect_ratio">1</property>
+    <property name="meta.media.progressive">1</property>
+    <property name="seekable">1</property>
+    <property name="format">1</property>
+    <property name="meta.media.width">4032</property>
+    <property name="meta.media.height">3024</property>
+    <property name="mlt_service">qimage</property>
+    <property name="creation_time">2025-01-03T07:52:21</property>
+    <property name="shotcut:skipConvert">1</property>
+    <property name="xml">was here</property>
+    <property name="shotcut:hash">6c848e1391b1d36cba8cc217f1a8ec18</property>
+  </producer>
+  <producer id="producer25" in="00:00:00.000" out="03:60:00.000">
+    <property name="length">04:00:00.050</property>
+    <property name="eof">pause</property>
+    <property name="resource">C:/Users/igapon/Downloads/1230/009.jpg</property>
+    <property name="ttl">1</property>
+    <property name="aspect_ratio">1</property>
+    <property name="meta.media.progressive">1</property>
+    <property name="seekable">1</property>
+    <property name="format">1</property>
+    <property name="meta.media.width">4284</property>
+    <property name="meta.media.height">5712</property>
+    <property name="mlt_service">qimage</property>
+    <property name="creation_time">2025-01-03T07:52:22</property>
+    <property name="shotcut:skipConvert">1</property>
+    <property name="xml">was here</property>
+    <property name="shotcut:hash">6abf46bfc9c1a2775d2479ac6833e6e4</property>
+  </producer>
+  <producer id="producer26" in="00:00:00.000" out="03:60:00.000">
+    <property name="length">04:00:00.050</property>
+    <property name="eof">pause</property>
+    <property name="resource">C:/Users/igapon/Downloads/1230/011.jpg</property>
+    <property name="ttl">1</property>
+    <property name="aspect_ratio">1</property>
+    <property name="meta.media.progressive">1</property>
+    <property name="seekable">1</property>
+    <property name="format">1</property>
+    <property name="meta.media.width">4284</property>
+    <property name="meta.media.height">5712</property>
+    <property name="mlt_service">qimage</property>
+    <property name="creation_time">2025-01-03T07:52:23</property>
+    <property name="shotcut:skipConvert">1</property>
+    <property name="xml">was here</property>
+    <property name="shotcut:hash">aff8910b7b9ac51a9f53ae17b62272b5</property>
+  </producer>
+  <producer id="producer27" in="00:00:00.000" out="03:60:00.000">
+    <property name="length">04:00:00.050</property>
+    <property name="eof">pause</property>
+    <property name="resource">C:/Users/igapon/Downloads/1230/012.jpg</property>
+    <property name="ttl">1</property>
+    <property name="aspect_ratio">1</property>
+    <property name="meta.media.progressive">1</property>
+    <property name="seekable">1</property>
+    <property name="format">1</property>
+    <property name="meta.media.width">4284</property>
+    <property name="meta.media.height">5712</property>
+    <property name="mlt_service">qimage</property>
+    <property name="creation_time">2025-01-03T07:52:24</property>
+    <property name="shotcut:skipConvert">1</property>
+    <property name="xml">was here</property>
+    <property name="shotcut:hash">b65bc79dd029373261a5eb62b6ae3872</property>
+  </producer>
+  <producer id="producer28" in="00:00:00.000" out="03:60:00.000">
+    <property name="length">04:00:00.050</property>
+    <property name="eof">pause</property>
+    <property name="resource">C:/Users/igapon/Downloads/1230/013.jpg</property>
+    <property name="ttl">1</property>
+    <property name="aspect_ratio">1</property>
+    <property name="meta.media.progressive">1</property>
+    <property name="seekable">1</property>
+    <property name="format">1</property>
+    <property name="meta.media.width">4284</property>
+    <property name="meta.media.height">5712</property>
+    <property name="mlt_service">qimage</property>
+    <property name="creation_time">2025-01-03T07:52:24</property>
+    <property name="shotcut:skipConvert">1</property>
+    <property name="xml">was here</property>
+    <property name="shotcut:hash">352e717920a53f8cfe42cda95c5e3271</property>
+  </producer>
+  <producer id="producer29" in="00:00:00.000" out="03:60:00.000">
+    <property name="length">04:00:00.050</property>
+    <property name="eof">pause</property>
+    <property name="resource">C:/Users/igapon/Downloads/1230/014.jpg</property>
+    <property name="ttl">1</property>
+    <property name="aspect_ratio">1</property>
+    <property name="meta.media.progressive">1</property>
+    <property name="seekable">1</property>
+    <property name="format">1</property>
+    <property name="meta.media.width">5712</property>
+    <property name="meta.media.height">4284</property>
+    <property name="mlt_service">qimage</property>
+    <property name="creation_time">2025-01-03T07:52:25</property>
+    <property name="shotcut:skipConvert">1</property>
+    <property name="xml">was here</property>
+    <property name="shotcut:hash">862cea77a53d8316bbe16ca72bf94e7f</property>
+  </producer>
+  <producer id="producer30" in="00:00:00.000" out="03:60:00.000">
+    <property name="length">04:00:00.050</property>
+    <property name="eof">pause</property>
+    <property name="resource">C:/Users/igapon/Downloads/1230/019.jpg</property>
+    <property name="ttl">1</property>
+    <property name="aspect_ratio">1</property>
+    <property name="meta.media.progressive">1</property>
+    <property name="seekable">1</property>
+    <property name="format">1</property>
+    <property name="meta.media.width">4284</property>
+    <property name="meta.media.height">5712</property>
+    <property name="mlt_service">qimage</property>
+    <property name="creation_time">2025-01-03T07:52:26</property>
+    <property name="shotcut:skipConvert">1</property>
+    <property name="xml">was here</property>
+    <property name="shotcut:hash">c13ec4d504aabf9bb7aba12789d44af2</property>
+  </producer>
+  <playlist id="main_bin">
+    <property name="xml_retain">1</property>
+    <entry producer="producer1" in="00:00:00.000" out="00:00:18.140"/>
+    <entry producer="producer2" in="00:00:00.000" out="00:00:59.968"/>
+    <entry producer="chain0" in="00:00:00.000" out="00:00:01.149"/>
+    <entry producer="chain1" in="00:00:00.000" out="00:00:07.796"/>
+    <entry producer="chain2" in="00:00:00.000" out="00:00:05.947"/>
+    <entry producer="chain3" in="00:00:00.000" out="00:00:03.648"/>
+    <entry producer="chain4" in="00:00:00.000" out="00:00:02.699"/>
+    <entry producer="chain5" in="00:00:00.000" out="00:00:03.548"/>
+    <entry producer="chain6" in="00:00:00.000" out="00:00:02.099"/>
+    <entry producer="producer0" in="00:00:00.000" out="00:00:02.948"/>
+    <entry producer="producer3" in="00:00:00.000" out="00:00:02.948"/>
+    <entry producer="producer4" in="00:00:00.000" out="00:00:02.948"/>
+    <entry producer="producer5" in="00:00:00.000" out="00:00:02.948"/>
+    <entry producer="producer6" in="00:00:00.000" out="00:00:02.948"/>
+    <entry producer="producer7" in="00:00:00.000" out="00:00:02.948"/>
+    <entry producer="producer8" in="00:00:00.000" out="00:00:02.948"/>
+    <entry producer="producer9" in="00:00:00.000" out="00:00:02.948"/>
+    <entry producer="producer10" in="00:00:00.000" out="00:00:02.948"/>
+    <entry producer="producer11" in="00:00:00.000" out="00:00:02.948"/>
+    <entry producer="producer12" in="00:00:00.000" out="00:00:02.948"/>
+    <entry producer="producer13" in="00:00:00.000" out="00:00:02.948"/>
+    <entry producer="producer14" in="00:00:00.000" out="00:00:02.948"/>
+    <entry producer="producer15" in="00:00:00.000" out="00:00:02.948"/>
+    <entry producer="producer16" in="00:00:00.000" out="00:00:02.948"/>
+    <entry producer="producer17" in="00:00:00.000" out="00:00:02.948"/>
+    <entry producer="producer18" in="00:00:00.000" out="00:00:02.948"/>
+    <entry producer="producer19" in="00:00:00.000" out="00:00:02.948"/>
+    <entry producer="producer20" in="00:00:00.000" out="00:00:02.948"/>
+    <entry producer="producer21" in="00:00:00.000" out="00:00:02.948"/>
+    <entry producer="producer22" in="00:00:00.000" out="00:00:02.948"/>
+    <entry producer="producer23" in="00:00:00.000" out="00:00:02.948"/>
+    <entry producer="producer24" in="00:00:00.000" out="00:00:02.948"/>
+    <entry producer="producer25" in="00:00:00.000" out="00:00:02.948"/>
+    <entry producer="producer26" in="00:00:00.000" out="00:00:02.948"/>
+    <entry producer="producer27" in="00:00:00.000" out="00:00:02.948"/>
+    <entry producer="producer28" in="00:00:00.000" out="00:00:02.948"/>
+    <entry producer="producer29" in="00:00:00.000" out="00:00:02.948"/>
+    <entry producer="producer30" in="00:00:00.000" out="00:00:02.948"/>
+  </playlist>
+  <producer id="black" in="00:00:00.000" out="00:01:46.475">
+    <property name="length">00:01:46.525</property>
+    <property name="eof">pause</property>
+    <property name="resource">0</property>
+    <property name="aspect_ratio">1</property>
+    <property name="mlt_service">color</property>
+    <property name="mlt_image_format">rgb24a</property>
+    <property name="set.test_audio">0</property>
+  </producer>
+  <playlist id="background">
+    <entry producer="black" in="00:00:00.000" out="00:01:46.475"/>
+  </playlist>
+  <producer id="producer31" in="00:00:00.000" out="00:00:18.140">
+    <property name="length">00:00:18.190</property>
+    <property name="eof">pause</property>
+    <property name="resource">D:/git/igaponr/training/python/Movie/せんちゃんネル/Clouds - 35573.mp4</property>
+    <property name="audio_index">1</property>
+    <property name="video_index">0</property>
+    <property name="mute_on_pause">0</property>
+    <property name="mlt_service">avformat-novalidate</property>
+    <property name="seekable">1</property>
+    <property name="aspect_ratio">1</property>
+    <property name="creation_time">2021-03-06T02:06:49</property>
+    <property name="global_feed">1</property>
+    <property name="xml">was here</property>
+    <property name="shotcut:hash">97e8d19532c15b7954398111c39c8a01</property>
+    <property name="shotcut:caption">Clouds - 35573.mp4</property>
+    <property name="meta.media.nb_streams">2</property>
+    <property name="meta.media.0.stream.type">video</property>
+    <property name="meta.media.0.stream.frame_rate">24</property>
+    <property name="meta.media.0.stream.sample_aspect_ratio">1</property>
+    <property name="meta.media.0.codec.width">1920</property>
+    <property name="meta.media.0.codec.height">1080</property>
+    <property name="meta.media.0.codec.rotate">0</property>
+    <property name="meta.media.0.codec.pix_fmt">yuv420p</property>
+    <property name="meta.media.0.codec.sample_aspect_ratio">1</property>
+    <property name="meta.media.0.codec.colorspace">709</property>
+    <property name="meta.media.0.codec.name">h264</property>
+    <property name="meta.media.0.codec.long_name">H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10</property>
+    <property name="meta.media.0.codec.bit_rate">1820567</property>
+    <property name="meta.attr.0.stream.handler_name.markup">VideoHandler</property>
+    <property name="meta.attr.0.stream.vendor_id.markup">[0][0][0][0]</property>
+    <property name="meta.media.1.stream.type">audio</property>
+    <property name="meta.media.1.codec.sample_fmt">fltp</property>
+    <property name="meta.media.1.codec.sample_rate">48000</property>
+    <property name="meta.media.1.codec.channels">2</property>
+    <property name="meta.media.1.codec.layout">stereo</property>
+    <property name="meta.media.1.codec.name">aac</property>
+    <property name="meta.media.1.codec.long_name">AAC (Advanced Audio Coding)</property>
+    <property name="meta.media.1.codec.bit_rate">4523</property>
+    <property name="meta.attr.1.stream.handler_name.markup">SoundHandler</property>
+    <property name="meta.attr.1.stream.vendor_id.markup">[0][0][0][0]</property>
+    <property name="meta.attr.major_brand.markup">isom</property>
+    <property name="meta.attr.minor_version.markup">512</property>
+    <property name="meta.attr.compatible_brands.markup">isomiso2avc1mp41</property>
+    <property name="meta.attr.encoder.markup">Lavf58.20.100</property>
+    <property name="meta.media.sample_aspect_num">1</property>
+    <property name="meta.media.sample_aspect_den">1</property>
+    <property name="format">3</property>
+    <property name="vstream">0</property>
+    <property name="meta.media.frame_rate_num">24</property>
+    <property name="meta.media.frame_rate_den">1</property>
+    <property name="meta.media.colorspace">709</property>
+    <property name="meta.media.color_trc">2</property>
+    <property name="meta.media.has_b_frames">2</property>
+    <property name="meta.media.width">1920</property>
+    <property name="meta.media.height">1080</property>
+    <property name="meta.media.aspect_ratio">1</property>
+    <property name="meta.media.color_range">mpeg</property>
+    <property name="astream">0</property>
+    <property name="meta.media.top_field_first">0</property>
+    <property name="meta.media.progressive">1</property>
+    <filter id="filter0" out="00:00:08.995">
+      <property name="argument">せんちゃんネル</property>
+      <property name="geometry">0 0 1920 1080 1</property>
+      <property name="family">Verdana</property>
+      <property name="size">1080</property>
+      <property name="weight">500</property>
+      <property name="style">normal</property>
+      <property name="fgcolour">#ffffffff</property>
+      <property name="bgcolour">#00000000</property>
+      <property name="olcolour">#aa000000</property>
+      <property name="pad">0</property>
+      <property name="halign">center</property>
+      <property name="valign">bottom</property>
+      <property name="outline">3</property>
+      <property name="opacity">1.0</property>
+      <property name="mlt_service">dynamictext</property>
+      <property name="shotcut:filter">dynamicText</property>
+      <property name="shotcut:usePointSize">0</property>
+      <property name="shotcut:animIn">00:00:00.000</property>
+      <property name="shotcut:animOut">00:00:00.000</property>
+    </filter>
+  </producer>
+  <producer id="producer32" in="00:00:00.000" out="03:60:00.000">
+    <property name="length">04:00:00.050</property>
+    <property name="eof">pause</property>
+    <property name="resource">C:/Users/igapon/Downloads/1229/002.jpg</property>
+    <property name="ttl">1</property>
+    <property name="aspect_ratio">1</property>
+    <property name="meta.media.progressive">1</property>
+    <property name="seekable">1</property>
+    <property name="format">1</property>
+    <property name="meta.media.width">4284</property>
+    <property name="meta.media.height">5712</property>
+    <property name="mlt_service">qimage</property>
+    <property name="creation_time">2025-01-03T07:54:56</property>
+    <property name="shotcut:skipConvert">1</property>
+    <property name="xml">was here</property>
+    <property name="shotcut:hash">2fb86cffdd214cefafa7b2622e8ce2d8</property>
+  </producer>
+  <producer id="producer33" in="00:00:00.000" out="03:60:00.000">
+    <property name="length">04:00:00.050</property>
+    <property name="eof">pause</property>
+    <property name="resource">C:/Users/igapon/Downloads/1229/003.jpg</property>
+    <property name="ttl">1</property>
+    <property name="aspect_ratio">1</property>
+    <property name="meta.media.progressive">1</property>
+    <property name="seekable">1</property>
+    <property name="format">1</property>
+    <property name="meta.media.width">4284</property>
+    <property name="meta.media.height">5712</property>
+    <property name="mlt_service">qimage</property>
+    <property name="creation_time">2025-01-03T07:54:57</property>
+    <property name="shotcut:skipConvert">1</property>
+    <property name="xml">was here</property>
+    <property name="shotcut:hash">1b08333b299ebc8f5d3ef0964090c3b5</property>
+  </producer>
+  <producer id="producer34" in="00:00:00.000" out="03:60:00.000">
+    <property name="length">04:00:00.050</property>
+    <property name="eof">pause</property>
+    <property name="resource">C:/Users/igapon/Downloads/1229/006.jpg</property>
+    <property name="ttl">1</property>
+    <property name="aspect_ratio">1</property>
+    <property name="meta.media.progressive">1</property>
+    <property name="seekable">1</property>
+    <property name="format">1</property>
+    <property name="meta.media.width">4284</property>
+    <property name="meta.media.height">5712</property>
+    <property name="mlt_service">qimage</property>
+    <property name="creation_time">2025-01-03T07:55:00</property>
+    <property name="shotcut:skipConvert">1</property>
+    <property name="xml">was here</property>
+    <property name="shotcut:hash">42ff0774f9ce12a7add676d5b9f40c07</property>
+    <property name="shotcut:caption">006.jpg</property>
+  </producer>
+  <producer id="producer35" in="00:00:00.000" out="03:60:00.000">
+    <property name="length">04:00:00.050</property>
+    <property name="eof">pause</property>
+    <property name="resource">C:/Users/igapon/Downloads/1229/008.jpg</property>
+    <property name="ttl">1</property>
+    <property name="aspect_ratio">1</property>
+    <property name="meta.media.progressive">1</property>
+    <property name="seekable">1</property>
+    <property name="format">1</property>
+    <property name="meta.media.width">5712</property>
+    <property name="meta.media.height">4284</property>
+    <property name="mlt_service">qimage</property>
+    <property name="creation_time">2025-01-03T07:55:01</property>
+    <property name="shotcut:skipConvert">1</property>
+    <property name="xml">was here</property>
+    <property name="shotcut:hash">f057e6a26572c6d5e92e010a090a6745</property>
+  </producer>
+  <producer id="producer36" in="00:00:00.000" out="03:60:00.000">
+    <property name="length">04:00:00.050</property>
+    <property name="eof">pause</property>
+    <property name="resource">C:/Users/igapon/Downloads/1229/009.jpg</property>
+    <property name="ttl">1</property>
+    <property name="aspect_ratio">1</property>
+    <property name="meta.media.progressive">1</property>
+    <property name="seekable">1</property>
+    <property name="format">1</property>
+    <property name="meta.media.width">5712</property>
+    <property name="meta.media.height">4284</property>
+    <property name="mlt_service">qimage</property>
+    <property name="creation_time">2025-01-03T07:55:02</property>
+    <property name="shotcut:skipConvert">1</property>
+    <property name="xml">was here</property>
+    <property name="shotcut:hash">0ff8024c2d15b264db92967e427423ca</property>
+  </producer>
+  <producer id="producer37" in="00:00:00.000" out="03:60:00.000">
+    <property name="length">04:00:00.050</property>
+    <property name="eof">pause</property>
+    <property name="resource">C:/Users/igapon/Downloads/1229/010.jpg</property>
+    <property name="ttl">1</property>
+    <property name="aspect_ratio">1</property>
+    <property name="meta.media.progressive">1</property>
+    <property name="seekable">1</property>
+    <property name="format">1</property>
+    <property name="meta.media.width">4284</property>
+    <property name="meta.media.height">5712</property>
+    <property name="mlt_service">qimage</property>
+    <property name="creation_time">2025-01-03T07:55:04</property>
+    <property name="shotcut:skipConvert">1</property>
+    <property name="xml">was here</property>
+    <property name="shotcut:hash">90421ea8a3e7660bba55080d84a4b570</property>
+  </producer>
+  <producer id="producer38" in="00:00:00.000" out="03:60:00.000">
+    <property name="length">04:00:00.050</property>
+    <property name="eof">pause</property>
+    <property name="resource">C:/Users/igapon/Downloads/1229/011.jpg</property>
+    <property name="ttl">1</property>
+    <property name="aspect_ratio">1</property>
+    <property name="meta.media.progressive">1</property>
+    <property name="seekable">1</property>
+    <property name="format">1</property>
+    <property name="meta.media.width">4284</property>
+    <property name="meta.media.height">5712</property>
+    <property name="mlt_service">qimage</property>
+    <property name="creation_time">2025-01-03T07:55:05</property>
+    <property name="shotcut:skipConvert">1</property>
+    <property name="xml">was here</property>
+    <property name="shotcut:hash">3ce606570243e61117c74e5337d51b9e</property>
+  </producer>
+  <producer id="producer39" in="00:00:00.000" out="03:60:00.000">
+    <property name="length">04:00:00.050</property>
+    <property name="eof">pause</property>
+    <property name="resource">C:/Users/igapon/Downloads/1229/012.jpg</property>
+    <property name="ttl">1</property>
+    <property name="aspect_ratio">1</property>
+    <property name="meta.media.progressive">1</property>
+    <property name="seekable">1</property>
+    <property name="format">1</property>
+    <property name="meta.media.width">5712</property>
+    <property name="meta.media.height">4284</property>
+    <property name="mlt_service">qimage</property>
+    <property name="creation_time">2025-01-03T07:55:06</property>
+    <property name="shotcut:skipConvert">1</property>
+    <property name="xml">was here</property>
+    <property name="shotcut:hash">d95f04e1ed2b4f36072c7474dbce87dd</property>
+  </producer>
+  <producer id="producer40" in="00:00:00.000" out="03:60:00.000">
+    <property name="length">04:00:00.050</property>
+    <property name="eof">pause</property>
+    <property name="resource">C:/Users/igapon/Downloads/1229/013.jpg</property>
+    <property name="ttl">1</property>
+    <property name="aspect_ratio">1</property>
+    <property name="meta.media.progressive">1</property>
+    <property name="seekable">1</property>
+    <property name="format">1</property>
+    <property name="meta.media.width">4284</property>
+    <property name="meta.media.height">5712</property>
+    <property name="mlt_service">qimage</property>
+    <property name="creation_time">2025-01-03T07:55:08</property>
+    <property name="shotcut:skipConvert">1</property>
+    <property name="xml">was here</property>
+    <property name="shotcut:hash">55460f08a83906a69956d8ce88817bfc</property>
+  </producer>
+  <producer id="producer41" in="00:00:00.000" out="03:60:00.000">
+    <property name="length">04:00:00.050</property>
+    <property name="eof">pause</property>
+    <property name="resource">C:/Users/igapon/Downloads/1229/014.jpg</property>
+    <property name="ttl">1</property>
+    <property name="aspect_ratio">1</property>
+    <property name="meta.media.progressive">1</property>
+    <property name="seekable">1</property>
+    <property name="format">1</property>
+    <property name="meta.media.width">4284</property>
+    <property name="meta.media.height">5712</property>
+    <property name="mlt_service">qimage</property>
+    <property name="creation_time">2025-01-03T07:55:08</property>
+    <property name="shotcut:skipConvert">1</property>
+    <property name="xml">was here</property>
+    <property name="shotcut:hash">ae0ec5eb3595aa438f8ba585793be828</property>
+  </producer>
+  <producer id="producer42" in="00:00:00.000" out="03:60:00.000">
+    <property name="length">04:00:00.050</property>
+    <property name="eof">pause</property>
+    <property name="resource">C:/Users/igapon/Downloads/1229/016.jpg</property>
+    <property name="ttl">1</property>
+    <property name="aspect_ratio">1</property>
+    <property name="meta.media.progressive">1</property>
+    <property name="seekable">1</property>
+    <property name="format">1</property>
+    <property name="meta.media.width">5712</property>
+    <property name="meta.media.height">4284</property>
+    <property name="mlt_service">qimage</property>
+    <property name="creation_time">2025-01-03T07:55:09</property>
+    <property name="shotcut:skipConvert">1</property>
+    <property name="xml">was here</property>
+    <property name="shotcut:hash">750b010c386376940ed822244bac4bc3</property>
+  </producer>
+  <producer id="producer43" in="00:00:00.000" out="03:60:00.000">
+    <property name="length">04:00:00.050</property>
+    <property name="eof">pause</property>
+    <property name="resource">C:/Users/igapon/Downloads/1229/017.jpg</property>
+    <property name="ttl">1</property>
+    <property name="aspect_ratio">1</property>
+    <property name="meta.media.progressive">1</property>
+    <property name="seekable">1</property>
+    <property name="format">1</property>
+    <property name="meta.media.width">5712</property>
+    <property name="meta.media.height">4284</property>
+    <property name="mlt_service">qimage</property>
+    <property name="creation_time">2025-01-03T07:55:11</property>
+    <property name="shotcut:skipConvert">1</property>
+    <property name="xml">was here</property>
+    <property name="shotcut:hash">22285c011937d94640889732bdad8c02</property>
+  </producer>
+  <producer id="producer44" in="00:00:00.000" out="03:60:00.000">
+    <property name="length">04:00:00.050</property>
+    <property name="eof">pause</property>
+    <property name="resource">C:/Users/igapon/Downloads/1229/018.jpg</property>
+    <property name="ttl">1</property>
+    <property name="aspect_ratio">1</property>
+    <property name="meta.media.progressive">1</property>
+    <property name="seekable">1</property>
+    <property name="format">1</property>
+    <property name="meta.media.width">4284</property>
+    <property name="meta.media.height">5712</property>
+    <property name="mlt_service">qimage</property>
+    <property name="creation_time">2025-01-03T07:55:11</property>
+    <property name="shotcut:skipConvert">1</property>
+    <property name="xml">was here</property>
+    <property name="shotcut:hash">687bddc51bf37449220740a348449952</property>
+  </producer>
+  <producer id="producer45" in="00:00:00.000" out="03:60:00.000">
+    <property name="length">04:00:00.050</property>
+    <property name="eof">pause</property>
+    <property name="resource">C:/Users/igapon/Downloads/1229/019.jpg</property>
+    <property name="ttl">1</property>
+    <property name="aspect_ratio">1</property>
+    <property name="meta.media.progressive">1</property>
+    <property name="seekable">1</property>
+    <property name="format">1</property>
+    <property name="meta.media.width">4284</property>
+    <property name="meta.media.height">5712</property>
+    <property name="mlt_service">qimage</property>
+    <property name="creation_time">2025-01-03T07:55:13</property>
+    <property name="shotcut:skipConvert">1</property>
+    <property name="xml">was here</property>
+    <property name="shotcut:hash">70e085ac665bd5499369ce0c8a8e172d</property>
+  </producer>
+  <producer id="producer46" in="00:00:00.000" out="03:60:00.000">
+    <property name="length">04:00:00.050</property>
+    <property name="eof">pause</property>
+    <property name="resource">C:/Users/igapon/Downloads/1229/023.jpg</property>
+    <property name="ttl">1</property>
+    <property name="aspect_ratio">1</property>
+    <property name="meta.media.progressive">1</property>
+    <property name="seekable">1</property>
+    <property name="format">1</property>
+    <property name="meta.media.width">5712</property>
+    <property name="meta.media.height">4284</property>
+    <property name="mlt_service">qimage</property>
+    <property name="creation_time">2025-01-03T07:55:14</property>
+    <property name="shotcut:skipConvert">1</property>
+    <property name="xml">was here</property>
+    <property name="shotcut:hash">5e9a5730dbe91838e64a4b904c193d49</property>
+  </producer>
+  <producer id="producer47" in="00:00:00.000" out="03:60:00.000">
+    <property name="length">04:00:00.050</property>
+    <property name="eof">pause</property>
+    <property name="resource">C:/Users/igapon/Downloads/1230/001.jpg</property>
+    <property name="ttl">1</property>
+    <property name="aspect_ratio">1</property>
+    <property name="meta.media.progressive">1</property>
+    <property name="seekable">1</property>
+    <property name="format">1</property>
+    <property name="meta.media.width">4284</property>
+    <property name="meta.media.height">5712</property>
+    <property name="mlt_service">qimage</property>
+    <property name="creation_time">2025-01-03T07:52:15</property>
+    <property name="shotcut:skipConvert">1</property>
+    <property name="xml">was here</property>
+    <property name="shotcut:hash">64898c54de5eaec0b9c602eb9c9afb26</property>
+    <property name="shotcut:caption">001.jpg</property>
+  </producer>
+  <producer id="producer48" in="00:00:00.000" out="03:60:00.000">
+    <property name="length">04:00:00.050</property>
+    <property name="eof">pause</property>
+    <property name="resource">C:/Users/igapon/Downloads/1230/002.jpg</property>
+    <property name="ttl">1</property>
+    <property name="aspect_ratio">1</property>
+    <property name="meta.media.progressive">1</property>
+    <property name="seekable">1</property>
+    <property name="format">1</property>
+    <property name="meta.media.width">5712</property>
+    <property name="meta.media.height">4284</property>
+    <property name="mlt_service">qimage</property>
+    <property name="creation_time">2025-01-03T07:52:16</property>
+    <property name="shotcut:skipConvert">1</property>
+    <property name="xml">was here</property>
+    <property name="shotcut:hash">9ef9a338b99d3eed6f1988a91c6ff306</property>
+  </producer>
+  <producer id="producer49" in="00:00:00.000" out="03:60:00.000">
+    <property name="length">04:00:00.050</property>
+    <property name="eof">pause</property>
+    <property name="resource">C:/Users/igapon/Downloads/1230/003.jpg</property>
+    <property name="ttl">1</property>
+    <property name="aspect_ratio">1</property>
+    <property name="meta.media.progressive">1</property>
+    <property name="seekable">1</property>
+    <property name="format">1</property>
+    <property name="meta.media.width">4032</property>
+    <property name="meta.media.height">3024</property>
+    <property name="mlt_service">qimage</property>
+    <property name="creation_time">2025-01-03T07:52:17</property>
+    <property name="shotcut:skipConvert">1</property>
+    <property name="xml">was here</property>
+    <property name="shotcut:hash">c15ed4451679cdac90a63993cfa6cb33</property>
+  </producer>
+  <producer id="producer50" in="00:00:00.000" out="03:60:00.000">
+    <property name="length">04:00:00.050</property>
+    <property name="eof">pause</property>
+    <property name="resource">C:/Users/igapon/Downloads/1230/004.jpg</property>
+    <property name="ttl">1</property>
+    <property name="aspect_ratio">1</property>
+    <property name="meta.media.progressive">1</property>
+    <property name="seekable">1</property>
+    <property name="format">1</property>
+    <property name="meta.media.width">4284</property>
+    <property name="meta.media.height">5712</property>
+    <property name="mlt_service">qimage</property>
+    <property name="creation_time">2025-01-03T07:52:18</property>
+    <property name="shotcut:skipConvert">1</property>
+    <property name="xml">was here</property>
+    <property name="shotcut:hash">8471cc909ee858308641f944528b5366</property>
+  </producer>
+  <producer id="producer51" in="00:00:00.000" out="03:60:00.000">
+    <property name="length">04:00:00.050</property>
+    <property name="eof">pause</property>
+    <property name="resource">C:/Users/igapon/Downloads/1230/005.jpg</property>
+    <property name="ttl">1</property>
+    <property name="aspect_ratio">1</property>
+    <property name="meta.media.progressive">1</property>
+    <property name="seekable">1</property>
+    <property name="format">1</property>
+    <property name="meta.media.width">5712</property>
+    <property name="meta.media.height">4284</property>
+    <property name="mlt_service">qimage</property>
+    <property name="creation_time">2025-01-03T07:52:19</property>
+    <property name="shotcut:skipConvert">1</property>
+    <property name="xml">was here</property>
+    <property name="shotcut:hash">9da5cbdcc462efd859de4e5d11576df7</property>
+  </producer>
+  <producer id="producer52" in="00:00:00.000" out="03:60:00.000">
+    <property name="length">04:00:00.050</property>
+    <property name="eof">pause</property>
+    <property name="resource">C:/Users/igapon/Downloads/1230/006.jpg</property>
+    <property name="ttl">1</property>
+    <property name="aspect_ratio">1</property>
+    <property name="meta.media.progressive">1</property>
+    <property name="seekable">1</property>
+    <property name="format">1</property>
+    <property name="meta.media.width">3024</property>
+    <property name="meta.media.height">4032</property>
+    <property name="mlt_service">qimage</property>
+    <property name="creation_time">2025-01-03T07:52:19</property>
+    <property name="shotcut:skipConvert">1</property>
+    <property name="xml">was here</property>
+    <property name="shotcut:hash">1b4dcb892fdf1dfc588c35cd0761f429</property>
+  </producer>
+  <producer id="producer53" in="00:00:00.000" out="03:60:00.000">
+    <property name="length">04:00:00.050</property>
+    <property name="eof">pause</property>
+    <property name="resource">C:/Users/igapon/Downloads/1230/007.jpg</property>
+    <property name="ttl">1</property>
+    <property name="aspect_ratio">1</property>
+    <property name="meta.media.progressive">1</property>
+    <property name="seekable">1</property>
+    <property name="format">1</property>
+    <property name="meta.media.width">4284</property>
+    <property name="meta.media.height">5712</property>
+    <property name="mlt_service">qimage</property>
+    <property name="creation_time">2025-01-03T07:52:20</property>
+    <property name="shotcut:skipConvert">1</property>
+    <property name="xml">was here</property>
+    <property name="shotcut:hash">e21de8b98814f92ee7aaa0f95900e632</property>
+  </producer>
+  <producer id="producer54" in="00:00:00.000" out="03:60:00.000">
+    <property name="length">04:00:00.050</property>
+    <property name="eof">pause</property>
+    <property name="resource">C:/Users/igapon/Downloads/1230/008.jpg</property>
+    <property name="ttl">1</property>
+    <property name="aspect_ratio">1</property>
+    <property name="meta.media.progressive">1</property>
+    <property name="seekable">1</property>
+    <property name="format">1</property>
+    <property name="meta.media.width">4032</property>
+    <property name="meta.media.height">3024</property>
+    <property name="mlt_service">qimage</property>
+    <property name="creation_time">2025-01-03T07:52:21</property>
+    <property name="shotcut:skipConvert">1</property>
+    <property name="xml">was here</property>
+    <property name="shotcut:hash">6c848e1391b1d36cba8cc217f1a8ec18</property>
+    <property name="shotcut:caption">008.jpg</property>
+  </producer>
+  <producer id="producer55" in="00:00:00.000" out="03:60:00.000">
+    <property name="length">04:00:00.050</property>
+    <property name="eof">pause</property>
+    <property name="resource">C:/Users/igapon/Downloads/1230/009.jpg</property>
+    <property name="ttl">1</property>
+    <property name="aspect_ratio">1</property>
+    <property name="meta.media.progressive">1</property>
+    <property name="seekable">1</property>
+    <property name="format">1</property>
+    <property name="meta.media.width">4284</property>
+    <property name="meta.media.height">5712</property>
+    <property name="mlt_service">qimage</property>
+    <property name="creation_time">2025-01-03T07:52:22</property>
+    <property name="shotcut:skipConvert">1</property>
+    <property name="xml">was here</property>
+    <property name="shotcut:hash">6abf46bfc9c1a2775d2479ac6833e6e4</property>
+    <property name="shotcut:caption">009.jpg</property>
+  </producer>
+  <producer id="producer56" in="00:00:00.000" out="03:60:00.000">
+    <property name="length">04:00:00.050</property>
+    <property name="eof">pause</property>
+    <property name="resource">C:/Users/igapon/Downloads/1230/011.jpg</property>
+    <property name="ttl">1</property>
+    <property name="aspect_ratio">1</property>
+    <property name="meta.media.progressive">1</property>
+    <property name="seekable">1</property>
+    <property name="format">1</property>
+    <property name="meta.media.width">4284</property>
+    <property name="meta.media.height">5712</property>
+    <property name="mlt_service">qimage</property>
+    <property name="creation_time">2025-01-03T07:52:23</property>
+    <property name="shotcut:skipConvert">1</property>
+    <property name="xml">was here</property>
+    <property name="shotcut:hash">aff8910b7b9ac51a9f53ae17b62272b5</property>
+    <property name="shotcut:caption">011.jpg</property>
+  </producer>
+  <producer id="producer57" in="00:00:00.000" out="03:60:00.000">
+    <property name="length">04:00:00.050</property>
+    <property name="eof">pause</property>
+    <property name="resource">C:/Users/igapon/Downloads/1230/012.jpg</property>
+    <property name="ttl">1</property>
+    <property name="aspect_ratio">1</property>
+    <property name="meta.media.progressive">1</property>
+    <property name="seekable">1</property>
+    <property name="format">1</property>
+    <property name="meta.media.width">4284</property>
+    <property name="meta.media.height">5712</property>
+    <property name="mlt_service">qimage</property>
+    <property name="creation_time">2025-01-03T07:52:24</property>
+    <property name="shotcut:skipConvert">1</property>
+    <property name="xml">was here</property>
+    <property name="shotcut:hash">b65bc79dd029373261a5eb62b6ae3872</property>
+  </producer>
+  <producer id="producer58" in="00:00:00.000" out="03:60:00.000">
+    <property name="length">04:00:00.050</property>
+    <property name="eof">pause</property>
+    <property name="resource">C:/Users/igapon/Downloads/1230/013.jpg</property>
+    <property name="ttl">1</property>
+    <property name="aspect_ratio">1</property>
+    <property name="meta.media.progressive">1</property>
+    <property name="seekable">1</property>
+    <property name="format">1</property>
+    <property name="meta.media.width">4284</property>
+    <property name="meta.media.height">5712</property>
+    <property name="mlt_service">qimage</property>
+    <property name="creation_time">2025-01-03T07:52:24</property>
+    <property name="shotcut:skipConvert">1</property>
+    <property name="xml">was here</property>
+    <property name="shotcut:hash">352e717920a53f8cfe42cda95c5e3271</property>
+  </producer>
+  <producer id="producer59" in="00:00:00.000" out="03:60:00.000">
+    <property name="length">04:00:00.050</property>
+    <property name="eof">pause</property>
+    <property name="resource">C:/Users/igapon/Downloads/1230/014.jpg</property>
+    <property name="ttl">1</property>
+    <property name="aspect_ratio">1</property>
+    <property name="meta.media.progressive">1</property>
+    <property name="seekable">1</property>
+    <property name="format">1</property>
+    <property name="meta.media.width">5712</property>
+    <property name="meta.media.height">4284</property>
+    <property name="mlt_service">qimage</property>
+    <property name="creation_time">2025-01-03T07:52:25</property>
+    <property name="shotcut:skipConvert">1</property>
+    <property name="xml">was here</property>
+    <property name="shotcut:hash">862cea77a53d8316bbe16ca72bf94e7f</property>
+    <property name="shotcut:caption">014.jpg</property>
+  </producer>
+  <producer id="producer60" in="00:00:00.000" out="03:60:00.000">
+    <property name="length">04:00:00.050</property>
+    <property name="eof">pause</property>
+    <property name="resource">C:/Users/igapon/Downloads/1230/019.jpg</property>
+    <property name="ttl">1</property>
+    <property name="aspect_ratio">1</property>
+    <property name="meta.media.progressive">1</property>
+    <property name="seekable">1</property>
+    <property name="format">1</property>
+    <property name="meta.media.width">4284</property>
+    <property name="meta.media.height">5712</property>
+    <property name="mlt_service">qimage</property>
+    <property name="creation_time">2025-01-03T07:52:26</property>
+    <property name="shotcut:skipConvert">1</property>
+    <property name="xml">was here</property>
+    <property name="shotcut:hash">c13ec4d504aabf9bb7aba12789d44af2</property>
+    <property name="shotcut:caption">019.jpg</property>
+  </producer>
+  <producer id="producer61" in="00:00:00.000" out="00:00:18.140">
+    <property name="length">00:00:18.190</property>
+    <property name="eof">pause</property>
+    <property name="resource">D:/git/igaponr/training/python/Movie/せんちゃんネル/Clouds - 35573.mp4</property>
+    <property name="audio_index">1</property>
+    <property name="video_index">0</property>
+    <property name="mute_on_pause">0</property>
+    <property name="mlt_service">avformat-novalidate</property>
+    <property name="seekable">1</property>
+    <property name="aspect_ratio">1</property>
+    <property name="creation_time">2021-03-06T02:06:49</property>
+    <property name="global_feed">1</property>
+    <property name="xml">was here</property>
+    <property name="shotcut:hash">97e8d19532c15b7954398111c39c8a01</property>
+    <property name="shotcut:caption">Clouds - 35573.mp4</property>
+    <property name="meta.media.nb_streams">2</property>
+    <property name="meta.media.0.stream.type">video</property>
+    <property name="meta.media.0.stream.frame_rate">24</property>
+    <property name="meta.media.0.stream.sample_aspect_ratio">1</property>
+    <property name="meta.media.0.codec.width">1920</property>
+    <property name="meta.media.0.codec.height">1080</property>
+    <property name="meta.media.0.codec.rotate">0</property>
+    <property name="meta.media.0.codec.pix_fmt">yuv420p</property>
+    <property name="meta.media.0.codec.sample_aspect_ratio">1</property>
+    <property name="meta.media.0.codec.colorspace">709</property>
+    <property name="meta.media.0.codec.name">h264</property>
+    <property name="meta.media.0.codec.long_name">H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10</property>
+    <property name="meta.media.0.codec.bit_rate">1820567</property>
+    <property name="meta.attr.0.stream.handler_name.markup">VideoHandler</property>
+    <property name="meta.attr.0.stream.vendor_id.markup">[0][0][0][0]</property>
+    <property name="meta.media.1.stream.type">audio</property>
+    <property name="meta.media.1.codec.sample_fmt">fltp</property>
+    <property name="meta.media.1.codec.sample_rate">48000</property>
+    <property name="meta.media.1.codec.channels">2</property>
+    <property name="meta.media.1.codec.layout">stereo</property>
+    <property name="meta.media.1.codec.name">aac</property>
+    <property name="meta.media.1.codec.long_name">AAC (Advanced Audio Coding)</property>
+    <property name="meta.media.1.codec.bit_rate">4523</property>
+    <property name="meta.attr.1.stream.handler_name.markup">SoundHandler</property>
+    <property name="meta.attr.1.stream.vendor_id.markup">[0][0][0][0]</property>
+    <property name="meta.attr.major_brand.markup">isom</property>
+    <property name="meta.attr.minor_version.markup">512</property>
+    <property name="meta.attr.compatible_brands.markup">isomiso2avc1mp41</property>
+    <property name="meta.attr.encoder.markup">Lavf58.20.100</property>
+    <property name="meta.media.sample_aspect_num">1</property>
+    <property name="meta.media.sample_aspect_den">1</property>
+    <property name="format">3</property>
+    <property name="vstream">0</property>
+    <property name="meta.media.frame_rate_num">24</property>
+    <property name="meta.media.frame_rate_den">1</property>
+    <property name="meta.media.colorspace">709</property>
+    <property name="meta.media.color_trc">2</property>
+    <property name="meta.media.has_b_frames">2</property>
+    <property name="meta.media.width">1920</property>
+    <property name="meta.media.height">1080</property>
+    <property name="meta.media.aspect_ratio">1</property>
+    <property name="meta.media.color_range">mpeg</property>
+    <property name="astream">0</property>
+    <property name="meta.media.top_field_first">0</property>
+    <property name="meta.media.progressive">1</property>
+    <property name="meta.shotcut.vui">1</property>
+    <filter id="filter4" out="00:00:10.894">
+      <property name="argument">またみてね♪
+
+せんちゃんネル</property>
+      <property name="geometry">0 0 1920 1080 1</property>
+      <property name="family">Verdana</property>
+      <property name="size">360</property>
+      <property name="weight">500</property>
+      <property name="style">normal</property>
+      <property name="fgcolour">#ffffffff</property>
+      <property name="bgcolour">#00000000</property>
+      <property name="olcolour">#aa000000</property>
+      <property name="pad">0</property>
+      <property name="halign">center</property>
+      <property name="valign">bottom</property>
+      <property name="outline">3</property>
+      <property name="opacity">1.0</property>
+      <property name="mlt_service">dynamictext</property>
+      <property name="shotcut:filter">dynamicText</property>
+      <property name="shotcut:usePointSize">0</property>
+      <property name="shotcut:animIn">00:00:00.000</property>
+      <property name="shotcut:animOut">00:00:00.000</property>
+    </filter>
+  </producer>
+  <playlist id="playlist0">
+    <property name="shotcut:video">1</property>
+    <property name="shotcut:name">V1</property>
+    <entry producer="producer31" in="00:00:00.000" out="00:00:08.995"/>
+    <entry producer="producer32" in="00:00:00.000" out="00:00:02.948"/>
+    <entry producer="producer33" in="00:00:00.000" out="00:00:02.948"/>
+    <blank length="00:00:00.050"/>
+    <entry producer="producer34" in="00:00:00.000" out="00:00:02.948"/>
+    <entry producer="producer35" in="00:00:00.000" out="00:00:02.948"/>
+    <entry producer="producer36" in="00:00:00.000" out="00:00:02.948"/>
+    <entry producer="producer37" in="00:00:00.000" out="00:00:02.948"/>
+    <entry producer="producer38" in="00:00:00.000" out="00:00:02.948"/>
+    <entry producer="producer39" in="00:00:00.000" out="00:00:02.948"/>
+    <entry producer="producer40" in="00:00:00.000" out="00:00:02.948"/>
+    <entry producer="producer41" in="00:00:00.000" out="00:00:02.948"/>
+    <entry producer="producer42" in="00:00:00.000" out="00:00:02.948"/>
+    <entry producer="producer43" in="00:00:00.000" out="00:00:02.948"/>
+    <entry producer="producer44" in="00:00:00.000" out="00:00:02.948"/>
+    <entry producer="producer45" in="00:00:00.000" out="00:00:02.948"/>
+    <entry producer="producer46" in="00:00:00.000" out="00:00:02.948"/>
+    <entry producer="producer47" in="00:00:00.000" out="00:00:02.948"/>
+    <entry producer="producer48" in="00:00:00.000" out="00:00:02.948"/>
+    <entry producer="producer49" in="00:00:00.000" out="00:00:02.948"/>
+    <entry producer="producer50" in="00:00:00.000" out="00:00:02.948"/>
+    <entry producer="producer51" in="00:00:00.000" out="00:00:02.948"/>
+    <entry producer="producer52" in="00:00:00.000" out="00:00:02.948"/>
+    <entry producer="producer53" in="00:00:00.000" out="00:00:02.948"/>
+    <entry producer="producer54" in="00:00:00.000" out="00:00:02.948"/>
+    <entry producer="producer55" in="00:00:00.000" out="00:00:02.948"/>
+    <entry producer="producer56" in="00:00:00.000" out="00:00:02.948"/>
+    <entry producer="producer57" in="00:00:00.000" out="00:00:02.948"/>
+    <entry producer="producer58" in="00:00:00.000" out="00:00:02.948"/>
+    <entry producer="producer59" in="00:00:00.000" out="00:00:02.948"/>
+    <entry producer="producer60" in="00:00:00.000" out="00:00:02.948"/>
+    <entry producer="producer61" in="00:00:00.500" out="00:00:10.894"/>
+  </playlist>
+  <producer id="producer62" in="00:00:00.000" out="00:00:59.968">
+    <property name="length">00:01:00.050</property>
+    <property name="eof">pause</property>
+    <property name="resource">D:/git/igaponr/training/python/Movie/せんちゃんネル/晴れの日.mp3</property>
+    <property name="audio_index">0</property>
+    <property name="video_index">-1</property>
+    <property name="mute_on_pause">0</property>
+    <property name="mlt_service">avformat-novalidate</property>
+    <property name="seekable">1</property>
+    <property name="global_feed">1</property>
+    <property name="xml">was here</property>
+    <property name="shotcut:hash">7dee00bd26e8d992717d3efd70fa3d2b</property>
+    <property name="shotcut:caption">晴れの日.mp3</property>
+    <property name="meta.media.nb_streams">1</property>
+    <property name="meta.media.0.stream.type">audio</property>
+    <property name="meta.media.0.codec.sample_fmt">fltp</property>
+    <property name="meta.media.0.codec.sample_rate">44100</property>
+    <property name="meta.media.0.codec.channels">2</property>
+    <property name="meta.media.0.codec.layout">stereo</property>
+    <property name="meta.media.0.codec.name">mp3float</property>
+    <property name="meta.media.0.codec.long_name">MP3 (MPEG audio layer 3)</property>
+    <property name="meta.media.0.codec.bit_rate">160000</property>
+    <property name="astream">0</property>
+    <filter id="filter5" out="00:00:59.968">
+      <property name="window">75</property>
+      <property name="max_gain">20dB</property>
+      <property name="level">-10</property>
+      <property name="mlt_service">volume</property>
+      <property name="shotcut:animIn">00:00:00.000</property>
+      <property name="shotcut:animOut">00:00:00.000</property>
+    </filter>
+  </producer>
+  <producer id="producer63" in="00:00:00.000" out="00:00:59.968">
+    <property name="length">00:01:00.050</property>
+    <property name="eof">pause</property>
+    <property name="resource">D:/git/igaponr/training/python/Movie/せんちゃんネル/晴れの日.mp3</property>
+    <property name="audio_index">0</property>
+    <property name="video_index">-1</property>
+    <property name="mute_on_pause">0</property>
+    <property name="mlt_service">avformat-novalidate</property>
+    <property name="seekable">1</property>
+    <property name="global_feed">1</property>
+    <property name="xml">was here</property>
+    <property name="shotcut:hash">7dee00bd26e8d992717d3efd70fa3d2b</property>
+    <property name="shotcut:caption">晴れの日.mp3</property>
+    <property name="meta.media.nb_streams">1</property>
+    <property name="meta.media.0.stream.type">audio</property>
+    <property name="meta.media.0.codec.sample_fmt">fltp</property>
+    <property name="meta.media.0.codec.sample_rate">44100</property>
+    <property name="meta.media.0.codec.channels">2</property>
+    <property name="meta.media.0.codec.layout">stereo</property>
+    <property name="meta.media.0.codec.name">mp3float</property>
+    <property name="meta.media.0.codec.long_name">MP3 (MPEG audio layer 3)</property>
+    <property name="meta.media.0.codec.bit_rate">160000</property>
+    <property name="astream">0</property>
+    <filter id="filter6" out="00:00:46.425">
+      <property name="window">75</property>
+      <property name="max_gain">20dB</property>
+      <property name="level">-10</property>
+      <property name="mlt_service">volume</property>
+      <property name="shotcut:animIn">00:00:00.000</property>
+      <property name="shotcut:animOut">00:00:00.000</property>
+    </filter>
+  </producer>
+  <playlist id="playlist1">
+    <property name="shotcut:audio">1</property>
+    <property name="shotcut:name">A1</property>
+    <entry producer="producer62" in="00:00:00.000" out="00:00:59.968"/>
+    <entry producer="producer63" in="00:00:00.000" out="00:00:46.425"/>
+  </playlist>
+  <chain id="chain7" out="00:00:01.149">
+    <property name="length">00:00:01.199</property>
+    <property name="eof">pause</property>
+    <property name="resource">001_四国めたん（ノーマル）_せんチャンネルです.wav</property>
+    <property name="mlt_service">avformat-novalidate</property>
+    <property name="meta.media.nb_streams">1</property>
+    <property name="meta.media.0.stream.type">audio</property>
+    <property name="meta.media.0.codec.sample_fmt">s16</property>
+    <property name="meta.media.0.codec.sample_rate">24000</property>
+    <property name="meta.media.0.codec.channels">1</property>
+    <property name="meta.media.0.codec.layout">mono</property>
+    <property name="meta.media.0.codec.name">pcm_s16le</property>
+    <property name="meta.media.0.codec.long_name">PCM signed 16-bit little-endian</property>
+    <property name="meta.media.0.codec.bit_rate">384000</property>
+    <property name="seekable">1</property>
+    <property name="audio_index">0</property>
+    <property name="video_index">-1</property>
+    <property name="creation_time">2025-01-03T09:24:26</property>
+    <property name="astream">0</property>
+    <property name="shotcut:skipConvert">1</property>
+    <property name="xml">was here</property>
+    <property name="shotcut:hash">5f372f149343159c528a5e2f573cd232</property>
+  </chain>
+  <chain id="chain8" out="00:00:07.796">
+    <property name="length">00:00:07.846</property>
+    <property name="eof">pause</property>
+    <property name="resource">002_四国めたん（ノーマル）_2024年末に、デ….wav</property>
+    <property name="mlt_service">avformat-novalidate</property>
+    <property name="meta.media.nb_streams">1</property>
+    <property name="meta.media.0.stream.type">audio</property>
+    <property name="meta.media.0.codec.sample_fmt">s16</property>
+    <property name="meta.media.0.codec.sample_rate">24000</property>
+    <property name="meta.media.0.codec.channels">1</property>
+    <property name="meta.media.0.codec.layout">mono</property>
+    <property name="meta.media.0.codec.name">pcm_s16le</property>
+    <property name="meta.media.0.codec.long_name">PCM signed 16-bit little-endian</property>
+    <property name="meta.media.0.codec.bit_rate">384000</property>
+    <property name="seekable">1</property>
+    <property name="audio_index">0</property>
+    <property name="video_index">-1</property>
+    <property name="creation_time">2025-01-03T09:24:26</property>
+    <property name="astream">0</property>
+    <property name="shotcut:skipConvert">1</property>
+    <property name="xml">was here</property>
+    <property name="shotcut:hash">bcfe6491e071bb042ce5227594a1495f</property>
+  </chain>
+  <chain id="chain9" out="00:00:05.947">
+    <property name="length">00:00:05.997</property>
+    <property name="eof">pause</property>
+    <property name="resource">003_四国めたん（ノーマル）_ディスカバリーワー….wav</property>
+    <property name="mlt_service">avformat-novalidate</property>
+    <property name="meta.media.nb_streams">1</property>
+    <property name="meta.media.0.stream.type">audio</property>
+    <property name="meta.media.0.codec.sample_fmt">s16</property>
+    <property name="meta.media.0.codec.sample_rate">24000</property>
+    <property name="meta.media.0.codec.channels">1</property>
+    <property name="meta.media.0.codec.layout">mono</property>
+    <property name="meta.media.0.codec.name">pcm_s16le</property>
+    <property name="meta.media.0.codec.long_name">PCM signed 16-bit little-endian</property>
+    <property name="meta.media.0.codec.bit_rate">384000</property>
+    <property name="seekable">1</property>
+    <property name="audio_index">0</property>
+    <property name="video_index">-1</property>
+    <property name="creation_time">2025-01-03T09:24:26</property>
+    <property name="astream">0</property>
+    <property name="shotcut:skipConvert">1</property>
+    <property name="xml">was here</property>
+    <property name="shotcut:hash">92409343100e12ec2f41c66c1a7bdd27</property>
+    <property name="shotcut:caption">003_四国めたん（ノーマル）_ディスカバリーワー….wav</property>
+  </chain>
+  <chain id="chain10" out="00:00:03.648">
+    <property name="length">00:00:03.698</property>
+    <property name="eof">pause</property>
+    <property name="resource">004_四国めたん（ノーマル）_そのご、へいじょう….wav</property>
+    <property name="mlt_service">avformat-novalidate</property>
+    <property name="meta.media.nb_streams">1</property>
+    <property name="meta.media.0.stream.type">audio</property>
+    <property name="meta.media.0.codec.sample_fmt">s16</property>
+    <property name="meta.media.0.codec.sample_rate">24000</property>
+    <property name="meta.media.0.codec.channels">1</property>
+    <property name="meta.media.0.codec.layout">mono</property>
+    <property name="meta.media.0.codec.name">pcm_s16le</property>
+    <property name="meta.media.0.codec.long_name">PCM signed 16-bit little-endian</property>
+    <property name="meta.media.0.codec.bit_rate">384000</property>
+    <property name="seekable">1</property>
+    <property name="audio_index">0</property>
+    <property name="video_index">-1</property>
+    <property name="creation_time">2025-01-03T09:24:26</property>
+    <property name="astream">0</property>
+    <property name="shotcut:skipConvert">1</property>
+    <property name="xml">was here</property>
+    <property name="shotcut:hash">69904d4e4d47e79bf385add09cf04982</property>
+    <property name="shotcut:caption">004_四国めたん（ノーマル）_そのご、へいじょう….wav</property>
+  </chain>
+  <chain id="chain11" out="00:00:02.699">
+    <property name="length">00:00:02.749</property>
+    <property name="eof">pause</property>
+    <property name="resource">005_四国めたん（ノーマル）_朱雀門が大きくて印….wav</property>
+    <property name="mlt_service">avformat-novalidate</property>
+    <property name="meta.media.nb_streams">1</property>
+    <property name="meta.media.0.stream.type">audio</property>
+    <property name="meta.media.0.codec.sample_fmt">s16</property>
+    <property name="meta.media.0.codec.sample_rate">24000</property>
+    <property name="meta.media.0.codec.channels">1</property>
+    <property name="meta.media.0.codec.layout">mono</property>
+    <property name="meta.media.0.codec.name">pcm_s16le</property>
+    <property name="meta.media.0.codec.long_name">PCM signed 16-bit little-endian</property>
+    <property name="meta.media.0.codec.bit_rate">384000</property>
+    <property name="seekable">1</property>
+    <property name="audio_index">0</property>
+    <property name="video_index">-1</property>
+    <property name="creation_time">2025-01-03T09:24:26</property>
+    <property name="astream">0</property>
+    <property name="shotcut:skipConvert">1</property>
+    <property name="xml">was here</property>
+    <property name="shotcut:hash">2067ff595d067eb71a17bdb7c97ecda6</property>
+  </chain>
+  <chain id="chain12" out="00:00:03.548">
+    <property name="length">00:00:03.598</property>
+    <property name="eof">pause</property>
+    <property name="resource">006_四国めたん（ノーマル）_カービーカフェでは….wav</property>
+    <property name="mlt_service">avformat-novalidate</property>
+    <property name="meta.media.nb_streams">1</property>
+    <property name="meta.media.0.stream.type">audio</property>
+    <property name="meta.media.0.codec.sample_fmt">s16</property>
+    <property name="meta.media.0.codec.sample_rate">24000</property>
+    <property name="meta.media.0.codec.channels">1</property>
+    <property name="meta.media.0.codec.layout">mono</property>
+    <property name="meta.media.0.codec.name">pcm_s16le</property>
+    <property name="meta.media.0.codec.long_name">PCM signed 16-bit little-endian</property>
+    <property name="meta.media.0.codec.bit_rate">384000</property>
+    <property name="seekable">1</property>
+    <property name="audio_index">0</property>
+    <property name="video_index">-1</property>
+    <property name="creation_time">2025-01-03T09:24:26</property>
+    <property name="astream">0</property>
+    <property name="shotcut:skipConvert">1</property>
+    <property name="xml">was here</property>
+    <property name="shotcut:hash">9141beeeada94fee544852230fe1e386</property>
+    <property name="shotcut:caption">006_四国めたん（ノーマル）_カービーカフェでは….wav</property>
+  </chain>
+  <chain id="chain13" out="00:00:02.099">
+    <property name="length">00:00:02.149</property>
+    <property name="eof">pause</property>
+    <property name="resource">007_四国めたん（ノーマル）_楽しかったです。ま….wav</property>
+    <property name="mlt_service">avformat-novalidate</property>
+    <property name="meta.media.nb_streams">1</property>
+    <property name="meta.media.0.stream.type">audio</property>
+    <property name="meta.media.0.codec.sample_fmt">s16</property>
+    <property name="meta.media.0.codec.sample_rate">24000</property>
+    <property name="meta.media.0.codec.channels">1</property>
+    <property name="meta.media.0.codec.layout">mono</property>
+    <property name="meta.media.0.codec.name">pcm_s16le</property>
+    <property name="meta.media.0.codec.long_name">PCM signed 16-bit little-endian</property>
+    <property name="meta.media.0.codec.bit_rate">384000</property>
+    <property name="seekable">1</property>
+    <property name="audio_index">0</property>
+    <property name="video_index">-1</property>
+    <property name="creation_time">2025-01-03T09:24:26</property>
+    <property name="astream">0</property>
+    <property name="shotcut:skipConvert">1</property>
+    <property name="xml">was here</property>
+    <property name="shotcut:hash">1d718fc72d011187d49084adc7ad063e</property>
+    <property name="shotcut:caption">007_四国めたん（ノーマル）_楽しかったです。ま….wav</property>
+  </chain>
+  <playlist id="playlist2">
+    <property name="shotcut:audio">1</property>
+    <property name="shotcut:name">A2</property>
+    <blank length="00:00:09.045"/>
+    <entry producer="chain7" in="00:00:00.000" out="00:00:01.149"/>
+    <entry producer="chain8" in="00:00:00.000" out="00:00:07.796"/>
+    <entry producer="chain9" in="00:00:00.000" out="00:00:05.947"/>
+    <blank length="00:00:17.990"/>
+    <entry producer="chain10" in="00:00:00.000" out="00:00:03.648"/>
+    <entry producer="chain11" in="00:00:00.000" out="00:00:02.699"/>
+    <blank length="00:00:05.547"/>
+    <entry producer="chain12" in="00:00:00.000" out="00:00:03.548"/>
+    <blank length="00:00:36.181"/>
+    <entry producer="chain13" in="00:00:00.000" out="00:00:02.099"/>
+  </playlist>
+  <producer id="producer64" in="00:00:00.000" out="03:60:00.000">
+    <property name="length">04:00:00.050</property>
+    <property name="eof">pause</property>
+    <property name="resource">C:/Users/igapon/Downloads/1230/001.jpg</property>
+    <property name="ttl">1</property>
+    <property name="aspect_ratio">1</property>
+    <property name="meta.media.progressive">1</property>
+    <property name="seekable">1</property>
+    <property name="format">1</property>
+    <property name="meta.media.width">4284</property>
+    <property name="meta.media.height">5712</property>
+    <property name="mlt_service">qimage</property>
+    <property name="creation_time">2025-01-03T07:52:15</property>
+    <property name="shotcut:skipConvert">1</property>
+    <property name="xml">was here</property>
+    <property name="shotcut:hash">64898c54de5eaec0b9c602eb9c9afb26</property>
+    <property name="shotcut:caption">001.jpg</property>
+    <property name="meta.shotcut.vui">1</property>
+    <filter id="filter1" out="00:00:02.948">
+      <property name="mlt_service">avfilter.gblur</property>
+      <property name="shotcut:filter">blur_gaussian_av</property>
+      <property name="av.sigma">10</property>
+      <property name="av.sigmaV">10</property>
+      <property name="av.planes">0xf</property>
+    </filter>
+    <filter id="filter2" out="00:00:02.948">
+      <property name="rect">1223 166 87 84 1</property>
+      <property name="circle">0</property>
+      <property name="color">#00000000</property>
+      <property name="radius">0.1</property>
+      <property name="mlt_service">qtcrop</property>
+      <property name="shotcut:filter">cropRectangle</property>
+    </filter>
+  </producer>
+  <producer id="producer65" in="00:00:00.000" out="03:60:00.000">
+    <property name="length">04:00:00.050</property>
+    <property name="eof">pause</property>
+    <property name="resource">C:/Users/igapon/Downloads/1230/009.jpg</property>
+    <property name="ttl">1</property>
+    <property name="aspect_ratio">1</property>
+    <property name="meta.media.progressive">1</property>
+    <property name="seekable">1</property>
+    <property name="format">1</property>
+    <property name="meta.media.width">4284</property>
+    <property name="meta.media.height">5712</property>
+    <property name="mlt_service">qimage</property>
+    <property name="creation_time">2025-01-03T07:52:22</property>
+    <property name="shotcut:skipConvert">1</property>
+    <property name="xml">was here</property>
+    <property name="shotcut:hash">6abf46bfc9c1a2775d2479ac6833e6e4</property>
+    <property name="shotcut:caption">009.jpg</property>
+    <property name="meta.shotcut.vui">1</property>
+    <filter id="filter3" out="00:00:02.948">
+      <property name="mlt_service">avfilter.gblur</property>
+      <property name="shotcut:filter">blur_gaussian_av</property>
+      <property name="av.sigma">10</property>
+      <property name="av.sigmaV">10</property>
+      <property name="av.planes">0xf</property>
+    </filter>
+    <filter id="filter7" out="00:00:02.948">
+      <property name="rect">595 388 87 84 1</property>
+      <property name="circle">0</property>
+      <property name="color">#00000000</property>
+      <property name="radius">0.1</property>
+      <property name="mlt_service">qtcrop</property>
+      <property name="shotcut:filter">cropRectangle</property>
+    </filter>
+  </producer>
+  <playlist id="playlist3">
+    <property name="shotcut:video">1</property>
+    <property name="shotcut:name">V2</property>
+    <blank length="00:00:54.071"/>
+    <entry producer="producer64" in="00:00:00.000" out="00:00:02.948"/>
+    <blank length="00:00:20.989"/>
+    <entry producer="producer65" in="00:00:00.000" out="00:00:02.948"/>
+  </playlist>
+  <tractor id="tractor6" title="Shotcut version 24.11.17" in="00:00:00.000" out="00:01:46.475">
+    <property name="shotcut">1</property>
+    <property name="shotcut:projectAudioChannels">2</property>
+    <property name="shotcut:projectFolder">1</property>
+    <property name="shotcut:scaleFactor">0.867375</property>
+    <property name="shotcut:skipConvert">0</property>
+    <track producer="background"/>
+    <track producer="playlist0"/>
+    <track producer="playlist1" hide="video"/>
+    <track producer="playlist2" hide="video"/>
+    <track producer="playlist3"/>
+    <transition id="transition12">
+      <property name="a_track">0</property>
+      <property name="b_track">1</property>
+      <property name="mlt_service">mix</property>
+      <property name="always_active">1</property>
+      <property name="sum">1</property>
+    </transition>
+    <transition id="transition13">
+      <property name="a_track">0</property>
+      <property name="b_track">1</property>
+      <property name="version">0.9</property>
+      <property name="mlt_service">frei0r.cairoblend</property>
+      <property name="threads">0</property>
+      <property name="disable">1</property>
+    </transition>
+    <transition id="transition14">
+      <property name="a_track">0</property>
+      <property name="b_track">2</property>
+      <property name="mlt_service">mix</property>
+      <property name="always_active">1</property>
+      <property name="sum">1</property>
+    </transition>
+    <transition id="transition0">
+      <property name="a_track">0</property>
+      <property name="b_track">3</property>
+      <property name="mlt_service">mix</property>
+      <property name="always_active">1</property>
+      <property name="sum">1</property>
+    </transition>
+    <transition id="transition1">
+      <property name="a_track">0</property>
+      <property name="b_track">4</property>
+      <property name="mlt_service">mix</property>
+      <property name="always_active">1</property>
+      <property name="sum">1</property>
+    </transition>
+    <transition id="transition2">
+      <property name="a_track">1</property>
+      <property name="b_track">4</property>
+      <property name="version">0.1</property>
+      <property name="mlt_service">frei0r.cairoblend</property>
+      <property name="threads">0</property>
+      <property name="disable">0</property>
+    </transition>
+  </tractor>
+</mlt>
