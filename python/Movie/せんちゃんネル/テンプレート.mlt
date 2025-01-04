@@ -4,7 +4,7 @@
   <producer id="producer1" in="00:00:00.000" out="00:00:18.140">
     <property name="length">00:00:18.190</property>
     <property name="eof">pause</property>
-    <property name="resource">C:\Git\igapon50\traning\python\Movie\せんちゃんネル/Clouds - 35573.mp4</property>
+    <property name="resource">D:\git\igaponr\traning\python\Movie\せんちゃんネル\Clouds - 35573.mp4</property>
     <property name="audio_index">1</property>
     <property name="video_index">0</property>
     <property name="mute_on_pause">0</property>
@@ -19,7 +19,7 @@
   <producer id="producer2" in="00:00:00.000" out="00:00:59.968">
     <property name="length">00:01:00.050</property>
     <property name="eof">pause</property>
-    <property name="resource">C:\Git\igapon50\traning\python\Movie\せんちゃんネル/晴れの日.mp3</property>
+    <property name="resource">D:\git\igaponr\traning\python\Movie\せんちゃんネル\晴れの日.mp3</property>
     <property name="audio_index">0</property>
     <property name="video_index">-1</property>
     <property name="mute_on_pause">0</property>
@@ -49,7 +49,7 @@
   <producer id="producer6" in="00:00:00.000" out="00:00:18.140">
     <property name="length">00:00:18.190</property>
     <property name="eof">pause</property>
-    <property name="resource">C:\Git\igapon50\traning\python\Movie\せんちゃんネル/Clouds - 35573.mp4</property>
+    <property name="resource">D:\git\igaponr\traning\python\Movie\せんちゃんネル\Clouds - 35573.mp4</property>
     <property name="audio_index">1</property>
     <property name="video_index">0</property>
     <property name="mute_on_pause">0</property>
@@ -85,7 +85,7 @@
   <producer id="producer11" in="00:00:00.000" out="00:00:18.140">
     <property name="length">00:00:18.190</property>
     <property name="eof">pause</property>
-    <property name="resource">C:\Git\igapon50\traning\python\Movie\せんちゃんネル/Clouds - 35573.mp4</property>
+    <property name="resource">D:\git\igaponr\traning\python\Movie\せんちゃんネル\Clouds - 35573.mp4</property>
     <property name="audio_index">1</property>
     <property name="video_index">0</property>
     <property name="mute_on_pause">0</property>
@@ -130,7 +130,7 @@
   <producer id="producer12" in="00:00:00.000" out="00:00:59.968">
     <property name="length">00:01:00.050</property>
     <property name="eof">pause</property>
-    <property name="resource">C:\Git\igapon50\traning\python\Movie\せんちゃんネル/晴れの日.mp3</property>
+    <property name="resource">D:\git\igaponr\traning\python\Movie\せんちゃんネル\晴れの日.mp3</property>
     <property name="audio_index">0</property>
     <property name="video_index">-1</property>
     <property name="mute_on_pause">0</property>
@@ -152,7 +152,7 @@
   <producer id="producer13" in="00:00:00.000" out="00:00:59.968">
     <property name="length">00:01:00.050</property>
     <property name="eof">pause</property>
-    <property name="resource">C:\Git\igapon50\traning\python\Movie\せんちゃんネル/晴れの日.mp3</property>
+    <property name="resource">D:\git\igaponr\traning\python\Movie\せんちゃんネル\晴れの日.mp3</property>
     <property name="audio_index">0</property>
     <property name="video_index">-1</property>
     <property name="mute_on_pause">0</property>
@@ -174,7 +174,7 @@
   <producer id="producer14" in="00:00:00.000" out="00:00:59.968">
     <property name="length">00:01:00.050</property>
     <property name="eof">pause</property>
-    <property name="resource">C:\Git\igapon50\traning\python\Movie\せんちゃんネル/晴れの日.mp3</property>
+    <property name="resource">D:\git\igaponr\traning\python\Movie\せんちゃんネル\晴れの日.mp3</property>
     <property name="audio_index">0</property>
     <property name="video_index">-1</property>
     <property name="mute_on_pause">0</property>
