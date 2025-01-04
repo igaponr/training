@@ -2,7 +2,9 @@
 # -*- coding: utf-8 -*-
 """
 # Irvineのヘルパー
+
 ## 説明
+
 - Irvineを使ってurlリストのファイルをダウンロードする
     - urlリストを渡してIrvineHelperインスタンスを作る。urlリストはIrvineHelperのlist_pathのファイルに保存される
         - 既にurlリストがファイルになっていれば、そのファイルパスを渡してIrvineHelperインスタンスを作る
@@ -10,12 +12,14 @@
         - あらかじめIrvineの設定を行っておくこと
 
 ## Irvineの設定
+
 - キューフォルダにフォーカスを当ててIrvineを終了しておく。Irvine起動時にフォーカスの当たっているキューフォルダにurlリストが追加される
 - ダウンロードが終わったらIrvineを終了する
     - [オプション設定]-[イベント]-[OnDeactivateQueue]に新規作成で以下のスクリプトを書き込む
     - [全て終了時にIrvineを終了]をチェックする
 
 ## list_pathのファイルフォーマット
+
 - タブ区切りフォーマット
     - URL
     - 保存フォルダ
@@ -43,18 +47,14 @@ irvine.ExecuteAction('actFileClose');
 ```
 
 ## 参考
-- Irvine公式
-    - http://hp.vector.co.jp/authors/VA024591/
-- Irvineマニュアル
-    - http://hp.vector.co.jp/authors/VA024591/doc/manual.html
-- IrvineまとめWiki
-    - https://w.atwiki.jp/irvinewiki/
-- Irvineの設定
-    - https://w.atwiki.jp/irvinewiki/pages/32.html
-- Irvine Uploader
-    - https://u1.getuploader.com/irvn/
-- Irvine Part36スレ
-    - https://mevius.5ch.net/test/read.cgi/win/1545612410
+
+- [Irvine公式](http://hp.vector.co.jp/authors/VA024591/)
+- [Irvineマニュアル](http://hp.vector.co.jp/authors/VA024591/doc/manual.html)
+- [IrvineまとめWiki](https://w.atwiki.jp/irvinewiki/)
+- [Irvineの設定](https://w.atwiki.jp/irvinewiki/pages/32.html)
+- [Irvine Uploader](https://u1.getuploader.com/irvn/)
+- [Irvine Part36スレ](https://mevius.5ch.net/test/read.cgi/win/1545612410)
+
 """
 # standard library
 import sys  # 終了時のエラー有無
@@ -75,9 +75,8 @@ sys.setrecursionlimit(10000)
 
 @dataclass(frozen=True)
 class IrvineHelperValue:
-    """Irvineのヘルパーオブジェクト"""
+    """Irvineの値オブジェクトクラス"""
     exe_path: str = r'c:\Program1\irvine1_3_0\irvine.exe'.replace(os.sep, '/')
-    # list_path: str = r'../../irvine_download_list.txt'
     list_path: str = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                                   '../irvine_download_list.txt').replace(os.sep, '/')
 
