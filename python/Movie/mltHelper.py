@@ -44,8 +44,7 @@ def get_abs_path(path):
 
 
 def get_next_index_entry(entry):
-    """
-    リストに無い次の(アルファベット+十進数値な)名前のindex(管理番号)を返す
+    """リストに無い次の(アルファベット+十進数値な)名前のindex(管理番号)を返す
 
     :param entry: list 対象の管理リスト
     :return: str 次のindex(管理番号)
@@ -61,20 +60,18 @@ def get_next_index_entry(entry):
 
 @dataclass(frozen=True)
 class MltValue:
-    """
-    mltの値オブジェクト
-    """
-    target_filepath: 'str 対象のファイルパス'
-    target_basename: 'str 対象のファイル名+拡張子'
-    target_dirname: 'str 対象のディレクトリ'
-    target_filename: 'str 対象のファイル名'
-    target_ext: 'str 対象の拡張子'
+    """mltの値オブジェクト"""
+    target_filepath: str
+    target_basename: str
+    target_dirname: str
+    target_filename: str
+    target_ext: str
 
     def __init__(self, mlt_path):
-        """
-        コンストラクタ
+        """コンストラクタ
 
-        :param mlt_path: str movieのファイルパス
+        Args:
+            mlt_path: 対象のファイルパス
         """
         if mlt_path is None:
             print('mltファイルパスがNoneです')
@@ -95,8 +92,7 @@ class MltValue:
 
 @dataclass(frozen=True)
 class ShotValue:
-    """
-    shot(動画やテロップなど操作の単位)の値オブジェクト
+    """shot(動画やテロップなど操作の単位)の値オブジェクト
 
     Todo: このクラスを継承させて、動画やテロップなどのクラスを、個別に用意したほうがいいか。そんなに頑張るつもりないので困るまで放置
     """
@@ -120,8 +116,7 @@ class ShotValue:
     filter_name: str = 'filter'
 
     def __init__(self, index, contents, in_time, out_time, length_time, creation_time=None, shotcut_hash=None):
-        """
-        完全コンストラクタパターン
+        """完全コンストラクタパターン
             * 動画の時は、index,contents,in_time,out_time,creation_time,shotcut_hash
             * 字幕の時は、index,contents,in_time,out_time
 
@@ -146,8 +141,7 @@ class ShotValue:
         object.__setattr__(self, "length_time", length_time)
 
     def is_filter(self):
-        """
-        フィルター(字幕)の判定
+        """フィルター(字幕)の判定
 
         :return: bool フィルター(字幕)ならTrue/そうでないならFalse
         """
@@ -157,8 +151,7 @@ class ShotValue:
             return False
 
     def create_shot_playlist(self):
-        """
-        playlistに追加するshotのodを作って返す
+        """playlistに追加するshotのodを作って返す
 
         :return: collections.OrderedDict playlistに追加するshot
         """
@@ -175,8 +168,7 @@ class ShotValue:
         return od
 
     def create_shot_mlt(self, index=None):
-        """
-        mltに追加するshotのodを作って返す
+        """mltに追加するshotのodを作って返す
         todo indexの渡し方がビミョー
 
         動画の時
@@ -274,9 +266,8 @@ class ShotValue:
 
 
 class MltHelper:
-    """
-    動画編集shotcutのmltプロジェクトファイルを編集するヘルパー
-    内部では辞書型でデータを保持する
+    """動画編集shotcutのmltプロジェクトファイルを編集するヘルパー、内部では辞書型でデータを保持する
+
     shotcutのmltプロジェクトファイルフォーマット https://shotcut.org/notes/mltxml-annotations/
     """
     app_name: str = 'shotcut'
@@ -291,8 +282,7 @@ class MltHelper:
     filter_name: str = 'filter'
 
     def __init__(self, mlt_value):
-        """
-        コンストラクタ
+        """コンストラクタ
 
         :param mlt_value: str shotcutのmltプロジェクトファイルパス、または、MltValue mltの値オブジェクト
         """
@@ -319,8 +309,7 @@ class MltHelper:
         self.load_xml()
 
     def __load_entry(self, entry_name, root):
-        """
-        エントリーをロードする(filter除く)
+        """エントリーをロードする(filter除く)
 
         :param entry_name: str 登録名
         :param root: OrderedDict 順序付き辞書
@@ -341,8 +330,7 @@ class MltHelper:
                 self.__register_index_entry(entry_name, int(number))
 
     def __load_filter(self):
-        """
-        エントリーをロードする(filterのみ)
+        """エントリーをロードする(filterのみ)
 
         :return: None
         """
@@ -365,8 +353,7 @@ class MltHelper:
             self.__register_index_entry(self.filter_name, int(number))
 
     def __load_mlt_root(self):
-        """
-        mltルートにあるエントリーのロード
+        """mltルートにあるエントリーのロード
 
         :return: None
         """
@@ -379,8 +366,7 @@ class MltHelper:
         self.__load_entry(self.chain_name, target_root)
 
     def __load_tractor_root(self):
-        """
-        tractorルートにあるエントリーのロード
+        """tractorルートにあるエントリーのロード
 
         :return: None
         """
@@ -393,8 +379,7 @@ class MltHelper:
         self.__load_entry(self.transition_name, target_root)
 
     def load_xml(self):
-        """
-        プロジェクトファイルをロードする
+        """プロジェクトファイルをロードする
 
         :return: None
         """
@@ -411,8 +396,7 @@ class MltHelper:
         self.__load_filter()
 
     def save_xml(self, save_path):
-        """
-        shotcutのmltプロジェクトファイルを保存する（ファイルがある場合は保存しない）
+        """shotcutのmltプロジェクトファイルを保存する（ファイルがある場合は保存しない）
 
         :param save_path: str xmlで保存するファイルパス
         :return: None
@@ -435,8 +419,7 @@ class MltHelper:
             fp.write(self.xml_data)
 
     def __get_count_entry(self, name):
-        """
-        現在のエントリー数を取得する
+        """現在のエントリー数を取得する
 
         :param name: str 登録名
         :return: int エントリー数
@@ -444,8 +427,7 @@ class MltHelper:
         return len(self.entry_manager.get(name))
 
     def __get_next_index_entry(self, name):
-        """
-        次の登録番号を取得する
+        """次の登録番号を取得する
 
         :param name: str 登録名
         :return: 次の登録番号
@@ -454,8 +436,7 @@ class MltHelper:
         return get_next_index_entry(ret_entry)
 
     def __register_index_entry(self, name, index):
-        """
-        管理番号を登録する
+        """管理番号を登録する
 
         :param name: str 登録名
         :param index: int 登録する管理番号
@@ -464,8 +445,7 @@ class MltHelper:
         self.entry_manager.get(name).append(index)
 
     def __clear_entry(self, name):
-        """
-        管理番号を初期化する
+        """管理番号を初期化する
 
         :param name: str 登録名
         :return: None
@@ -473,8 +453,7 @@ class MltHelper:
         self.entry_manager.get(name).clear()
 
     def __add_shot_to_playlist(self, playlist_id, shot_value):
-        """
-        playlistにshotを追加する
+        """playlistにshotを追加する
 
         :param playlist_id: str 追加するプレイリストのID
         :param shot_value: ShotValue shot(動画やテロップなど操作の単位)の値クラス
@@ -495,8 +474,7 @@ class MltHelper:
         sys.exit()
 
     def __add_shot_to_mlt(self, shot_value):
-        """
-        mltにshotを追加する
+        """mltにshotを追加する
 
         :param shot_value: ShotValue shot(動画や字幕など操作の単位)の値クラス
         :return: None
@@ -518,8 +496,7 @@ class MltHelper:
             target_root.append(od)
 
     def add_movie(self, playlist_id, movie):
-        """
-        producerの空き番号を調べて、playlistとproducerに動画を追加する
+        """producerの空き番号を調べて、playlistとproducerに動画を追加する
         ※途中で失敗したらロールバックせずに中断
 
         :param playlist_id: str 対象のプレイリストのID
@@ -556,8 +533,7 @@ class MltHelper:
         self.__register_index_entry(self.chain_name, index)
 
     def add_movies(self, playlist_id, movie_list):
-        """
-        プレイリストに動画を追加する
+        """プレイリストに動画を追加する
 
         :param playlist_id: str 対象のプレイリストのID
         :param movie_list: list 追加する動画ファイルパスのリスト
@@ -573,8 +549,7 @@ class MltHelper:
             self.add_movie(playlist_id, movie)
 
     def add_subtitle(self, playlist_id, movie):
-        """
-        動画ファイルから文字起こしして、プレイリストに字幕を追加する
+        """動画ファイルから文字起こしして、プレイリストに字幕を追加する
 
         :param playlist_id: str 対象のプレイリストのID
         :param movie: str 動画ファイルパス
@@ -609,8 +584,7 @@ class MltHelper:
         self.__register_index_entry(self.chain_name, index)
 
     def add_subtitles(self, playlist_id, movies):
-        """
-        動画ファイルから文字起こしして、プレイリストに字幕を追加する
+        """動画ファイルから文字起こしして、プレイリストに字幕を追加する
 
         :param playlist_id: str 対象のプレイリストのID
         :param movies: list[str] 動画ファイルパスのリスト
@@ -626,9 +600,7 @@ class MltHelper:
             self.add_subtitle(playlist_id, movie)
 
     def __add_playlist_to_mlt(self, index, name):
-        """
-        mltにplaylistを追加する(nameは他のトラックと重複可能)
-        videoトラック追加用
+        """mltにplaylistを追加する(nameは他のトラックと重複可能)、videoトラック追加用
 
         < playlist id = "playlist2" >
             < property name = "shotcut:video" > 1 < / property >
@@ -658,11 +630,9 @@ class MltHelper:
         target_root.append(od)
 
     def __add_track_to_tractor(self, index):
-        """
-        mltのtractorにtrackを追加する
-        transitionの空き番号を調べる
-        todo tractorがない時、tractorを作る必要ある
+        """mltのtractorにtrackを追加する、transitionの空き番号を調べる
 
+        todo tractorがない時、tractorを作る必要ある
         < tractor id = "tractor6" title = "Shotcut version UNSTABLE-21.02.09" global_feed = "1"
          in = "00:00:00.000" out = "00:02:44.726" >
         < track producer = "playlist2" / >
@@ -680,10 +650,7 @@ class MltHelper:
         return ret_producer
 
     def __add_transition_to_tractor(self):
-        """
-        mltのtractorにtransitionを二つ追加する
-        ※映像トラック追加時に使用する
-        ※先にplaylistの登録__register_index_entry()を行うこと
+        """mltのtractorにtransitionを二つ追加する、※映像トラック追加時に使用する、※先にplaylistの登録__register_index_entry()を行うこと
 
         < transition id = "transition0" >
             < property name = "a_track" > 0 < / property > 固定
@@ -740,9 +707,7 @@ class MltHelper:
         self.__register_index_entry(self.transition_name, index)
 
     def add_track(self, name):
-        """
-        タイムラインに(映像)トラックを追加する(mltファイルのplaylistタグid=playlist0..)
-        videoトラック追加用
+        """タイムラインに(映像)トラックを追加する(mltファイルのplaylistタグid=playlist0..)、videoトラック追加用
 
         Todo: トラックが一つもない時に未対応
             * mltにplaylist id="main_bin"がなければmain_binを追加し、mltのproducer="main_bin"に変更する
@@ -766,8 +731,7 @@ class MltHelper:
 
 
 def test01():
-    """
-    絶対パスでmltファイルを読み込み、保存する
+    """絶対パスでmltファイルを読み込み、保存する
 
     :return: None
     """
@@ -776,8 +740,7 @@ def test01():
 
 
 def test02():
-    """
-    相対パスでmltファイルを読み込み、動画を2つプレイリストに追加して、保存する
+    """相対パスでmltファイルを読み込み、動画を2つプレイリストに追加して、保存する
 
     :return: None
     """
@@ -791,8 +754,7 @@ def test02():
 
 
 def test03():
-    """
-    カレントフォルダ以下で「*_part*.mov」を再帰検索して、見つけたファイルをトラックplaylist0に追加して、保存する
+    """カレントフォルダ以下で「*_part*.mov」を再帰検索して、見つけたファイルをトラックplaylist0に追加して、保存する
 
     :return: None
     """
@@ -803,8 +765,7 @@ def test03():
 
 
 def test04():
-    """
-    トラックを1つ追加して、保存する
+    """トラックを1つ追加して、保存する
 
     :return: None
     """
@@ -814,8 +775,7 @@ def test04():
 
 
 def test05():
-    """
-    トラックを1つ追加し、カレントフォルダ以下で「*_part*.mov」を再帰検索して、見つけたファイルを追加したトラックに追加して、保存する
+    """トラックを1つ追加し、カレントフォルダ以下で「*_part*.mov」を再帰検索して、見つけたファイルを追加したトラックに追加して、保存する
 
     :return: None
     """
@@ -827,8 +787,7 @@ def test05():
 
 
 def test06():
-    """
-    target_file_pathの親フォルダ以下で「*_part*.mov」を再帰検索して、見つけたファイルをプレイリストとV1トラックに追加して、保存する
+    """target_file_pathの親フォルダ以下で「*_part*.mov」を再帰検索して、見つけたファイルをプレイリストとV1トラックに追加して、保存する
 
     :return: None
     """
@@ -850,8 +809,7 @@ def test06():
 
 
 def test07():
-    """
-    V2トラックを追加して、保存する。
+    """V2トラックを追加して、保存する。
     さらに、動画をプレイリストと追加したV2トラックに追加して、保存する。
     さらに、V3トラックを追加して、保存する。
     さらに、動画から文字起こしして、プレイリストと追加したV3トラックに追加して、保存する。

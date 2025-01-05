@@ -42,8 +42,7 @@ import hashlib
 
 
 def time_to_dt(time, tzinfo=None):
-    """
-    動画のstart_timeとdurationよりdatetimeを作る
+    """動画のstart_timeとdurationよりdatetimeを作る
 
     :param time: float 秒[s]
     :param tzinfo:
@@ -62,12 +61,10 @@ def time_to_dt(time, tzinfo=None):
 
 
 def wav_to_subtitles(wav_filepath):
-    """
-    音声ファイルから文字起こしして返す(長いと失敗するので1分以下のファイルにする)
-
-    Todo:
-        * wavHelperとかあってもいいかも。
-        * エラーの回避策がわからないので、とりあえず例外処理にした。
+    """音声ファイルから文字起こしして返す(長いと失敗するので1分以下のファイルにする)
+        Todo
+            * wavHelperとかあってもいいかも。
+            * エラーの回避策がわからないので、とりあえず例外処理にした。
     :param wav_filepath: str 音声ファイルのパス
     :return: str 文字起こし結果
     """
@@ -88,8 +85,7 @@ def wav_to_subtitles(wav_filepath):
 
 
 def movies_to_helpers(movies):
-    """
-    動画ファイル群からMovieHelperリストを作る
+    """動画ファイル群からMovieHelperリストを作る
 
     :param movies: list[str] 動画ファイルパスのリスト
     :return: list[MovieHelper] ヘルパーのリスト
@@ -105,8 +101,7 @@ def movies_to_helpers(movies):
 
 
 def helpers_to_subtitles(movie_helpers):
-    """
-    MovieHelperリストから文字起こしする
+    """MovieHelperリストから文字起こしする
 
     :param movie_helpers: list[Movie_helper] ヘルパーのリスト
     :return: tuple (list[str] 動画ファイルパスのリスト,
@@ -124,8 +119,7 @@ def helpers_to_subtitles(movie_helpers):
 
 
 def movies_to_subtitles(movies):
-    """
-    動画ファイル群から文字起こしする
+    """動画ファイル群から文字起こしする
 
     :param movies: list[str] 文字起こしする動画ファイル群のファイルパスリスト
     :return: tuple (list[str] 動画ファイルパスのリストと,
@@ -138,8 +132,7 @@ def movies_to_subtitles(movies):
 
 
 def movie_directory_to_helpers(path):
-    """
-    ディレクトリ内の全ての動画ファイルからMovieHelperリストを作る
+    """ディレクトリ内の全ての動画ファイルからMovieHelperリストを作る
 
     :param path: str 動画ファイルが含まれるパス
     :return: list[MovieHelper] ヘルパーのリストを返す
@@ -153,8 +146,7 @@ def movie_directory_to_helpers(path):
 
 
 def movie_directory_to_subtitles(path):
-    """
-    指定ディレクトリ内の全てのmovファイルについて、無音部分をカットした動画に分割し、それぞれ文字起こしする
+    """指定ディレクトリ内の全てのmovファイルについて、無音部分をカットした動画に分割し、それぞれ文字起こしする
 
     :param path: str 動画ファイルが含まれるパス
     :return: tuple (list[str] 動画ファイルパスのリストと,
@@ -167,8 +159,7 @@ def movie_directory_to_subtitles(path):
 
 
 def clear_helpers_to_subtitles(movie_helpers):
-    """
-    以下のメソッドで作成した文字起こし結果ファイル群を削除する
+    """以下のメソッドで作成した文字起こし結果ファイル群を削除する
         * helpers_to_subtitles
         * movies_to_subtitles
         * movie_directory_to_subtitles
@@ -186,19 +177,16 @@ def clear_helpers_to_subtitles(movie_helpers):
 
 @dataclass(frozen=True)
 class MovieValue:
-    """
-    動画の値オブジェクト
-    """
-    target_filepath: 'str 対象のファイルパス'
-    target_basename: 'str 対象のファイル名+拡張子'
-    target_dirname: 'str 対象のディレクトリ'
-    target_filename: 'str 対象のファイル名'
-    target_ext: 'str 対象の拡張子'
-    video_info: 'Any 動画の情報'
+    """動画の値オブジェクト"""
+    target_filepath: str
+    target_basename: str
+    target_dirname: str
+    target_filename: str
+    target_ext: str
+    video_info: 'Any'
 
     def __init__(self, target_filepath):
-        """
-        コンストラクタ
+        """コンストラクタ
 
         :param target_filepath: str movieのファイルパス
         """
@@ -221,18 +209,15 @@ class MovieValue:
 
 
 class MovieHelper:
-    """
-    動画ファイルのヘルパー
-    """
-    movie_value: 'MovieValue movieの値オブジェクト'
-    movie_filepath: 'str 動画ファイル入力パス'
-    wave_filepath: 'str 音声ファイル出力パス'
-    subtitles_filepath: 'str 文字起こし出力パス'
-    movie_dividing_filepath: 'list 分割動画ファイル出力パスリスト'
+    """動画ファイルのヘルパー"""
+    movie_value: MovieValue
+    movie_filepath: str
+    wave_filepath: str
+    subtitles_filepath: str
+    movie_dividing_filepath: list
 
     def __init__(self, movie_value):
-        """
-        コンストラクタ
+        """コンストラクタ
 
         :param movie_value: str 動画のファイルパス、または、MovieValue 動画の値オブジェクト
         """
@@ -252,8 +237,7 @@ class MovieHelper:
                                                )
 
     def get_md5(self):
-        """
-        動画ファイルのMD5を取得する
+        """動画ファイルのMD5を取得する
         参考)windowsでMD5ハッシュを出力するコマンド例
         > certutil -hashfile C:\Git\igapon50\traning\python\Movie\せんちゃんネル\mov\BPUB2392.MP4 MD5
 
@@ -270,8 +254,7 @@ class MovieHelper:
         return hash_object.hexdigest()
 
     def get_duration_time(self):
-        """
-        動画ファイルの長さ(秒)を取得する
+        """動画ファイルの長さ(秒)を取得する
 
         :return: float 長さ(秒)
         """
@@ -279,8 +262,7 @@ class MovieHelper:
         return float(length_time)
 
     def get_length_time(self):
-        """
-        動画ファイルの長さ(秒)を取得する
+        """動画ファイルの長さ(秒)を取得する
 
         :return: str 長さtime
         """
@@ -290,8 +272,7 @@ class MovieHelper:
         return length_time
 
     def get_in_time(self):
-        """
-        動画ファイルのin_timeを取得する
+        """動画ファイルのin_timeを取得する
 
         :return: str 開始time
         """
@@ -301,10 +282,8 @@ class MovieHelper:
         return in_time
 
     def get_out_time(self):
-        """
-        動画ファイルのout_timeを取得する
-        shotcutのout_timeは、動画の長さより0.05秒短い
-        todo 動画の長さによって0.05秒は変わるかも
+        """動画ファイルのout_timeを取得する、shotcutのout_timeは、動画の長さより0.05秒短い
+            todo 動画の長さによって0.05秒は変わるかも
 
         :return: str 終了time
         """
@@ -316,8 +295,7 @@ class MovieHelper:
         return out_time
 
     def get_creation_time(self):
-        """
-        動画ファイルのcreation_timeを取得する
+        """動画ファイルのcreation_timeを取得する
 
         :return: str 作成time
         """
@@ -332,8 +310,7 @@ class MovieHelper:
         return creation_time
 
     def mov_to_wave(self):
-        """
-        動画ファイルから音声ファイルを作る(movファイルを対象とする)
+        """動画ファイルから音声ファイルを作る(movファイルを対象とする)
 
         :return: str 音声ファイルパス
         """
@@ -359,8 +336,7 @@ class MovieHelper:
         return self.wave_filepath
 
     def _split_wave(self, time=30):
-        """
-        動画について、指定秒数単位に分割した音声ファイルを作り、そのパスリストを返す
+        """動画について、指定秒数単位に分割した音声ファイルを作り、そのパスリストを返す
         一時的に全体のWaveファイルを作るが、使い終わったら削除する
 
         :param time: int 区切る時間[秒]
@@ -395,8 +371,7 @@ class MovieHelper:
         return output_file_list
 
     def mov_to_subtitles(self):
-        """
-        動画ファイルの文字起こしして返す。ファイルにも保存する
+        """動画ファイルの文字起こしして返す。ファイルにも保存する
         一時的にWaveファイルを作るが、使い終わったら削除する
         既に文字起こしファイルがある場合は、読み込んで返す
 
@@ -421,8 +396,7 @@ class MovieHelper:
         return output_subtitles
 
     def clear_subtitles(self):
-        """
-        mov_to_subtitlesで作った文字起こしファイルを削除する
+        """mov_to_subtitlesで作った文字起こしファイルを削除する
 
         :return: None
         """
@@ -433,8 +407,7 @@ class MovieHelper:
                        min_silence_duration=0.5,
                        padding_time=0.1,
                        ):
-        """
-        動画ファイルから無音部分をカットした部分動画ファイル群を作成する
+        """動画ファイルから無音部分をカットした部分動画ファイル群を作成する
         作成した動画のファイルパスリストを返す
         一時的にWaveファイルを作るが、使い終わったら削除する
 
@@ -517,8 +490,7 @@ class MovieHelper:
         return self.movie_dividing_filepath
 
     def movie_dividing_to_subtitles(self):
-        """
-        分割動画ファイル群から文字起こしして返す。ファイルにも保存する
+        """分割動画ファイル群から文字起こしして返す。ファイルにも保存する
 
         :return: tuple (list[str] 動画ファイルパスのリストと,
             list[MovieHelper] ヘルパーのリストと,
@@ -527,8 +499,7 @@ class MovieHelper:
         return movies_to_subtitles(self.movie_dividing_filepath)
 
     def clear_movie_dividing(self):
-        """
-        movie_dividingで作った動画ファイル群を削除する
+        """movie_dividingで作った動画ファイル群を削除する
 
         :return: None
         """
@@ -538,8 +509,7 @@ class MovieHelper:
 
 
 def test01():
-    """
-    指定動画ファイルの(無音部分をカットした動画分割後に)文字起こし
+    """指定動画ファイルの(無音部分をカットした動画分割後に)文字起こし
 
     :return: None
     """
@@ -554,8 +524,7 @@ def test01():
 
 
 def test02():
-    """
-    指定動画ファイルの文字起こし
+    """指定動画ファイルの文字起こし
 
     :return: None
     """
@@ -568,8 +537,7 @@ def test02():
 
 
 def test03():
-    """
-    指定ディレクトリ内のすべての動画文字起こし
+    """指定ディレクトリ内のすべての動画文字起こし
 
     :return: None
     """
