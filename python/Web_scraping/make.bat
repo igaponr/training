@@ -34,7 +34,7 @@ if "%1" == "preview" (
 )
 
 :html
-%SPHINXBUILD% -b html %SOURCEDIR% "../docs" %SPHINXOPTS% %O%
+%SPHINXBUILD% -b html %SOURCEDIR% "docs" %SPHINXOPTS% %O%
 goto end
 
 %SPHINXBUILD% -M %1 %SOURCEDIR% %BUILDDIR% %SPHINXOPTS% %O%
