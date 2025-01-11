@@ -25,6 +25,18 @@ if errorlevel 9009 (
 
 if "%1" == "" goto help
 
+if "%1" == "preview" (
+    echo.Running sphinx-autobuild. View live edits at:
+    echo.  http://0.0.0.0:8000
+    sphinx-autobuild -b html %SOURCEDIR% %BUILDDIR%/html
+    if errorlevel 1 exit /b 1
+    goto end
+)
+
+:html
+%SPHINXBUILD% -b html %SOURCEDIR% "../docs" %SPHINXOPTS% %O%
+goto end
+
 %SPHINXBUILD% -M %1 %SOURCEDIR% %BUILDDIR% %SPHINXOPTS% %O%
 goto end
 
