@@ -15,7 +15,7 @@ source_suffix = {
 source_parsers = {
     '.md': CommonMarkParser,
 }
-sys.path.insert(0, os.path.abspath('../'))
+sys.path.insert(0, os.path.abspath('../python/Web_scraping/'))
 # print(sys.path)
 project = 'Web_scraping'
 copyright = '2025, Ryosuke Igarashi'
