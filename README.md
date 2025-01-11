@@ -14,7 +14,7 @@
 
 # Contributors
 
-- [igapon50](https://github.com/igapon50)
+- [igaponr](https://github.com/igaponr)
 
 <!-- CREATED_BY_LEADYOU_README_GENERATOR -->
 
@@ -192,9 +192,8 @@ pip install numpy
 
 
 # python/Web_scraping
-クローリングして、スクレイピングして、画像URLリストを作り、その画像をまとめてダウンロードして、ファイル名をナンバリングして、zipファイルにアーカイブする。
-
-使い方はユニットテスト（例えば、test_crawling.py）を参照のこと
+webクローリング関連の処理を行う。
+使い方は、[ドキュメント](https://igaponr.github.io/training/index.html)や、ユニットテスト（例えば、test_crawling.py）を参照のこと
 
 以下は「新しい」
 
@@ -269,7 +268,6 @@ aws s3 syncコマンドは、とりあえずおいといて、AWS S3のバケッ
 動画から無音部分をカットするために、有音部分を切り出す
 
 - movieCutter：指定したmovファイルから、有音部分のmovを切り出す
-
 
 ### 参考
 
