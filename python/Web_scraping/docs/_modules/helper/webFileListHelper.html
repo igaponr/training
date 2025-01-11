@@ -1,0 +1,516 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="ja" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>helper.webFileListHelper &mdash; Web_scraping 1.0.0 ドキュメント</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=144c8c96"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/translations.js?v=4755f45a"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="索引" href="../../genindex.html" />
+    <link rel="search" title="検索" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Web_scraping
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../helper.html">helper package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Web_scraping</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">モジュールコード</a></li>
+      <li class="breadcrumb-item active">helper.webFileListHelper</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>helper.webFileListHelper のソースコード</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python3</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;webファイルリストのヘルパー</span>
+
+<span class="sd">Todo:</span>
+<span class="sd">    - docstringを整える</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">inspect</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">import</span> <span class="nn">zipfile</span>  <span class="c1"># zipファイル</span>
+<span class="kn">import</span> <span class="nn">pathlib</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+
+<span class="kn">from</span> <span class="nn">helper</span> <span class="kn">import</span> <span class="n">uriHelper</span>
+<span class="kn">from</span> <span class="nn">helper</span> <span class="kn">import</span> <span class="n">chromeDriverHelper</span>
+<span class="kn">from</span> <span class="nn">helper</span> <span class="kn">import</span> <span class="n">webFileHelper</span>
+<span class="kn">from</span> <span class="nn">helper</span> <span class="kn">import</span> <span class="n">irvineHelper</span>
+
+
+<div class="viewcode-block" id="WebFileListHelperValue">
+<a class="viewcode-back" href="../../helper.webFileListHelper.html#helper.webFileListHelper.WebFileListHelperValue">[ドキュメント]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">WebFileListHelperValue</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;値オブジェクト&quot;&quot;&quot;</span>
+    <span class="n">web_file_list</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">work_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)),</span>
+                                  <span class="s1">&#39;../work&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">,</span> <span class="s1">&#39;/&#39;</span><span class="p">)</span>
+    <span class="n">archive_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)),</span>
+                                     <span class="s1">&#39;../archive&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">,</span> <span class="s1">&#39;/&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">web_file_list</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">work_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">work_path</span><span class="p">,</span>
+                 <span class="n">archive_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">archive_path</span><span class="p">,</span>
+                 <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;完全コンストラクタパターン&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">web_file_list</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">inspect</span><span class="o">.</span><span class="n">stack</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">function</span><span class="si">}</span><span class="s2">&quot;</span>
+                             <span class="sa">f</span><span class="s2">&quot;引数エラー:web_file_list=None&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">count</span><span class="p">,</span> <span class="n">item</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">web_file_list</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">webFileHelper</span><span class="o">.</span><span class="n">WebFileHelper</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">inspect</span><span class="o">.</span><span class="n">stack</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">function</span><span class="si">}</span><span class="s2">&quot;</span>
+                                 <span class="sa">f</span><span class="s2">&quot;引数エラー:web_file_listの</span><span class="si">{</span><span class="n">count</span><span class="si">}</span><span class="s2">個目がWebFileHelperで無い&quot;</span><span class="p">)</span>
+        <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;web_file_list&quot;</span><span class="p">,</span> <span class="n">web_file_list</span><span class="p">)</span>
+        <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;work_path&quot;</span><span class="p">,</span> <span class="n">work_path</span><span class="p">)</span>
+        <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;archive_path&quot;</span><span class="p">,</span> <span class="n">archive_path</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="WebFileListHelper">
+<a class="viewcode-back" href="../../helper.webFileListHelper.html#helper.webFileListHelper.WebFileListHelper">[ドキュメント]</a>
+<span class="k">class</span> <span class="nc">WebFileListHelper</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;webファイルリスト&quot;&quot;&quot;</span>
+    <span class="n">value_object</span><span class="p">:</span> <span class="n">WebFileListHelperValue</span> <span class="ow">or</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">start_ext</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">webFileHelper</span><span class="o">.</span><span class="n">WebFileHelper</span><span class="o">.</span><span class="n">start_ext</span>
+    <span class="n">download_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)),</span>
+                                      <span class="s1">&#39;../download&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">,</span> <span class="s1">&#39;/&#39;</span><span class="p">)</span>
+    <span class="n">work_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">WebFileListHelperValue</span><span class="o">.</span><span class="n">work_path</span>
+    <span class="n">archive_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">WebFileListHelperValue</span><span class="o">.</span><span class="n">archive_path</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">value_object</span><span class="p">:</span> <span class="n">WebFileListHelperValue</span> <span class="ow">or</span> <span class="nb">list</span> <span class="o">=</span> <span class="n">value_object</span><span class="p">,</span>
+                 <span class="n">start_ext</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">start_ext</span><span class="p">,</span>
+                 <span class="n">download_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">download_path</span><span class="p">,</span>
+                 <span class="n">work_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">work_path</span><span class="p">,</span>
+                 <span class="n">archive_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">archive_path</span><span class="p">,</span>
+                 <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;値オブジェクトからの復元、</span>
+<span class="sd">        または、Webファイルのヘルパー: list[WebFileHelper]と、ファイル名、拡張子名、各種pathより、値オブジェクトを作成する</span>
+<span class="sd">        または、url: list[str]と、ファイル名、拡張子名、各種pathより、値オブジェクトを作成する</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">value_object</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value_object</span><span class="p">,</span> <span class="n">WebFileListHelperValue</span><span class="p">):</span>
+                <span class="n">value_object</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">value_object</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">value_object</span> <span class="o">=</span> <span class="n">value_object</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value_object</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">download_path</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">inspect</span><span class="o">.</span><span class="n">stack</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">function</span><span class="si">}</span><span class="s2">&quot;</span>
+                                     <span class="sa">f</span><span class="s2">&quot;引数エラー:download_path=None&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">work_path</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">inspect</span><span class="o">.</span><span class="n">stack</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">function</span><span class="si">}</span><span class="s2">&quot;</span>
+                                     <span class="sa">f</span><span class="s2">&quot;引数エラー:work_path=None&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">archive_path</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">inspect</span><span class="o">.</span><span class="n">stack</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">function</span><span class="si">}</span><span class="s2">&quot;</span>
+                                     <span class="sa">f</span><span class="s2">&quot;引数エラー:archive_path=None&quot;</span><span class="p">)</span>
+                <span class="n">value_object</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">value_object</span><span class="p">)</span>
+                <span class="n">web_file_list</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="n">isinstance_list</span> <span class="o">=</span> <span class="p">[</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">webFileHelper</span><span class="o">.</span><span class="n">WebFileHelper</span><span class="p">)</span> <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">value_object</span><span class="p">]</span>
+                <span class="n">isinstance_str</span> <span class="o">=</span> <span class="p">[</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">value_object</span><span class="p">]</span>
+                <span class="k">if</span> <span class="nb">sum</span><span class="p">(</span><span class="n">isinstance_list</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="nb">sum</span><span class="p">(</span><span class="n">isinstance_list</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">isinstance_list</span><span class="p">):</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">inspect</span><span class="o">.</span><span class="n">stack</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">function</span><span class="si">}</span><span class="s2">&quot;</span>
+                                         <span class="sa">f</span><span class="s2">&quot;引数エラー:value_objectの型list[WebFileHelper]ではない&quot;</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">web_file_list</span> <span class="o">=</span> <span class="n">value_object</span>
+                <span class="k">elif</span> <span class="nb">sum</span><span class="p">(</span><span class="n">isinstance_str</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="nb">sum</span><span class="p">(</span><span class="n">isinstance_str</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">isinstance_str</span><span class="p">):</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">inspect</span><span class="o">.</span><span class="n">stack</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">function</span><span class="si">}</span><span class="s2">&quot;</span>
+                                         <span class="sa">f</span><span class="s2">&quot;引数エラー:value_objectの型list[str]ではない&quot;</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="c1"># TODO: urlには、DataURIやURLが混ざってくる。URLには、ファイル名がない場合もある</span>
+                        <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">url</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">value_object</span><span class="p">):</span>
+                            <span class="n">uri</span> <span class="o">=</span> <span class="n">uriHelper</span><span class="o">.</span><span class="n">UriHelper</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+                            <span class="n">download_file_name</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{:04d}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+                            <span class="n">__start_ext</span> <span class="o">=</span> <span class="n">start_ext</span>
+                            <span class="k">if</span> <span class="ow">not</span> <span class="n">__start_ext</span><span class="p">:</span>
+                                <span class="n">__start_ext</span> <span class="o">=</span> <span class="n">uri</span><span class="o">.</span><span class="n">get_ext</span><span class="p">()</span>
+                            <span class="n">web_file</span> <span class="o">=</span> <span class="n">webFileHelper</span><span class="o">.</span><span class="n">WebFileHelper</span><span class="p">(</span><span class="n">uri</span><span class="p">,</span> <span class="n">download_file_name</span><span class="p">,</span> <span class="n">__start_ext</span><span class="p">,</span> <span class="n">download_path</span><span class="p">)</span>
+                            <span class="n">web_file_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">web_file</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">inspect</span><span class="o">.</span><span class="n">stack</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">function</span><span class="si">}</span><span class="s2">&quot;</span>
+                                     <span class="sa">f</span><span class="s2">&quot;引数エラー:value_objectの型&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">value_object</span> <span class="o">=</span> <span class="n">WebFileListHelperValue</span><span class="p">(</span><span class="n">web_file_list</span><span class="p">,</span>
+                                                           <span class="n">work_path</span><span class="p">,</span>
+                                                           <span class="n">archive_path</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">inspect</span><span class="o">.</span><span class="n">stack</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">function</span><span class="si">}</span><span class="s2">&quot;</span>
+                                 <span class="sa">f</span><span class="s2">&quot;引数エラー:value_objectの型&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">inspect</span><span class="o">.</span><span class="n">stack</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">function</span><span class="si">}</span><span class="s2">&quot;</span>
+                             <span class="sa">f</span><span class="s2">&quot;引数エラー:value_object=None&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="WebFileListHelper.flatten_zip">
+<a class="viewcode-back" href="../../helper.webFileListHelper.html#helper.webFileListHelper.WebFileListHelper.flatten_zip">[ドキュメント]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">flatten_zip</span><span class="p">(</span><span class="n">zip_filepath</span><span class="p">,</span> <span class="n">output_filepath</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;zip ファイル内のフォルダを削除し、すべてのファイルをルートに移動した新しい zip ファイルを作成します。</span>
+<span class="sd">        :param: zip_filepath: 処理対象の zip ファイルのパス</span>
+<span class="sd">        :param: output_filepath: 出力先の zip ファイルのパス</span>
+<span class="sd">        :return: なし</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># 一時フォルダを作成</span>
+        <span class="n">temp_dir</span> <span class="o">=</span> <span class="s2">&quot;temp_zip_extract&quot;</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">temp_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="c1"># zip ファイルを一時フォルダに展開</span>
+        <span class="k">with</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">ZipFile</span><span class="p">(</span><span class="n">zip_filepath</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">zip_ref</span><span class="p">:</span>
+            <span class="n">zip_ref</span><span class="o">.</span><span class="n">extractall</span><span class="p">(</span><span class="n">temp_dir</span><span class="p">)</span>
+        <span class="c1"># 新しい zip ファイルを作成</span>
+        <span class="k">with</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">ZipFile</span><span class="p">(</span><span class="n">output_filepath</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">new_zip</span><span class="p">:</span>
+            <span class="c1"># 一時フォルダ内のファイルを走査</span>
+            <span class="k">for</span> <span class="n">root</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">files</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">temp_dir</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+                    <span class="c1"># ファイルをルートに追加 (フォルダ構造を無視)</span>
+                    <span class="n">filepath</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span>
+                    <span class="n">new_zip</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">arcname</span><span class="o">=</span><span class="n">file</span><span class="p">)</span>
+        <span class="c1"># 一時フォルダを削除</span>
+        <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">temp_dir</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="WebFileListHelper.get_web_file_list">
+<a class="viewcode-back" href="../../helper.webFileListHelper.html#helper.webFileListHelper.WebFileListHelper.get_web_file_list">[ドキュメント]</a>
+    <span class="k">def</span> <span class="nf">get_web_file_list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;webファイルリストを得る</span>
+<span class="sd">        :return: list[WebFileHelper]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value_object</span><span class="o">.</span><span class="n">web_file_list</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="WebFileListHelper.get_path_list">
+<a class="viewcode-back" href="../../helper.webFileListHelper.html#helper.webFileListHelper.WebFileListHelper.get_path_list">[ドキュメント]</a>
+    <span class="k">def</span> <span class="nf">get_path_list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;ファイルパスのリストを得る</span>
+<span class="sd">        :return: list[str]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">__paths</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">__web_file</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_web_file_list</span><span class="p">():</span>
+            <span class="n">__paths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">__web_file</span><span class="o">.</span><span class="n">get_path</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">__paths</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="WebFileListHelper.get_url_list">
+<a class="viewcode-back" href="../../helper.webFileListHelper.html#helper.webFileListHelper.WebFileListHelper.get_url_list">[ドキュメント]</a>
+    <span class="k">def</span> <span class="nf">get_url_list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;URLのリストを得る</span>
+<span class="sd">        :return: list[str]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">__urls</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">__web_file</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_web_file_list</span><span class="p">():</span>
+            <span class="n">__urls</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">__web_file</span><span class="o">.</span><span class="n">get_url</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">__urls</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="WebFileListHelper.get_file_name_list">
+<a class="viewcode-back" href="../../helper.webFileListHelper.html#helper.webFileListHelper.WebFileListHelper.get_file_name_list">[ドキュメント]</a>
+    <span class="k">def</span> <span class="nf">get_file_name_list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;ファイル名のリストを得る</span>
+<span class="sd">        :return: list[str]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">__file_name_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">__web_file</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_web_file_list</span><span class="p">():</span>
+            <span class="n">__file_name_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">__web_file</span><span class="o">.</span><span class="n">get_download_file_name</span><span class="p">()</span> <span class="o">+</span> <span class="n">__web_file</span><span class="o">.</span><span class="n">get_ext</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">__file_name_list</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="WebFileListHelper.get_only_url_of_file_not_exist">
+<a class="viewcode-back" href="../../helper.webFileListHelper.html#helper.webFileListHelper.WebFileListHelper.get_only_url_of_file_not_exist">[ドキュメント]</a>
+    <span class="k">def</span> <span class="nf">get_only_url_of_file_not_exist</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;ローカルにファイルがないURLだけのリストを得る</span>
+<span class="sd">        :return: list[str]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">__url_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">value_object</span><span class="o">.</span><span class="n">web_file_list</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">file</span><span class="o">.</span><span class="n">is_exist</span><span class="p">():</span>
+                <span class="n">__url_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">file</span><span class="o">.</span><span class="n">get_url</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">__url_list</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="WebFileListHelper.get_only_file_name_of_file_not_exist">
+<a class="viewcode-back" href="../../helper.webFileListHelper.html#helper.webFileListHelper.WebFileListHelper.get_only_file_name_of_file_not_exist">[ドキュメント]</a>
+    <span class="k">def</span> <span class="nf">get_only_file_name_of_file_not_exist</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;ローカルにファイルがないファイル名だけのリストを得る</span>
+<span class="sd">        :return: list[str]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">__file_name_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">value_object</span><span class="o">.</span><span class="n">web_file_list</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">file</span><span class="o">.</span><span class="n">is_exist</span><span class="p">():</span>
+                <span class="n">__file_name_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">file</span><span class="o">.</span><span class="n">get_download_file_name</span><span class="p">()</span> <span class="o">+</span> <span class="n">file</span><span class="o">.</span><span class="n">get_ext</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">__file_name_list</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="WebFileListHelper.get_download_path_from_1st_element">
+<a class="viewcode-back" href="../../helper.webFileListHelper.html#helper.webFileListHelper.WebFileListHelper.get_download_path_from_1st_element">[ドキュメント]</a>
+    <span class="k">def</span> <span class="nf">get_download_path_from_1st_element</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;ファイルリストの一つ目に登録されているダウンロードパスを得る</span>
+<span class="sd">        :return: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_web_file_list</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_download_path</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="WebFileListHelper.is_exist">
+<a class="viewcode-back" href="../../helper.webFileListHelper.html#helper.webFileListHelper.WebFileListHelper.is_exist">[ドキュメント]</a>
+    <span class="k">def</span> <span class="nf">is_exist</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;ファイルリストの全ファイルがローカルに存在する</span>
+<span class="sd">        :return: bool 全てのファイルが存在すればTrueを返す</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">__web_file</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_web_file_list</span><span class="p">():</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">__web_file</span><span class="o">.</span><span class="n">is_exist</span><span class="p">():</span>
+                <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="WebFileListHelper.download_requests">
+<a class="viewcode-back" href="../../helper.webFileListHelper.html#helper.webFileListHelper.WebFileListHelper.download_requests">[ドキュメント]</a>
+    <span class="k">def</span> <span class="nf">download_requests</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;requestsを用いて、ファイルリストをダウンロードする</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">__web_file</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_web_file_list</span><span class="p">():</span>
+            <span class="n">__web_file</span><span class="o">.</span><span class="n">download_requests</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="WebFileListHelper.download_irvine">
+<a class="viewcode-back" href="../../helper.webFileListHelper.html#helper.webFileListHelper.WebFileListHelper.download_irvine">[ドキュメント]</a>
+    <span class="k">def</span> <span class="nf">download_irvine</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;irvineを用いて、ファイルリストをダウンロードする</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">__irvine</span> <span class="o">=</span> <span class="n">irvineHelper</span><span class="o">.</span><span class="n">IrvineHelper</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_only_url_of_file_not_exist</span><span class="p">(),</span>
+                                             <span class="bp">self</span><span class="o">.</span><span class="n">get_download_path_from_1st_element</span><span class="p">(),</span>
+                                             <span class="bp">self</span><span class="o">.</span><span class="n">get_only_file_name_of_file_not_exist</span><span class="p">(),</span>
+                                             <span class="p">)</span>
+        <span class="n">__irvine</span><span class="o">.</span><span class="n">download</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="WebFileListHelper.download_chrome_driver">
+<a class="viewcode-back" href="../../helper.webFileListHelper.html#helper.webFileListHelper.WebFileListHelper.download_chrome_driver">[ドキュメント]</a>
+    <span class="k">def</span> <span class="nf">download_chrome_driver</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;selenium chromeDriverを用いて、画像をデフォルトダウンロードフォルダにダウンロードして、指定のフォルダに移動する</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">chromedriver</span> <span class="o">=</span> <span class="n">chromeDriverHelper</span><span class="o">.</span><span class="n">ChromeDriverHelper</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">url</span><span class="p">,</span> <span class="n">web_file</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_url_list</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_web_file_list</span><span class="p">()):</span>
+            <span class="n">chromedriver</span><span class="o">.</span><span class="n">download_image</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">web_file</span><span class="o">.</span><span class="n">get_path</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="WebFileListHelper.rename_url_ext_shift">
+<a class="viewcode-back" href="../../helper.webFileListHelper.html#helper.webFileListHelper.WebFileListHelper.rename_url_ext_shift">[ドキュメント]</a>
+    <span class="k">def</span> <span class="nf">rename_url_ext_shift</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;ファイルリストの各ファイルについて、ローカルに存在しないファイルの拡張子をシフトし、ファイルリストを更新する</span>
+<span class="sd">        :return: None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">__count</span><span class="p">,</span> <span class="n">__web_file_helper</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value_object</span><span class="o">.</span><span class="n">web_file_list</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">__web_file_helper</span><span class="o">.</span><span class="n">is_exist</span><span class="p">():</span>
+                <span class="n">__web_file_helper</span><span class="o">.</span><span class="n">rename_url_ext_shift</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="WebFileListHelper.rename_filenames">
+<a class="viewcode-back" href="../../helper.webFileListHelper.html#helper.webFileListHelper.WebFileListHelper.rename_filenames">[ドキュメント]</a>
+    <span class="k">def</span> <span class="nf">rename_filenames</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;ファイルリストの各ファイルについて、ローカルに存在するファイルのファイル名をナンバリングファイル名に変更し、ファイルリストを更新する</span>
+<span class="sd">        :return: bool 成功/失敗=True/False</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">__count</span><span class="p">,</span> <span class="n">__web_file_helper</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value_object</span><span class="o">.</span><span class="n">web_file_list</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">__web_file_helper</span><span class="o">.</span><span class="n">is_exist</span><span class="p">():</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">__web_file_helper</span><span class="o">.</span><span class="n">rename_filename</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{:04d}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">__count</span><span class="p">)):</span>
+                    <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="WebFileListHelper.make_zip_file">
+<a class="viewcode-back" href="../../helper.webFileListHelper.html#helper.webFileListHelper.WebFileListHelper.make_zip_file">[ドキュメント]</a>
+    <span class="k">def</span> <span class="nf">make_zip_file</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;ファイルリストのファイルについて、一つの圧縮ファイルにする</span>
+<span class="sd">        圧縮ファイルが既に存在する場合は変名してから圧縮する</span>
+<span class="sd">        :return: bool 成功/失敗=True/False</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_exist</span><span class="p">():</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="n">zip_file_name</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_download_path_from_1st_element</span><span class="p">())</span><span class="o">.</span><span class="n">with_suffix</span><span class="p">(</span><span class="s1">&#39;.zip&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">name</span>
+        <span class="n">archive_path</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">archive_path</span><span class="p">)</span>
+        <span class="n">zip_path</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">archive_path</span><span class="p">,</span> <span class="n">zip_file_name</span><span class="p">))</span>
+        <span class="c1"># フォルダがなかったらフォルダを作る</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">archive_path</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">zip_path</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+            <span class="n">now_str</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;_%Y%m</span><span class="si">%d</span><span class="s1">_%H%M%S&#39;</span><span class="p">)</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">zip_path</span><span class="p">,</span> <span class="n">zip_path</span><span class="o">.</span><span class="n">with_suffix</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">now_str</span><span class="si">}</span><span class="s1">.zip&#39;</span><span class="p">))</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;圧縮ファイル</span><span class="si">{</span><span class="n">zip_path</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">が既に存在したので</span><span class="si">{</span><span class="n">zip_path</span><span class="o">.</span><span class="n">name</span><span class="si">}{</span><span class="n">now_str</span><span class="si">}</span><span class="s1">.zipに変名しました&#39;</span><span class="p">)</span>
+        <span class="k">with</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">ZipFile</span><span class="p">(</span><span class="n">zip_path</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">ZIP_DEFLATED</span><span class="p">)</span> <span class="k">as</span> <span class="n">zip_file</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">__web_file_helper</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_web_file_list</span><span class="p">():</span>
+                <span class="n">file_path</span> <span class="o">=</span> <span class="n">__web_file_helper</span><span class="o">.</span><span class="n">get_path</span><span class="p">()</span>
+                <span class="n">zip_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">arcname</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">file_path</span><span class="p">))</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="WebFileListHelper.rename_zip_file">
+<a class="viewcode-back" href="../../helper.webFileListHelper.html#helper.webFileListHelper.WebFileListHelper.rename_zip_file">[ドキュメント]</a>
+    <span class="k">def</span> <span class="nf">rename_zip_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zip_filename</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;圧縮ファイルの名前を付けなおす</span>
+<span class="sd">        :param zip_filename: str 付け直すファイル名(禁則文字は削除される)</span>
+<span class="sd">        :return: bool 成功/失敗=True/False</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">zip_file_name</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_download_path_from_1st_element</span><span class="p">())</span><span class="o">.</span><span class="n">with_suffix</span><span class="p">(</span><span class="s1">&#39;.zip&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">name</span>
+        <span class="n">archive_path</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">archive_path</span><span class="p">)</span>
+        <span class="n">zip_path</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">archive_path</span><span class="p">,</span> <span class="n">zip_file_name</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">zip_path</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+            <span class="n">new_zip_filename</span> <span class="o">=</span> <span class="n">webFileHelper</span><span class="o">.</span><span class="n">WebFileHelper</span><span class="o">.</span><span class="n">fixed_file_name</span><span class="p">(</span><span class="n">zip_filename</span><span class="p">)</span>
+            <span class="n">new_zip_path</span> <span class="o">=</span> <span class="n">zip_path</span><span class="o">.</span><span class="n">with_name</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">new_zip_filename</span><span class="si">}</span><span class="s1">.zip&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">new_zip_path</span><span class="p">):</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;圧縮リネームファイル</span><span class="si">{</span><span class="n">new_zip_filename</span><span class="si">}</span><span class="s1">.zipが既に存在しています&#39;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="kc">False</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;圧縮ファイル名を付け直します:</span><span class="si">{</span><span class="n">new_zip_filename</span><span class="si">}</span><span class="s1">.zip&#39;</span><span class="p">)</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">zip_path</span><span class="p">,</span> <span class="n">new_zip_path</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="WebFileListHelper.delete_local_folder">
+<a class="viewcode-back" href="../../helper.webFileListHelper.html#helper.webFileListHelper.WebFileListHelper.delete_local_folder">[ドキュメント]</a>
+    <span class="k">def</span> <span class="nf">delete_local_folder</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;ファイルリストのローカルファイルをフォルダごと削除する</span>
+<span class="sd">        :return: None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">__zip_folder</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_download_path_from_1st_element</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;ファイル削除します(フォルダごと削除して、フォルダを作り直します)&#39;</span><span class="p">)</span>
+        <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">__zip_folder</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">__zip_folder</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">__zip_folder</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&#39;</span><span class="p">:</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">__zip_folder</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">__zip_folder</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="WebFileListHelper.delete_local_files">
+<a class="viewcode-back" href="../../helper.webFileListHelper.html#helper.webFileListHelper.WebFileListHelper.delete_local_files">[ドキュメント]</a>
+    <span class="k">def</span> <span class="nf">delete_local_files</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;ファイルリストのファイルについて、ローカルから削除する</span>
+<span class="sd">        :return: None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">__web_file</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_web_file_list</span><span class="p">():</span>
+            <span class="n">__web_file</span><span class="o">.</span><span class="n">delete_local_file</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="WebFileListHelper.move">
+<a class="viewcode-back" href="../../helper.webFileListHelper.html#helper.webFileListHelper.WebFileListHelper.move">[ドキュメント]</a>
+    <span class="k">def</span> <span class="nf">move</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_path</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;ファイルリストのローカルファイルを移動する</span>
+<span class="sd">        :param new_path: 移動先のフォルダーパス</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_exist</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">__web_file</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_web_file_list</span><span class="p">():</span>
+                <span class="n">__web_file</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="n">new_path</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;ローカルファイルが不足しているため、ファイルリストの移動を中止した&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="WebFileListHelper.update_value_object_by_deployment_url_list">
+<a class="viewcode-back" href="../../helper.webFileListHelper.html#helper.webFileListHelper.WebFileListHelper.update_value_object_by_deployment_url_list">[ドキュメント]</a>
+    <span class="k">def</span> <span class="nf">update_value_object_by_deployment_url_list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;ナンバリングされた末尾画像URL一つの時、全体のURLリストを生成してvalue_objectを再生成する</span>
+<span class="sd">        :return: bool 処理の実施/未実施</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_web_file_list</span><span class="p">())</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="n">__web_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_web_file_list</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">url_list</span> <span class="o">=</span> <span class="n">__web_file</span><span class="o">.</span><span class="n">get_deployment_url_list</span><span class="p">()</span>
+        <span class="n">download_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_download_path_from_1st_element</span><span class="p">()</span>
+        <span class="n">__web_file_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">url</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">url_list</span><span class="p">):</span>
+            <span class="n">uri</span> <span class="o">=</span> <span class="n">uriHelper</span><span class="o">.</span><span class="n">UriHelper</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+            <span class="n">download_file_name</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{:04d}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+            <span class="n">__start_ext</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_ext</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">__start_ext</span><span class="p">:</span>
+                <span class="n">__start_ext</span> <span class="o">=</span> <span class="n">uri</span><span class="o">.</span><span class="n">get_ext</span><span class="p">()</span>
+            <span class="n">web_file</span> <span class="o">=</span> <span class="n">webFileHelper</span><span class="o">.</span><span class="n">WebFileHelper</span><span class="p">(</span><span class="n">uri</span><span class="p">,</span> <span class="n">download_file_name</span><span class="p">,</span> <span class="n">__start_ext</span><span class="p">,</span> <span class="n">download_path</span><span class="p">)</span>
+            <span class="n">__web_file_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">web_file</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value_object</span> <span class="o">=</span> <span class="n">WebFileListHelperValue</span><span class="p">(</span><span class="n">__web_file_list</span><span class="p">,</span>
+                                                   <span class="bp">self</span><span class="o">.</span><span class="n">value_object</span><span class="o">.</span><span class="n">work_path</span><span class="p">,</span>
+                                                   <span class="bp">self</span><span class="o">.</span><span class="n">value_object</span><span class="o">.</span><span class="n">archive_path</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+</div>
+
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Ryosuke Igarashi.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,415 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="ja" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>helper.chromeDriverHelper module &mdash; Web_scraping 1.0.0 ドキュメント</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=144c8c96"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/translations.js?v=4755f45a"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="索引" href="genindex.html" />
+    <link rel="search" title="検索" href="search.html" />
+    <link rel="next" title="helper.crawling module" href="helper.crawling.html" />
+    <link rel="prev" title="helper package" href="helper.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Web_scraping
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="helper.html">helper package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="helper.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">helper.chromeDriverHelper module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#helper.chromeDriverHelper.ChromeDriverHelper"><code class="docutils literal notranslate"><span class="pre">ChromeDriverHelper</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#helper.chromeDriverHelper.ChromeDriverHelperValue"><code class="docutils literal notranslate"><span class="pre">ChromeDriverHelperValue</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="helper.crawling.html">helper.crawling module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="helper.egoser_zipper.html">helper.egoser_zipper module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="helper.irvineHelper.html">helper.irvineHelper module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="helper.line_message_api.html">helper.line_message_api module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="helper.scraping.html">helper.scraping module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="helper.slack_message_api.html">helper.slack_message_api module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="helper.spreadsheet.html">helper.spreadsheet module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="helper.tenki.html">helper.tenki module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="helper.uriHelper.html">helper.uriHelper module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="helper.urlDeployment.html">helper.urlDeployment module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="helper.webFileHelper.html">helper.webFileHelper module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="helper.webFileListHelper.html">helper.webFileListHelper module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="helper.html#module-helper">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Web_scraping</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="helper.html">helper package</a></li>
+      <li class="breadcrumb-item active">helper.chromeDriverHelper module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/helper.chromeDriverHelper.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-helper.chromeDriverHelper">
+<span id="helper-chromedriverhelper-module"></span><h1>helper.chromeDriverHelper module<a class="headerlink" href="#module-helper.chromeDriverHelper" title="Link to this heading"></a></h1>
+<p>Selenium Chromeドライバのヘルパー</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt>コンストラクタで引数を指定するとスクレイピングまで実施されてget_value_objectが有効になる</dt><dd><ul>
+<li><p>fixed_path (staticmethod)フォルダ名の禁止文字を全角文字に置き換える</p></li>
+<li><p>fixed_file_name (staticmethod)ファイル名の禁止文字を全角文字に置き換える</p></li>
+<li><p>scraping (staticmethod、画面依存)現在表示のURLにスクレイピングする</p></li>
+<li><p>scroll_element (画面遷移有)指定のelementまでスクロールする</p></li>
+<li><p>get_value_object 値オブジェクトを取得する</p></li>
+<li><p>get_url URLを取得する</p></li>
+<li><p>get_selectors セレクタを取得する</p></li>
+<li><p>get_items スクレイピング結果を取得する</p></li>
+<li><p>destroy Chromeを閉じる</p></li>
+<li><p>get_source Chromeで表示しているタブのsourceを取得する</p></li>
+<li><p>save_source Chromeで表示しているタブのsourceをファイルに保存する</p></li>
+<li><p>back (画面遷移有)ブラウザの戻るボタン押下と同じ動作</p></li>
+<li><p>forward (画面遷移有)ブラウザの進むボタン押下と同じ動作</p></li>
+<li><p>next_tab (画面遷移有)openで作ったタブ(__window_handle_list)の内、一つ後のタブを表示する</p></li>
+<li><p>previous_tab (画面遷移有)openで作ったタブ(__window_handle_list)の内、一つ前のタブを表示する</p></li>
+<li><p>download_image (画面遷移有)urlの画像を保存する(open_new_tab → save_image → closeする)</p></li>
+<li><p>open_current_tab (画面依存)現在表示されているタブでurlを開く</p></li>
+<li><p>open_new_tab (画面遷移有)新しいタブでurlを開く</p></li>
+<li><p>open_new_tabs (画面遷移有)新しいタブでurlリストを開く</p></li>
+<li><p>close (画面遷移有)指定の画面か、現在の画面を閉じる</p></li>
+<li><p>save_image (画面依存)表示されている画像を保存する(Chromeデフォルトダウンロードフォルダに保存)</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>参考記事</dt><dd><ul>
+<li><p><a class="reference external" href="https://note.nkmk.me/python/">https://note.nkmk.me/python/</a></p></li>
+<li><p><a class="reference external" href="https://maku77.github.io/python/">https://maku77.github.io/python/</a></p></li>
+<li><p><a class="reference external" href="https://nikkie-ftnext.hatenablog.com/entry/value-object-python-dataclass">https://nikkie-ftnext.hatenablog.com/entry/value-object-python-dataclass</a></p></li>
+<li><p><a class="reference external" href="https://blog.wotakky.net/2018/08/12/post-4829/">https://blog.wotakky.net/2018/08/12/post-4829/</a></p></li>
+<li><p><a class="reference external" href="https://www.zacoding.com/post/selenium-custom-wait/">https://www.zacoding.com/post/selenium-custom-wait/</a></p></li>
+<li><p><a class="reference external" href="https://stackoverflow-com.translate.goog/questions/63421086/modulenotfounderror-no-module-named-webdriver-manager-error-even-after-instal?_x_tr_sl=en&amp;_x_tr_tl=ja&amp;_x_tr_hl=ja&amp;_x_tr_pto=sc">https://stackoverflow-com.translate.goog/questions/63421086/modulenotfounderror-no-module-named-webdriver-manager-error-even-after-instal?_x_tr_sl=en&amp;_x_tr_tl=ja&amp;_x_tr_hl=ja&amp;_x_tr_pto=sc</a></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>参考リファレンス</dt><dd><ul>
+<li><p><a class="reference external" href="https://selenium-python.readthedocs.io/">https://selenium-python.readthedocs.io/</a></p></li>
+<li><p><a class="reference external" href="https://www.seleniumqref.com/api/webdriver_gyaku.html">https://www.seleniumqref.com/api/webdriver_gyaku.html</a></p></li>
+<li><p><a class="reference external" href="https://www.selenium.dev/ja/documentation/webdriver/getting_started/">https://www.selenium.dev/ja/documentation/webdriver/getting_started/</a></p></li>
+<li><p><a class="reference external" href="https://kurozumi.github.io/selenium-python/index.html">https://kurozumi.github.io/selenium-python/index.html</a></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<div class="admonition-todo admonition" id="id1">
+<p class="admonition-title">課題</p>
+<ul class="simple">
+<li><p>docstringを整える</p></li>
+</ul>
+</div>
+<dl class="py class">
+<dt class="sig sig-object py" id="helper.chromeDriverHelper.ChromeDriverHelper">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">helper.chromeDriverHelper.</span></span><span class="sig-name descname"><span class="pre">ChromeDriverHelper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value_object</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">selectors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">download_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'D:/git/igaponr/training/python/Web_scraping/helper/../download'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/chromeDriverHelper.html#ChromeDriverHelper"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.chromeDriverHelper.ChromeDriverHelper" title="Link to this definition"></a></dt>
+<dd><p>ベースクラス: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>chromeドライバを操作する</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="helper.chromeDriverHelper.ChromeDriverHelper.back">
+<span class="sig-name descname"><span class="pre">back</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/chromeDriverHelper.html#ChromeDriverHelper.back"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.chromeDriverHelper.ChromeDriverHelper.back" title="Link to this definition"></a></dt>
+<dd><p>(画面遷移有)ブラウザの戻るボタン押下と同じ動作
+:return:</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="helper.chromeDriverHelper.ChromeDriverHelper.chrome_path">
+<span class="sig-name descname"><span class="pre">chrome_path</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'&quot;C:\\Program</span> <span class="pre">Files</span> <span class="pre">(x86)\\Google\\Chrome\\Application\\chrome.exe&quot;'</span></em><a class="headerlink" href="#helper.chromeDriverHelper.ChromeDriverHelper.chrome_path" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helper.chromeDriverHelper.ChromeDriverHelper.close">
+<span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">window_handle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/chromeDriverHelper.html#ChromeDriverHelper.close"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.chromeDriverHelper.ChromeDriverHelper.close" title="Link to this definition"></a></dt>
+<dd><p>(画面遷移有)openで開いた画面の内、指定の画面か、現在の画面を閉じる
+:param window_handle: str 閉じる画面のハンドル
+:return: None</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helper.chromeDriverHelper.ChromeDriverHelper.destroy">
+<span class="sig-name descname"><span class="pre">destroy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/chromeDriverHelper.html#ChromeDriverHelper.destroy"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.chromeDriverHelper.ChromeDriverHelper.destroy" title="Link to this definition"></a></dt>
+<dd><p>chromeが開いていれば閉じる
+:return: なし</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helper.chromeDriverHelper.ChromeDriverHelper.download_image">
+<span class="sig-name descname"><span class="pre">download_image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">download_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/chromeDriverHelper.html#ChromeDriverHelper.download_image"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.chromeDriverHelper.ChromeDriverHelper.download_image" title="Link to this definition"></a></dt>
+<dd><p>(画面遷移有)urlの画像を保存する(open_new_tab → save_image → closeする)
+:param url: 画像のurl
+:param download_path:
+:return:</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="helper.chromeDriverHelper.ChromeDriverHelper.download_path">
+<span class="sig-name descname"><span class="pre">download_path</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'D:/git/igaponr/training/python/Web_scraping/helper/../download'</span></em><a class="headerlink" href="#helper.chromeDriverHelper.ChromeDriverHelper.download_path" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="helper.chromeDriverHelper.ChromeDriverHelper.driver_path">
+<span class="sig-name descname"><span class="pre">driver_path</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'D:\\git\\igaponr\\training\\python\\Web_scraping\\helper\\driver\\chromedriver.exe'</span></em><a class="headerlink" href="#helper.chromeDriverHelper.ChromeDriverHelper.driver_path" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helper.chromeDriverHelper.ChromeDriverHelper.fixed_file_name">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">fixed_file_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/chromeDriverHelper.html#ChromeDriverHelper.fixed_file_name"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.chromeDriverHelper.ChromeDriverHelper.fixed_file_name" title="Link to this definition"></a></dt>
+<dd><p>ファイル名の禁止文字を全角文字に置き換える
+:param file_name: str 置き換えたいファイル名
+:return: str 置き換え後のファイル名</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helper.chromeDriverHelper.ChromeDriverHelper.fixed_path">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">fixed_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/chromeDriverHelper.html#ChromeDriverHelper.fixed_path"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.chromeDriverHelper.ChromeDriverHelper.fixed_path" title="Link to this definition"></a></dt>
+<dd><p>フォルダ名の禁止文字を全角文字に置き換える
+:param file_path: str 置き換えたいフォルダパス
+:return: str 置き換え後のフォルダパス</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helper.chromeDriverHelper.ChromeDriverHelper.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/chromeDriverHelper.html#ChromeDriverHelper.forward"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.chromeDriverHelper.ChromeDriverHelper.forward" title="Link to this definition"></a></dt>
+<dd><p>(画面遷移有)ブラウザの進むボタン押下と同じ動作
+:return:</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helper.chromeDriverHelper.ChromeDriverHelper.get_items">
+<span class="sig-name descname"><span class="pre">get_items</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/chromeDriverHelper.html#ChromeDriverHelper.get_items"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.chromeDriverHelper.ChromeDriverHelper.get_items" title="Link to this definition"></a></dt>
+<dd><p>スクレイピング結果を取得する</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helper.chromeDriverHelper.ChromeDriverHelper.get_selectors">
+<span class="sig-name descname"><span class="pre">get_selectors</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/chromeDriverHelper.html#ChromeDriverHelper.get_selectors"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.chromeDriverHelper.ChromeDriverHelper.get_selectors" title="Link to this definition"></a></dt>
+<dd><p>セレクタを取得する</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helper.chromeDriverHelper.ChromeDriverHelper.get_source">
+<span class="sig-name descname"><span class="pre">get_source</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/chromeDriverHelper.html#ChromeDriverHelper.get_source"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.chromeDriverHelper.ChromeDriverHelper.get_source" title="Link to this definition"></a></dt>
+<dd><p>(画面依存)現在の画面(chromeで現在表示しているタブ)のソースコードを取得する
+:return: str ソースコード</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helper.chromeDriverHelper.ChromeDriverHelper.get_url">
+<span class="sig-name descname"><span class="pre">get_url</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/chromeDriverHelper.html#ChromeDriverHelper.get_url"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.chromeDriverHelper.ChromeDriverHelper.get_url" title="Link to this definition"></a></dt>
+<dd><p>URLを取得する</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helper.chromeDriverHelper.ChromeDriverHelper.get_value_object">
+<span class="sig-name descname"><span class="pre">get_value_object</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/chromeDriverHelper.html#ChromeDriverHelper.get_value_object"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.chromeDriverHelper.ChromeDriverHelper.get_value_object" title="Link to this definition"></a></dt>
+<dd><p>値オブジェクトを取得する</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helper.chromeDriverHelper.ChromeDriverHelper.is_chrome_running_in_debug_mode">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_chrome_running_in_debug_mode</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/chromeDriverHelper.html#ChromeDriverHelper.is_chrome_running_in_debug_mode"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.chromeDriverHelper.ChromeDriverHelper.is_chrome_running_in_debug_mode" title="Link to this definition"></a></dt>
+<dd><p>chrome.exeが起動していて、9222ポートに応答することを確認する
+:return: bool 全ての条件を満たす場合True、そうでない場合False</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helper.chromeDriverHelper.ChromeDriverHelper.next_tab">
+<span class="sig-name descname"><span class="pre">next_tab</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/chromeDriverHelper.html#ChromeDriverHelper.next_tab"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.chromeDriverHelper.ChromeDriverHelper.next_tab" title="Link to this definition"></a></dt>
+<dd><p>(画面遷移有)openで作ったタブ(__window_handle_list)の内、一つ後のタブを表示する
+:return:</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helper.chromeDriverHelper.ChromeDriverHelper.open_current_tab">
+<span class="sig-name descname"><span class="pre">open_current_tab</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/chromeDriverHelper.html#ChromeDriverHelper.open_current_tab"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.chromeDriverHelper.ChromeDriverHelper.open_current_tab" title="Link to this definition"></a></dt>
+<dd><p>(画面依存)現在表示されているタブでurlを開く
+:param url: str chromeで開くURL
+:return: なし</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helper.chromeDriverHelper.ChromeDriverHelper.open_new_tab">
+<span class="sig-name descname"><span class="pre">open_new_tab</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/chromeDriverHelper.html#ChromeDriverHelper.open_new_tab"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.chromeDriverHelper.ChromeDriverHelper.open_new_tab" title="Link to this definition"></a></dt>
+<dd><p>(画面遷移有)新しいタブでurlを開く
+:param url: str 開くURL
+:return: str 開いたタブのハンドル</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helper.chromeDriverHelper.ChromeDriverHelper.open_new_tabs">
+<span class="sig-name descname"><span class="pre">open_new_tabs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url_list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/chromeDriverHelper.html#ChromeDriverHelper.open_new_tabs"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.chromeDriverHelper.ChromeDriverHelper.open_new_tabs" title="Link to this definition"></a></dt>
+<dd><p>(画面遷移有)新しいタブでurlリストを開く
+:param url_list:  list[str] 開くURLのリスト
+:return: list[str] 開いたタブのハンドルリスト</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helper.chromeDriverHelper.ChromeDriverHelper.previous_tab">
+<span class="sig-name descname"><span class="pre">previous_tab</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/chromeDriverHelper.html#ChromeDriverHelper.previous_tab"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.chromeDriverHelper.ChromeDriverHelper.previous_tab" title="Link to this definition"></a></dt>
+<dd><p>(画面遷移有)openで作ったタブ(__window_handle_list)の内、一つ前のタブを表示する
+:return:</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="helper.chromeDriverHelper.ChromeDriverHelper.profile_path">
+<span class="sig-name descname"><span class="pre">profile_path</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'C:\\Users\\igapon\\temp'</span></em><a class="headerlink" href="#helper.chromeDriverHelper.ChromeDriverHelper.profile_path" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="helper.chromeDriverHelper.ChromeDriverHelper.root_path">
+<span class="sig-name descname"><span class="pre">root_path</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'D:\\git\\igaponr\\training\\python\\Web_scraping\\helper'</span></em><a class="headerlink" href="#helper.chromeDriverHelper.ChromeDriverHelper.root_path" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helper.chromeDriverHelper.ChromeDriverHelper.save_image">
+<span class="sig-name descname"><span class="pre">save_image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">download_file_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">download_ext</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'.jpg'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wait_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/chromeDriverHelper.html#ChromeDriverHelper.save_image"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.chromeDriverHelper.ChromeDriverHelper.save_image" title="Link to this definition"></a></dt>
+<dd><p>(画面依存)表示されている画像を保存する
+chromeのデフォルトダウンロードフォルダに保存された後に、指定のフォルダに移動する
+ダウンロード実行用スクリプトを生成＆実行する
+:return:</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helper.chromeDriverHelper.ChromeDriverHelper.save_source">
+<span class="sig-name descname"><span class="pre">save_source</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'./title.html'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/chromeDriverHelper.html#ChromeDriverHelper.save_source"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.chromeDriverHelper.ChromeDriverHelper.save_source" title="Link to this definition"></a></dt>
+<dd><p>(画面依存)現在の画面のソースコードをファイルに保存する
+:param path: str 保存するファイルパス(URLかタイトルを指定するとよさそう)
+:return:</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helper.chromeDriverHelper.ChromeDriverHelper.scraping">
+<span class="sig-name descname"><span class="pre">scraping</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">selectors</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/chromeDriverHelper.html#ChromeDriverHelper.scraping"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.chromeDriverHelper.ChromeDriverHelper.scraping" title="Link to this definition"></a></dt>
+<dd><p>(画面依存)現在表示のURLにスクレイピングする</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helper.chromeDriverHelper.ChromeDriverHelper.scroll_element">
+<span class="sig-name descname"><span class="pre">scroll_element</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">element</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/chromeDriverHelper.html#ChromeDriverHelper.scroll_element"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.chromeDriverHelper.ChromeDriverHelper.scroll_element" title="Link to this definition"></a></dt>
+<dd><p>(画面遷移有)elementまでスクロールする</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="helper.chromeDriverHelper.ChromeDriverHelper.value_object">
+<span class="sig-name descname"><span class="pre">value_object</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#helper.chromeDriverHelper.ChromeDriverHelperValue" title="helper.chromeDriverHelper.ChromeDriverHelperValue"><span class="pre">ChromeDriverHelperValue</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#helper.chromeDriverHelper.ChromeDriverHelper.value_object" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="helper.chromeDriverHelper.ChromeDriverHelperValue">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">helper.chromeDriverHelper.</span></span><span class="sig-name descname"><span class="pre">ChromeDriverHelperValue</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">selectors</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">items</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/chromeDriverHelper.html#ChromeDriverHelperValue"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.chromeDriverHelper.ChromeDriverHelperValue" title="Link to this definition"></a></dt>
+<dd><p>ベースクラス: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Chromeドライバ値オブジェクト</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="helper.chromeDriverHelper.ChromeDriverHelperValue.is_url_only">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_url_only</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="_modules/helper/chromeDriverHelper.html#ChromeDriverHelperValue.is_url_only"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.chromeDriverHelper.ChromeDriverHelperValue.is_url_only" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="helper.chromeDriverHelper.ChromeDriverHelperValue.items">
+<span class="sig-name descname"><span class="pre">items</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#helper.chromeDriverHelper.ChromeDriverHelperValue.items" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="helper.chromeDriverHelper.ChromeDriverHelperValue.selectors">
+<span class="sig-name descname"><span class="pre">selectors</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#helper.chromeDriverHelper.ChromeDriverHelperValue.selectors" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="helper.chromeDriverHelper.ChromeDriverHelperValue.url">
+<span class="sig-name descname"><span class="pre">url</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#helper.chromeDriverHelper.ChromeDriverHelperValue.url" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="helper.html" class="btn btn-neutral float-left" title="helper package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="helper.crawling.html" class="btn btn-neutral float-right" title="helper.crawling module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Ryosuke Igarashi.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

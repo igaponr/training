@@ -1,0 +1,734 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="ja" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>helper.chromeDriverHelper &mdash; Web_scraping 1.0.0 ドキュメント</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=144c8c96"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/translations.js?v=4755f45a"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="索引" href="../../genindex.html" />
+    <link rel="search" title="検索" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Web_scraping
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../helper.html">helper package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Web_scraping</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">モジュールコード</a></li>
+      <li class="breadcrumb-item active">helper.chromeDriverHelper</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>helper.chromeDriverHelper のソースコード</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python3</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;Selenium Chromeドライバのヘルパー</span>
+
+<span class="sd">- コンストラクタで引数を指定するとスクレイピングまで実施されてget_value_objectが有効になる</span>
+<span class="sd">    - fixed_path (staticmethod)フォルダ名の禁止文字を全角文字に置き換える</span>
+<span class="sd">    - fixed_file_name (staticmethod)ファイル名の禁止文字を全角文字に置き換える</span>
+<span class="sd">    - scraping (staticmethod、画面依存)現在表示のURLにスクレイピングする</span>
+<span class="sd">    - scroll_element (画面遷移有)指定のelementまでスクロールする</span>
+<span class="sd">    - get_value_object 値オブジェクトを取得する</span>
+<span class="sd">    - get_url URLを取得する</span>
+<span class="sd">    - get_selectors セレクタを取得する</span>
+<span class="sd">    - get_items スクレイピング結果を取得する</span>
+<span class="sd">    - destroy Chromeを閉じる</span>
+<span class="sd">    - get_source Chromeで表示しているタブのsourceを取得する</span>
+<span class="sd">    - save_source Chromeで表示しているタブのsourceをファイルに保存する</span>
+<span class="sd">    - back (画面遷移有)ブラウザの戻るボタン押下と同じ動作</span>
+<span class="sd">    - forward (画面遷移有)ブラウザの進むボタン押下と同じ動作</span>
+<span class="sd">    - next_tab (画面遷移有)openで作ったタブ(__window_handle_list)の内、一つ後のタブを表示する</span>
+<span class="sd">    - previous_tab (画面遷移有)openで作ったタブ(__window_handle_list)の内、一つ前のタブを表示する</span>
+<span class="sd">    - download_image (画面遷移有)urlの画像を保存する(open_new_tab → save_image → closeする)</span>
+<span class="sd">    - open_current_tab (画面依存)現在表示されているタブでurlを開く</span>
+<span class="sd">    - open_new_tab (画面遷移有)新しいタブでurlを開く</span>
+<span class="sd">    - open_new_tabs (画面遷移有)新しいタブでurlリストを開く</span>
+<span class="sd">    - close (画面遷移有)指定の画面か、現在の画面を閉じる</span>
+<span class="sd">    - save_image (画面依存)表示されている画像を保存する(Chromeデフォルトダウンロードフォルダに保存)</span>
+<span class="sd">- 参考記事</span>
+<span class="sd">    - https://note.nkmk.me/python/</span>
+<span class="sd">    - https://maku77.github.io/python/</span>
+<span class="sd">    - https://nikkie-ftnext.hatenablog.com/entry/value-object-python-dataclass</span>
+<span class="sd">    - https://blog.wotakky.net/2018/08/12/post-4829/</span>
+<span class="sd">    - https://www.zacoding.com/post/selenium-custom-wait/</span>
+<span class="sd">    - https://stackoverflow-com.translate.goog/questions/63421086/modulenotfounderror-no-module-named-webdriver-manager-error-even-after-instal?_x_tr_sl=en&amp;_x_tr_tl=ja&amp;_x_tr_hl=ja&amp;_x_tr_pto=sc</span>
+<span class="sd">- 参考リファレンス</span>
+<span class="sd">    - https://selenium-python.readthedocs.io/</span>
+<span class="sd">    - https://www.seleniumqref.com/api/webdriver_gyaku.html</span>
+<span class="sd">    - https://www.selenium.dev/ja/documentation/webdriver/getting_started/</span>
+<span class="sd">    - https://kurozumi.github.io/selenium-python/index.html</span>
+
+<span class="sd">Todo:</span>
+<span class="sd">    - docstringを整える</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">socket</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">inspect</span>
+
+<span class="kn">import</span> <span class="nn">psutil</span>
+<span class="kn">from</span> <span class="nn">urllib.parse</span> <span class="kn">import</span> <span class="n">urlparse</span>
+
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span> <span class="nn">selenium</span> <span class="kn">import</span> <span class="n">webdriver</span>
+<span class="kn">from</span> <span class="nn">selenium.common</span> <span class="kn">import</span> <span class="n">NoSuchElementException</span>
+<span class="kn">from</span> <span class="nn">selenium.webdriver</span> <span class="kn">import</span> <span class="n">ActionChains</span>
+<span class="kn">from</span> <span class="nn">selenium.webdriver</span> <span class="kn">import</span> <span class="n">ChromeOptions</span>
+<span class="kn">from</span> <span class="nn">selenium.webdriver.chrome.service</span> <span class="kn">import</span> <span class="n">Service</span>
+<span class="kn">from</span> <span class="nn">selenium.webdriver.support.wait</span> <span class="kn">import</span> <span class="n">WebDriverWait</span>
+<span class="kn">from</span> <span class="nn">selenium.webdriver.support</span> <span class="kn">import</span> <span class="n">expected_conditions</span> <span class="k">as</span> <span class="n">EC</span>
+<span class="kn">from</span> <span class="nn">webdriver_manager.chrome</span> <span class="kn">import</span> <span class="n">ChromeDriverManager</span>
+
+<span class="kn">from</span> <span class="nn">helper</span> <span class="kn">import</span> <span class="n">uriHelper</span>
+<span class="kn">from</span> <span class="nn">helper</span> <span class="kn">import</span> <span class="n">webFileListHelper</span>
+<span class="kn">from</span> <span class="nn">helper</span> <span class="kn">import</span> <span class="n">webFileHelper</span>
+
+
+<div class="viewcode-block" id="ChromeDriverHelperValue">
+<a class="viewcode-back" href="../../helper.chromeDriverHelper.html#helper.chromeDriverHelper.ChromeDriverHelperValue">[ドキュメント]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">ChromeDriverHelperValue</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Chromeドライバ値オブジェクト&quot;&quot;&quot;</span>
+    <span class="n">url</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">selectors</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">items</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">selectors</span><span class="p">,</span> <span class="n">items</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;完全コンストラクタパターン</span>
+<span class="sd">        :param url: str 処理対象サイトURL</span>
+<span class="sd">        :param selectors: dict スクレイピングする際のセレクタリスト</span>
+<span class="sd">        :param items: dict スクレイピングして取得した値の辞書</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">url</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">inspect</span><span class="o">.</span><span class="n">stack</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">function</span><span class="si">}</span><span class="s2">&quot;</span>
+                             <span class="sa">f</span><span class="s2">&quot;引数エラー:urlが不正[</span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s2">]&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">selectors</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">inspect</span><span class="o">.</span><span class="n">stack</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">function</span><span class="si">}</span><span class="s2">&quot;</span>
+                             <span class="sa">f</span><span class="s2">&quot;引数エラー:selectorsが不正[</span><span class="si">{</span><span class="n">selectors</span><span class="si">}</span><span class="s2">]&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">items</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">inspect</span><span class="o">.</span><span class="n">stack</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">function</span><span class="si">}</span><span class="s2">&quot;</span>
+                             <span class="sa">f</span><span class="s2">&quot;引数エラー:itemsが不正[</span><span class="si">{</span><span class="n">items</span><span class="si">}</span><span class="s2">]&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">inspect</span><span class="o">.</span><span class="n">stack</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">function</span><span class="si">}</span><span class="s2">&quot;</span>
+                             <span class="sa">f</span><span class="s2">&quot;引数エラー:urlがstrではない&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">selectors</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">inspect</span><span class="o">.</span><span class="n">stack</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">function</span><span class="si">}</span><span class="s2">&quot;</span>
+                             <span class="sa">f</span><span class="s2">&quot;引数エラー:selectorsがdictではない&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">items</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">inspect</span><span class="o">.</span><span class="n">stack</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">function</span><span class="si">}</span><span class="s2">&quot;</span>
+                             <span class="sa">f</span><span class="s2">&quot;引数エラー:itemsがdictではない&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_url_only</span><span class="p">(</span><span class="n">url</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">inspect</span><span class="o">.</span><span class="n">stack</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">function</span><span class="si">}</span><span class="s2">&quot;</span>
+                             <span class="sa">f</span><span class="s2">&quot;引数エラー:urlがURLではない[</span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s2">]&quot;</span><span class="p">)</span>
+        <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;url&quot;</span><span class="p">,</span> <span class="n">url</span><span class="p">)</span>
+        <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;selectors&quot;</span><span class="p">,</span> <span class="n">selectors</span><span class="p">)</span>
+        <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;items&quot;</span><span class="p">,</span> <span class="n">items</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ChromeDriverHelperValue.is_url_only">
+<a class="viewcode-back" href="../../helper.chromeDriverHelper.html#helper.chromeDriverHelper.ChromeDriverHelperValue.is_url_only">[ドキュメント]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">is_url_only</span><span class="p">(</span><span class="n">string</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">urlparse</span><span class="p">(</span><span class="n">string</span><span class="p">)</span><span class="o">.</span><span class="n">scheme</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="ChromeDriverHelper">
+<a class="viewcode-back" href="../../helper.chromeDriverHelper.html#helper.chromeDriverHelper.ChromeDriverHelper">[ドキュメント]</a>
+<span class="k">class</span> <span class="nc">ChromeDriverHelper</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;chromeドライバを操作する</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">value_object</span><span class="p">:</span> <span class="n">ChromeDriverHelperValue</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">download_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)),</span>
+                                      <span class="s1">&#39;../download&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">,</span> <span class="s1">&#39;/&#39;</span><span class="p">)</span>
+
+    <span class="n">__driver</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">__wait</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">__source</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">__start_window_handle</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">__window_handle_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">root_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))</span>
+    <span class="n">driver_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root_path</span><span class="p">,</span> <span class="sa">r</span><span class="s1">&#39;driver\chromedriver.exe&#39;</span><span class="p">)</span>
+    <span class="n">chrome_path</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;&quot;C:\Program Files (x86)\Google\Chrome\Application\chrome.exe&quot;&#39;</span>
+    <span class="n">__options</span> <span class="o">=</span> <span class="n">ChromeOptions</span><span class="p">()</span>
+    <span class="n">__port</span> <span class="o">=</span> <span class="s2">&quot;9222&quot;</span>
+    <span class="n">__chrome_add_argument</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;--blink-settings=imagesEnabled=false&#39;</span><span class="p">,</span>  <span class="c1"># 画像非表示</span>
+                             <span class="c1"># &#39;--incognito&#39;,  # シークレットモードで起動する</span>
+                             <span class="c1"># &#39;--headless&#39;,  # バックグラウンドで起動する</span>
+                             <span class="p">]</span>
+    <span class="n">__chrome_add_experimental_option</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;debuggerAddress&#39;</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;127.0.0.1:</span><span class="si">{</span><span class="n">__port</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">),</span>
+                                        <span class="c1"># TODO: prefsはdebuggerAddressと同時に指定できない？</span>
+                                        <span class="c1"># (&#39;prefs&#39;, {&#39;download.default_directory&#39;: download_path}),</span>
+                                        <span class="p">]</span>
+    <span class="n">profile_path</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;C:\Users\igapon\temp&#39;</span>
+    <span class="n">__cmd</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">chrome_path</span><span class="si">}</span><span class="s1">&#39;</span> \
+            <span class="sa">f</span><span class="s1">&#39; -remote-debugging-port=</span><span class="si">{</span><span class="n">__port</span><span class="si">}</span><span class="s1">&#39;</span> \
+            <span class="sa">f</span><span class="s1">&#39; --user-data-dir=&quot;</span><span class="si">{</span><span class="n">profile_path</span><span class="si">}</span><span class="s1">&quot;&#39;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value_object</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">selectors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">download_path</span><span class="o">=</span><span class="n">download_path</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;コンストラクタ</span>
+<span class="sd">        値オブジェクトからの復元、</span>
+<span class="sd">        または、urlとselectorsより、値オブジェクトを作成する</span>
+<span class="sd">        :param value_object: list 対象となるサイトURL、または、値オブジェクト</span>
+<span class="sd">        :param selectors: dict スクレイピングする際のセレクタリスト</span>
+<span class="sd">        :param download_path: str ダウンロードフォルダのパス</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__start</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">download_path</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">download_path</span> <span class="o">=</span> <span class="n">download_path</span>
+        <span class="k">if</span> <span class="n">value_object</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value_object</span><span class="p">,</span> <span class="n">ChromeDriverHelperValue</span><span class="p">):</span>
+                <span class="n">value_object</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">value_object</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">value_object</span> <span class="o">=</span> <span class="n">value_object</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value_object</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="n">url</span> <span class="o">=</span> <span class="n">value_object</span>
+                <span class="k">if</span> <span class="n">selectors</span><span class="p">:</span>
+                    <span class="n">selectors</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">selectors</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">open_current_tab</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+                    <span class="n">items</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scraping</span><span class="p">(</span><span class="n">selectors</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">value_object</span> <span class="o">=</span> <span class="n">ChromeDriverHelperValue</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">selectors</span><span class="p">,</span> <span class="n">items</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">inspect</span><span class="o">.</span><span class="n">stack</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">function</span><span class="si">}</span><span class="s2">&quot;</span>
+                                     <span class="sa">f</span><span class="s2">&quot;引数エラー:selectorsが不正[</span><span class="si">{</span><span class="n">selectors</span><span class="si">}</span><span class="s2">]&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">inspect</span><span class="o">.</span><span class="n">stack</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">function</span><span class="si">}</span><span class="s2">&quot;</span>
+                                 <span class="sa">f</span><span class="s2">&quot;引数エラー:value_objectが不正[</span><span class="si">{</span><span class="n">value_object</span><span class="si">}</span><span class="s2">]&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ChromeDriverHelper.is_chrome_running_in_debug_mode">
+<a class="viewcode-back" href="../../helper.chromeDriverHelper.html#helper.chromeDriverHelper.ChromeDriverHelper.is_chrome_running_in_debug_mode">[ドキュメント]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">is_chrome_running_in_debug_mode</span><span class="p">():</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;chrome.exeが起動していて、9222ポートに応答することを確認する</span>
+<span class="sd">        :return: bool 全ての条件を満たす場合True、そうでない場合False</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># chrome.exeが起動しているか確認</span>
+        <span class="n">chrome_running</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">for</span> <span class="n">proc</span> <span class="ow">in</span> <span class="n">psutil</span><span class="o">.</span><span class="n">process_iter</span><span class="p">():</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">if</span> <span class="s1">&#39;chrome.exe&#39;</span> <span class="ow">in</span> <span class="n">proc</span><span class="o">.</span><span class="n">name</span><span class="p">():</span>
+                    <span class="n">chrome_running</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="k">break</span>
+            <span class="k">except</span> <span class="p">(</span><span class="n">psutil</span><span class="o">.</span><span class="n">NoSuchProcess</span><span class="p">,</span> <span class="n">psutil</span><span class="o">.</span><span class="n">AccessDenied</span><span class="p">,</span> <span class="n">psutil</span><span class="o">.</span><span class="n">ZombieProcess</span><span class="p">):</span>
+                <span class="k">pass</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">chrome_running</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;chrome見つからず。&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="c1"># 9222ポートに応答しているか確認</span>
+        <span class="k">with</span> <span class="n">socket</span><span class="o">.</span><span class="n">socket</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">AF_INET</span><span class="p">,</span> <span class="n">socket</span><span class="o">.</span><span class="n">SOCK_STREAM</span><span class="p">)</span> <span class="k">as</span> <span class="n">s</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">s</span><span class="o">.</span><span class="n">connect</span><span class="p">((</span><span class="s1">&#39;127.0.0.1&#39;</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">ChromeDriverHelper</span><span class="o">.</span><span class="n">__port</span><span class="p">)))</span>
+                <span class="k">return</span> <span class="kc">True</span>
+            <span class="k">except</span> <span class="ne">ConnectionRefusedError</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;chrome見つかるが、9222に応答せず。&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="ChromeDriverHelper.fixed_path">
+<a class="viewcode-back" href="../../helper.chromeDriverHelper.html#helper.chromeDriverHelper.ChromeDriverHelper.fixed_path">[ドキュメント]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">fixed_path</span><span class="p">(</span><span class="n">file_path</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;フォルダ名の禁止文字を全角文字に置き換える</span>
+<span class="sd">        :param file_path: str 置き換えたいフォルダパス</span>
+<span class="sd">        :return: str 置き換え後のフォルダパス</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">file_path</span> <span class="o">=</span> <span class="n">file_path</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">,</span> <span class="s1">&#39;：&#39;</span><span class="p">)</span>
+        <span class="n">file_path</span> <span class="o">=</span> <span class="n">file_path</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;*&#39;</span><span class="p">,</span> <span class="s1">&#39;＊&#39;</span><span class="p">)</span>
+        <span class="n">file_path</span> <span class="o">=</span> <span class="n">file_path</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;?&#39;</span><span class="p">,</span> <span class="s1">&#39;？&#39;</span><span class="p">)</span>
+        <span class="n">file_path</span> <span class="o">=</span> <span class="n">file_path</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;&quot;&#39;</span><span class="p">,</span> <span class="s1">&#39;”&#39;</span><span class="p">)</span>
+        <span class="n">file_path</span> <span class="o">=</span> <span class="n">file_path</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;&lt;&#39;</span><span class="p">,</span> <span class="s1">&#39;＜&#39;</span><span class="p">)</span>
+        <span class="n">file_path</span> <span class="o">=</span> <span class="n">file_path</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;&gt;&#39;</span><span class="p">,</span> <span class="s1">&#39;＞&#39;</span><span class="p">)</span>
+        <span class="n">file_path</span> <span class="o">=</span> <span class="n">file_path</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;|&#39;</span><span class="p">,</span> <span class="s1">&#39;｜&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">file_path</span></div>
+
+
+<div class="viewcode-block" id="ChromeDriverHelper.fixed_file_name">
+<a class="viewcode-back" href="../../helper.chromeDriverHelper.html#helper.chromeDriverHelper.ChromeDriverHelper.fixed_file_name">[ドキュメント]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">fixed_file_name</span><span class="p">(</span><span class="n">file_name</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;ファイル名の禁止文字を全角文字に置き換える</span>
+<span class="sd">        :param file_name: str 置き換えたいファイル名</span>
+<span class="sd">        :return: str 置き換え後のファイル名</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">file_name</span> <span class="o">=</span> <span class="n">file_name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">,</span> <span class="s1">&#39;￥&#39;</span><span class="p">)</span>
+        <span class="n">file_name</span> <span class="o">=</span> <span class="n">file_name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="s1">&#39;／&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ChromeDriverHelper</span><span class="o">.</span><span class="n">fixed_path</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ChromeDriverHelper.scraping">
+<a class="viewcode-back" href="../../helper.chromeDriverHelper.html#helper.chromeDriverHelper.ChromeDriverHelper.scraping">[ドキュメント]</a>
+    <span class="k">def</span> <span class="nf">scraping</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">selectors</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;(画面依存)現在表示のURLにスクレイピングする&quot;&quot;&quot;</span>
+        <span class="n">selectors</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">selectors</span><span class="p">)</span>
+        <span class="n">items</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">selector_list</span> <span class="ow">in</span> <span class="n">selectors</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">items</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_scraping_selector_list</span><span class="p">(</span><span class="n">selector_list</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">items</span></div>
+
+
+<div class="viewcode-block" id="ChromeDriverHelper.scroll_element">
+<a class="viewcode-back" href="../../helper.chromeDriverHelper.html#helper.chromeDriverHelper.ChromeDriverHelper.scroll_element">[ドキュメント]</a>
+    <span class="k">def</span> <span class="nf">scroll_element</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">element</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;(画面遷移有)elementまでスクロールする&quot;&quot;&quot;</span>
+        <span class="n">actions</span> <span class="o">=</span> <span class="n">ActionChains</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__driver</span><span class="p">)</span>
+        <span class="n">actions</span><span class="o">.</span><span class="n">move_to_element</span><span class="p">(</span><span class="n">element</span><span class="p">)</span>
+        <span class="n">actions</span><span class="o">.</span><span class="n">perform</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="ChromeDriverHelper.get_value_object">
+<a class="viewcode-back" href="../../helper.chromeDriverHelper.html#helper.chromeDriverHelper.ChromeDriverHelper.get_value_object">[ドキュメント]</a>
+    <span class="k">def</span> <span class="nf">get_value_object</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;値オブジェクトを取得する&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">value_object</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value_object</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">inspect</span><span class="o">.</span><span class="n">stack</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">function</span><span class="si">}</span><span class="s2">&quot;</span>
+                         <span class="sa">f</span><span class="s2">&quot;オブジェクトエラー:value_object&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ChromeDriverHelper.get_url">
+<a class="viewcode-back" href="../../helper.chromeDriverHelper.html#helper.chromeDriverHelper.ChromeDriverHelper.get_url">[ドキュメント]</a>
+    <span class="k">def</span> <span class="nf">get_url</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;URLを取得する&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_value_object</span><span class="p">():</span>
+            <span class="k">return</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_value_object</span><span class="p">()</span><span class="o">.</span><span class="n">url</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">inspect</span><span class="o">.</span><span class="n">stack</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">function</span><span class="si">}</span><span class="s2">&quot;</span>
+                         <span class="sa">f</span><span class="s2">&quot;オブジェクトエラー:url&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ChromeDriverHelper.get_selectors">
+<a class="viewcode-back" href="../../helper.chromeDriverHelper.html#helper.chromeDriverHelper.ChromeDriverHelper.get_selectors">[ドキュメント]</a>
+    <span class="k">def</span> <span class="nf">get_selectors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;セレクタを取得する&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_value_object</span><span class="p">():</span>
+            <span class="k">return</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_value_object</span><span class="p">()</span><span class="o">.</span><span class="n">selectors</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">inspect</span><span class="o">.</span><span class="n">stack</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">function</span><span class="si">}</span><span class="s2">&quot;</span>
+                         <span class="sa">f</span><span class="s2">&quot;オブジェクトエラー:selectors&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ChromeDriverHelper.get_items">
+<a class="viewcode-back" href="../../helper.chromeDriverHelper.html#helper.chromeDriverHelper.ChromeDriverHelper.get_items">[ドキュメント]</a>
+    <span class="k">def</span> <span class="nf">get_items</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;スクレイピング結果を取得する&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_value_object</span><span class="p">():</span>
+            <span class="k">return</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_value_object</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">inspect</span><span class="o">.</span><span class="n">stack</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">function</span><span class="si">}</span><span class="s2">&quot;</span>
+                         <span class="sa">f</span><span class="s2">&quot;オブジェクトエラー:items&quot;</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span> <span class="nf">__add_options</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;オプション追加</span>
+<span class="sd">        :param args: tuple(str, str) 追加するキーと値</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__options</span><span class="o">.</span><span class="n">add_experimental_option</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__add_argument</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__options</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Chromeへの接続を完了する。起動していなければ起動する。既に開いているtabは、とりあえず気にしない</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># TODO: __add_argumentが効いてない、使い方を調べる</span>
+        <span class="c1">#        for arg in self.__chrome_add_argument:</span>
+        <span class="c1">#            self.__add_argument(arg)</span>
+        <span class="k">for</span> <span class="n">args</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__chrome_add_experimental_option</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__add_options</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_chrome_running_in_debug_mode</span><span class="p">():</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Chromeに繋がらなかったので、起動して接続する。&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__create</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># NOTE: タイムアウト長いので、なるべくChrome起動してから呼び出したい</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__connection</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="s2">&quot;Chromeに繋がらなかったので、起動して接続する。&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__create</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__connection</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__start_window_handle</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__driver</span><span class="o">.</span><span class="n">current_window_handle</span>
+
+    <span class="k">def</span> <span class="nf">__connection</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;起動しているchromeに接続</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">chrome_service</span> <span class="o">=</span> <span class="n">Service</span><span class="p">(</span><span class="n">executable_path</span><span class="o">=</span><span class="n">ChromeDriverManager</span><span class="p">()</span><span class="o">.</span><span class="n">install</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__driver</span> <span class="o">=</span> <span class="n">webdriver</span><span class="o">.</span><span class="n">Chrome</span><span class="p">(</span><span class="n">service</span><span class="o">=</span><span class="n">chrome_service</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__options</span><span class="p">)</span>
+        <span class="c1"># self.__driver = Chrome(executable_path=ChromeDriverManager().install(), options=self.__options)</span>
+
+    <span class="k">def</span> <span class="nf">__create</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;chromeを起動する</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__cmd</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">STDOUT</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ChromeDriverHelper.destroy">
+<a class="viewcode-back" href="../../helper.chromeDriverHelper.html#helper.chromeDriverHelper.ChromeDriverHelper.destroy">[ドキュメント]</a>
+    <span class="k">def</span> <span class="nf">destroy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;chromeが開いていれば閉じる</span>
+<span class="sd">        :return: なし</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__driver</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">__window_handle</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__window_handle_list</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__start_window_handle</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__driver</span><span class="o">.</span><span class="n">switch_to</span><span class="o">.</span><span class="n">window</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__start_window_handle</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__driver</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__start_window_handle</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__driver</span><span class="o">.</span><span class="n">quit</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__driver</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+    <span class="k">def</span> <span class="nf">__gen_scraping_selectors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">selectors</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;(画面依存)chromeで開いているサイトに対して、スクレイピング結果を返すジェネレータ</span>
+<span class="sd">        :param selectors: dict{key, list[tuple(by, selector, action)]}] スクレイピングの規則</span>
+<span class="sd">        :return: list[str] スクレイピング結果をlistに入れて返す</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">selector_list</span> <span class="ow">in</span> <span class="n">selectors</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">while</span> <span class="n">selector_list</span><span class="p">:</span>
+                <span class="n">by</span><span class="p">,</span> <span class="n">selector</span><span class="p">,</span> <span class="n">action</span> <span class="o">=</span> <span class="n">selector_list</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+                <span class="n">ret_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_scraping_selector</span><span class="p">(</span><span class="n">by</span><span class="p">,</span> <span class="n">selector</span><span class="p">,</span> <span class="n">action</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">ret_list</span> <span class="ow">and</span> <span class="n">ret_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">and</span> <span class="n">selector_list</span><span class="p">:</span>
+                    <span class="c1"># ret_listに値があり、selector_listの末尾ではない時</span>
+                    <span class="k">for</span> <span class="n">url</span> <span class="ow">in</span> <span class="n">ret_list</span><span class="p">:</span>
+                        <span class="n">ret_parse</span> <span class="o">=</span> <span class="n">urlparse</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="n">ret_parse</span><span class="o">.</span><span class="n">scheme</span><span class="p">:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">open_new_tab</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">inspect</span><span class="o">.</span><span class="n">stack</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">function</span><span class="si">}</span><span class="s2">&quot;</span>
+                                             <span class="sa">f</span><span class="s2">&quot;引数エラー:urlが不正[</span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s2">]&quot;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__window_handle_list</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                    <span class="k">yield</span> <span class="n">ret_list</span>
+
+    <span class="k">def</span> <span class="nf">__get_scraping_selector_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">selector_list</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;(画面依存)chromeで開いているサイトに対して、スクレイピング結果を返す</span>
+<span class="sd">        :param selector_list: list[tuple(by, selector, action)] スクレイピングの規則</span>
+<span class="sd">        :return: list[str] スクレイピング結果をlistに入れて返す</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">selector_list</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">selector_list</span><span class="p">)</span>
+        <span class="k">while</span> <span class="n">selector_list</span><span class="p">:</span>
+            <span class="n">by</span><span class="p">,</span> <span class="n">selector</span><span class="p">,</span> <span class="n">action</span> <span class="o">=</span> <span class="n">selector_list</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">ret_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_scraping_selector</span><span class="p">(</span><span class="n">by</span><span class="p">,</span> <span class="n">selector</span><span class="p">,</span> <span class="n">action</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">ret_list</span> <span class="ow">and</span> <span class="n">ret_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">and</span> <span class="n">selector_list</span><span class="p">:</span>
+                <span class="c1"># ret_listに値があり、selector_listの末尾ではない時</span>
+                <span class="k">for</span> <span class="n">url</span> <span class="ow">in</span> <span class="n">ret_list</span><span class="p">:</span>
+                    <span class="n">ret_parse</span> <span class="o">=</span> <span class="n">urlparse</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">ret_parse</span><span class="o">.</span><span class="n">scheme</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">open_new_tab</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">inspect</span><span class="o">.</span><span class="n">stack</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">function</span><span class="si">}</span><span class="s2">&quot;</span>
+                                         <span class="sa">f</span><span class="s2">&quot;引数エラー:urlが不正[</span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s2">]&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__window_handle_list</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                <span class="k">return</span> <span class="n">ret_list</span>
+
+    <span class="k">def</span> <span class="nf">__get_scraping_selector</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">by</span><span class="p">,</span> <span class="n">selector</span><span class="p">,</span> <span class="n">action</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;(画面遷移有)現在の画面(self._window_handle_listがあればそれ、無ければself.__start_window_handle)について、</span>
+<span class="sd">        スクレイピングして、画面を閉じて、結果を返す</span>
+<span class="sd">        :param by:</span>
+<span class="sd">        :param selector:</span>
+<span class="sd">        :param action:</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">ret_list</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">__temp_window_handle_list</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__window_handle_list</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">__temp_window_handle_list</span><span class="p">:</span>
+                <span class="n">count</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">__temp_window_handle_list</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">count</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">count</span><span class="p">):</span>
+                <span class="n">elements</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__driver</span><span class="o">.</span><span class="n">find_elements</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="n">by</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">selector</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">elements</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">scroll_element</span><span class="p">(</span><span class="n">elem</span><span class="p">)</span>
+                    <span class="n">text</span> <span class="o">=</span> <span class="n">action</span><span class="p">(</span><span class="n">elem</span><span class="p">)</span>
+                    <span class="n">ret_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">except</span> <span class="n">NoSuchElementException</span><span class="p">:</span>
+            <span class="c1"># find_elementsでelementが見つからなかったとき</span>
+            <span class="n">ret_list</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">ret_list</span>
+
+<div class="viewcode-block" id="ChromeDriverHelper.get_source">
+<a class="viewcode-back" href="../../helper.chromeDriverHelper.html#helper.chromeDriverHelper.ChromeDriverHelper.get_source">[ドキュメント]</a>
+    <span class="k">def</span> <span class="nf">get_source</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;(画面依存)現在の画面(chromeで現在表示しているタブ)のソースコードを取得する</span>
+<span class="sd">        :return: str ソースコード</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__source</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__driver</span><span class="o">.</span><span class="n">page_source</span>
+        <span class="k">return</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__source</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ChromeDriverHelper.save_source">
+<a class="viewcode-back" href="../../helper.chromeDriverHelper.html#helper.chromeDriverHelper.ChromeDriverHelper.save_source">[ドキュメント]</a>
+    <span class="k">def</span> <span class="nf">save_source</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="s1">&#39;./title.html&#39;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;(画面依存)現在の画面のソースコードをファイルに保存する</span>
+<span class="sd">        :param path: str 保存するファイルパス(URLかタイトルを指定するとよさそう)</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">html</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_source</span><span class="p">()</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">html</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ChromeDriverHelper.back">
+<a class="viewcode-back" href="../../helper.chromeDriverHelper.html#helper.chromeDriverHelper.ChromeDriverHelper.back">[ドキュメント]</a>
+    <span class="k">def</span> <span class="nf">back</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;(画面遷移有)ブラウザの戻るボタン押下と同じ動作</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__driver</span><span class="o">.</span><span class="n">back</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="ChromeDriverHelper.forward">
+<a class="viewcode-back" href="../../helper.chromeDriverHelper.html#helper.chromeDriverHelper.ChromeDriverHelper.forward">[ドキュメント]</a>
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;(画面遷移有)ブラウザの進むボタン押下と同じ動作</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__driver</span><span class="o">.</span><span class="n">forward</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="ChromeDriverHelper.next_tab">
+<a class="viewcode-back" href="../../helper.chromeDriverHelper.html#helper.chromeDriverHelper.ChromeDriverHelper.next_tab">[ドキュメント]</a>
+    <span class="k">def</span> <span class="nf">next_tab</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;(画面遷移有)openで作ったタブ(__window_handle_list)の内、一つ後のタブを表示する</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__shift_tab</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ChromeDriverHelper.previous_tab">
+<a class="viewcode-back" href="../../helper.chromeDriverHelper.html#helper.chromeDriverHelper.ChromeDriverHelper.previous_tab">[ドキュメント]</a>
+    <span class="k">def</span> <span class="nf">previous_tab</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;(画面遷移有)openで作ったタブ(__window_handle_list)の内、一つ前のタブを表示する</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__shift_tab</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span> <span class="nf">__shift_tab</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">):</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">count</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__window_handle_list</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__driver</span><span class="o">.</span><span class="n">current_window_handle</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__window_handle_list</span><span class="p">:</span>
+            <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__window_handle_list</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__driver</span><span class="o">.</span><span class="n">current_window_handle</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__driver</span><span class="o">.</span><span class="n">switch_to</span><span class="o">.</span><span class="n">window</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__window_handle_list</span><span class="p">[(</span><span class="n">index</span> <span class="o">+</span> <span class="n">step</span><span class="p">)</span> <span class="o">%</span> <span class="n">count</span><span class="p">])</span>
+
+<div class="viewcode-block" id="ChromeDriverHelper.download_image">
+<a class="viewcode-back" href="../../helper.chromeDriverHelper.html#helper.chromeDriverHelper.ChromeDriverHelper.download_image">[ドキュメント]</a>
+    <span class="k">def</span> <span class="nf">download_image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">download_path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;(画面遷移有)urlの画像を保存する(open_new_tab → save_image → closeする)</span>
+<span class="sd">        :param url: 画像のurl</span>
+<span class="sd">        :param download_path:</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">uri</span> <span class="o">=</span> <span class="n">uriHelper</span><span class="o">.</span><span class="n">UriHelper</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">uri</span><span class="o">.</span><span class="n">is_data_uri</span><span class="p">(</span><span class="n">url</span><span class="p">):</span>
+            <span class="n">uri</span><span class="o">.</span><span class="n">save_data_uri</span><span class="p">(</span><span class="n">download_path</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">__handle</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">open_new_tab</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">save_image</span><span class="p">(</span><span class="n">uri</span><span class="o">.</span><span class="n">get_filename</span><span class="p">(),</span> <span class="n">uri</span><span class="o">.</span><span class="n">get_ext</span><span class="p">())</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">__handle</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ChromeDriverHelper.open_current_tab">
+<a class="viewcode-back" href="../../helper.chromeDriverHelper.html#helper.chromeDriverHelper.ChromeDriverHelper.open_current_tab">[ドキュメント]</a>
+    <span class="k">def</span> <span class="nf">open_current_tab</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;(画面依存)現在表示されているタブでurlを開く</span>
+<span class="sd">        :param url: str chromeで開くURL</span>
+<span class="sd">        :return: なし</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__driver</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="c1"># ページが読み込まれるまで待機</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__wait</span> <span class="o">=</span> <span class="n">WebDriverWait</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__driver</span><span class="p">,</span> <span class="mi">30</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__wait</span><span class="o">.</span><span class="n">until</span><span class="p">(</span><span class="n">EC</span><span class="o">.</span><span class="n">presence_of_all_elements_located</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ChromeDriverHelper.open_new_tab">
+<a class="viewcode-back" href="../../helper.chromeDriverHelper.html#helper.chromeDriverHelper.ChromeDriverHelper.open_new_tab">[ドキュメント]</a>
+    <span class="k">def</span> <span class="nf">open_new_tab</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;(画面遷移有)新しいタブでurlを開く</span>
+<span class="sd">        :param url: str 開くURL</span>
+<span class="sd">        :return: str 開いたタブのハンドル</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__driver</span><span class="o">.</span><span class="n">switch_to</span><span class="o">.</span><span class="n">new_window</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">open_current_tab</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__window_handle_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__driver</span><span class="o">.</span><span class="n">current_window_handle</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__window_handle_list</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="ChromeDriverHelper.open_new_tabs">
+<a class="viewcode-back" href="../../helper.chromeDriverHelper.html#helper.chromeDriverHelper.ChromeDriverHelper.open_new_tabs">[ドキュメント]</a>
+    <span class="k">def</span> <span class="nf">open_new_tabs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url_list</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;(画面遷移有)新しいタブでurlリストを開く</span>
+<span class="sd">        :param url_list:  list[str] 開くURLのリスト</span>
+<span class="sd">        :return: list[str] 開いたタブのハンドルリスト</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">window_handle_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">url</span> <span class="ow">in</span> <span class="n">url_list</span><span class="p">:</span>
+            <span class="n">window_handle_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">open_new_tab</span><span class="p">(</span><span class="n">url</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">window_handle_list</span></div>
+
+
+<div class="viewcode-block" id="ChromeDriverHelper.close">
+<a class="viewcode-back" href="../../helper.chromeDriverHelper.html#helper.chromeDriverHelper.ChromeDriverHelper.close">[ドキュメント]</a>
+    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">window_handle</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;(画面遷移有)openで開いた画面の内、指定の画面か、現在の画面を閉じる</span>
+<span class="sd">        :param window_handle: str 閉じる画面のハンドル</span>
+<span class="sd">        :return: None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">window_handle</span><span class="p">:</span>
+                <span class="n">window_handle</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__driver</span><span class="o">.</span><span class="n">current_window_handle</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__driver</span><span class="o">.</span><span class="n">switch_to</span><span class="o">.</span><span class="n">window</span><span class="p">(</span><span class="n">window_handle</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">window_handle</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">__start_window_handle</span><span class="p">:</span>
+                <span class="k">return</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__driver</span><span class="o">.</span><span class="n">current_window_handle</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">__start_window_handle</span><span class="p">:</span>
+                <span class="k">return</span>
+            <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__window_handle_list</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">window_handle</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__driver</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">__window_handle_list</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__window_handle_list</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__driver</span><span class="o">.</span><span class="n">switch_to</span><span class="o">.</span><span class="n">window</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__start_window_handle</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">index</span><span class="p">:</span>
+                    <span class="n">index</span> <span class="o">-=</span> <span class="mi">1</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__driver</span><span class="o">.</span><span class="n">switch_to</span><span class="o">.</span><span class="n">window</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__window_handle_list</span><span class="p">[</span><span class="n">index</span><span class="p">])</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;ValueError 指定のwindow_handleがありません。&quot;</span><span class="p">)</span>
+            <span class="n">exit</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="ChromeDriverHelper.save_image">
+<a class="viewcode-back" href="../../helper.chromeDriverHelper.html#helper.chromeDriverHelper.ChromeDriverHelper.save_image">[ドキュメント]</a>
+    <span class="k">def</span> <span class="nf">save_image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">download_file_name</span><span class="p">,</span> <span class="n">download_ext</span><span class="o">=</span><span class="s1">&#39;.jpg&#39;</span><span class="p">,</span> <span class="n">wait_time</span><span class="o">=</span><span class="mi">3</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;(画面依存)表示されている画像を保存する</span>
+<span class="sd">        chromeのデフォルトダウンロードフォルダに保存された後に、指定のフォルダに移動する</span>
+<span class="sd">        ダウンロード実行用スクリプトを生成＆実行する</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">__image_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__driver</span><span class="o">.</span><span class="n">current_url</span>
+        <span class="n">downloads_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;HOMEDRIVE&quot;</span><span class="p">),</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;HOMEPATH&quot;</span><span class="p">),</span> <span class="s2">&quot;downloads&quot;</span><span class="p">)</span>
+        <span class="n">__web_file</span> <span class="o">=</span> <span class="n">webFileHelper</span><span class="o">.</span><span class="n">WebFileHelper</span><span class="p">(</span><span class="n">__image_url</span><span class="p">,</span> <span class="n">download_file_name</span><span class="p">,</span> <span class="n">download_ext</span><span class="p">,</span> <span class="n">downloads_path</span><span class="p">)</span>
+        <span class="n">__filename</span> <span class="o">=</span> <span class="n">__web_file</span><span class="o">.</span><span class="n">get_filename</span><span class="p">()</span> <span class="o">+</span> <span class="n">__web_file</span><span class="o">.</span><span class="n">get_ext</span><span class="p">()</span>
+        <span class="n">script_str</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">        window.URL = window.URL || window.webkitURL;</span>
+
+<span class="s2">        var xhr = new XMLHttpRequest(),</span>
+<span class="s2">        a = document.createElement(&#39;a&#39;), file;</span>
+
+<span class="s2">        xhr.open(&#39;GET&#39;, &#39;&quot;&quot;&quot;</span> <span class="o">+</span> <span class="n">__image_url</span> <span class="o">+</span> <span class="s2">&quot;&quot;&quot;&#39;, true);</span>
+<span class="s2">        xhr.responseType = &#39;blob&#39;;</span>
+<span class="s2">        xhr.onload = function () {</span>
+<span class="s2">        file = new Blob([xhr.response], { type : &#39;application/octet-stream&#39; });</span>
+<span class="s2">        a.href = window.URL.createObjectURL(file);</span>
+<span class="s2">        a.download = &#39;&quot;&quot;&quot;</span> <span class="o">+</span> <span class="n">__filename</span> <span class="o">+</span> <span class="s2">&quot;&quot;&quot;&#39;;</span>
+<span class="s2">        a.click();</span>
+<span class="s2">        };</span>
+<span class="s2">        xhr.send();</span>
+<span class="s2">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__driver</span><span class="o">.</span><span class="n">execute_script</span><span class="p">(</span><span class="n">script_str</span><span class="p">)</span>
+        <span class="n">file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">download_path</span><span class="p">,</span> <span class="n">__filename</span><span class="p">)</span>
+        <span class="c1"># TODO: メソッド化する</span>
+        <span class="c1"># what = (lambda web_file, path: web_file.move(path))(__web_file, file_path)</span>
+        <span class="c1"># how = (lambda web_file: os.path.isfile(web_file.get_path()))(__web_file)</span>
+        <span class="c1"># self.wait_until(what, how)</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="k">while</span> <span class="p">((</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">wait_time</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">__web_file</span><span class="o">.</span><span class="n">get_path</span><span class="p">())):</span>
+            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+        <span class="n">__web_file</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span></div>
+</div>
+
+
+    <span class="c1"># @staticmethod</span>
+    <span class="c1"># def wait_until(what, how, wait_time=3):</span>
+    <span class="c1">#     &quot;&quot;&quot;what(何)を実行するために、how(どのように)なるまで最大でwait_time秒間待つ&quot;&quot;&quot;</span>
+    <span class="c1">#     start = time.time()</span>
+    <span class="c1">#     while ((time.time() - start) &lt; wait_time) and not (how):</span>
+    <span class="c1">#         time.sleep(0.1)</span>
+    <span class="c1">#     return what</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Ryosuke Igarashi.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,351 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="ja" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>helper.urlDeployment &mdash; Web_scraping 1.0.0 ドキュメント</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=144c8c96"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/translations.js?v=4755f45a"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="索引" href="../../genindex.html" />
+    <link rel="search" title="検索" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Web_scraping
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../helper.html">helper package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Web_scraping</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">モジュールコード</a></li>
+      <li class="breadcrumb-item active">helper.urlDeployment</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>helper.urlDeployment のソースコード</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python3</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">引数URLのサイトにアクセスして、タイトルと最終画像URLをスクレイピングする。</span>
+<span class="sd">最終画像URLの数字を展開した、URLリストをファイルに保存して、irvineに渡す。</span>
+<span class="sd">    http:/hoge/10.jpg</span>
+<span class="sd">    ↓</span>
+<span class="sd">    http:/hoge/1.jpg ～ http:/hoge/10.jpg</span>
+<span class="sd">irvineが起動してダウンロードが開始されるので、ダウンロードが終わったらirvineを手動で終了する。</span>
+<span class="sd">irvineが終了したらダウンロードファイルをチェックする。</span>
+<span class="sd">失敗している時は、拡張子を変えて、ファイルに保存して、irvineに渡す。</span>
+<span class="sd">成功している時は、リネームしてzipして削除する。</span>
+
+<span class="sd">Todo:</span>
+<span class="sd">    - docstringを整える</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">inspect</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span> <span class="nn">urllib.parse</span> <span class="kn">import</span> <span class="n">urlparse</span>  <span class="c1"># URLパーサー</span>
+<span class="kn">from</span> <span class="nn">urllib.parse</span> <span class="kn">import</span> <span class="n">urlunparse</span>
+<span class="kn">import</span> <span class="nn">pyperclip</span>  <span class="c1"># クリップボード</span>
+<span class="kn">from</span> <span class="nn">helper</span> <span class="kn">import</span> <span class="n">chromeDriverHelper</span>
+<span class="kn">from</span> <span class="nn">helper</span> <span class="kn">import</span> <span class="n">webFileListHelper</span>
+<span class="kn">from</span> <span class="nn">helper</span> <span class="kn">import</span> <span class="n">webFileHelper</span>
+
+<span class="c1"># local source</span>
+<span class="kn">from</span> <span class="nn">const</span> <span class="kn">import</span> <span class="o">*</span>
+
+
+<div class="viewcode-block" id="UrlDeploymentValue">
+<a class="viewcode-back" href="../../helper.urlDeployment.html#helper.urlDeployment.UrlDeploymentValue">[ドキュメント]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">UrlDeploymentValue</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;URL展開クラスの値オブジェクト</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">url</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">selectors</span><span class="p">:</span> <span class="nb">list</span>
+    <span class="n">title</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">image_urls</span><span class="p">:</span> <span class="nb">list</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">selectors</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">image_urls</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;完全コンストラクタパターン</span>
+<span class="sd">        :param url: str 処理対象サイトURL</span>
+<span class="sd">        :param selectors: list スクレイピングする際のセレクタリスト</span>
+<span class="sd">        :param title: str 取得したサイトタイトル</span>
+<span class="sd">        :param image_urls: list 取得した画像のURLリスト</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">url</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_url_only</span><span class="p">(</span><span class="n">url</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">inspect</span><span class="o">.</span><span class="n">stack</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">function</span><span class="si">}</span><span class="s2">&quot;</span>
+                                 <span class="sa">f</span><span class="s2">&quot;不正:引数urlがURLではない[</span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s2">]&quot;</span><span class="p">)</span>
+            <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;url&quot;</span><span class="p">,</span> <span class="n">url</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">selectors</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;selectors&quot;</span><span class="p">,</span> <span class="n">selectors</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">title</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;title&quot;</span><span class="p">,</span> <span class="n">title</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">image_urls</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">image_url</span> <span class="ow">in</span> <span class="n">image_urls</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_url_only</span><span class="p">(</span><span class="n">image_url</span><span class="p">):</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">inspect</span><span class="o">.</span><span class="n">stack</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">function</span><span class="si">}</span><span class="s2">&quot;</span>
+                                     <span class="sa">f</span><span class="s2">&quot;不正:引数last_image_urlがurlではない[</span><span class="si">{</span><span class="n">image_url</span><span class="si">}</span><span class="s2">]&quot;</span><span class="p">)</span>
+            <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;image_urls&quot;</span><span class="p">,</span> <span class="n">image_urls</span><span class="p">)</span>
+
+<div class="viewcode-block" id="UrlDeploymentValue.is_url_only">
+<a class="viewcode-back" href="../../helper.urlDeployment.html#helper.urlDeployment.UrlDeploymentValue.is_url_only">[ドキュメント]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">is_url_only</span><span class="p">(</span><span class="n">string</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">urlparse</span><span class="p">(</span><span class="n">string</span><span class="p">)</span><span class="o">.</span><span class="n">scheme</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="UrlDeployment">
+<a class="viewcode-back" href="../../helper.urlDeployment.html#helper.urlDeployment.UrlDeployment">[ドキュメント]</a>
+<span class="k">class</span> <span class="nc">UrlDeployment</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    「UrlDeploymentValue 値オブジェクト」</span>
+<span class="sd">    「str スクレイプ対象URL, list selectors」が引数で渡されるケース</span>
+<span class="sd">    「str 末尾画像URL, str タイトル」が引数で渡されるケース</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">value_object</span><span class="p">:</span> <span class="n">UrlDeploymentValue</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">url_list</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value_object</span><span class="p">,</span> <span class="n">selectors_or_title</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">value_object</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value_object</span><span class="p">,</span> <span class="n">UrlDeploymentValue</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">value_object</span> <span class="o">=</span> <span class="n">value_object</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value_object</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="c1"># URLかチェックする</span>
+                <span class="n">__parse</span> <span class="o">=</span> <span class="n">urlparse</span><span class="p">(</span><span class="n">value_object</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">__parse</span><span class="o">.</span><span class="n">scheme</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;引数が不正です。URLではない？&#39;</span><span class="p">)</span>
+                    <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">__parse</span><span class="o">.</span><span class="n">path</span><span class="p">[</span><span class="o">-</span><span class="mi">4</span><span class="p">:]</span> <span class="o">==</span> <span class="s1">&#39;.jpg&#39;</span> <span class="ow">or</span> <span class="n">__parse</span><span class="o">.</span><span class="n">path</span><span class="p">[</span><span class="o">-</span><span class="mi">4</span><span class="p">:]</span> <span class="o">==</span> <span class="s1">&#39;.png&#39;</span><span class="p">:</span>
+                    <span class="n">__image_url</span> <span class="o">=</span> <span class="n">value_object</span>
+                    <span class="n">__title</span> <span class="o">=</span> <span class="n">selectors_or_title</span>
+                    <span class="n">__selectors</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">__selectors</span> <span class="o">=</span> <span class="n">selectors_or_title</span>
+                    <span class="n">page_url</span> <span class="o">=</span> <span class="n">value_object</span>
+                    <span class="n">__driver</span> <span class="o">=</span> <span class="n">chromeDriverHelper</span><span class="o">.</span><span class="n">ChromeDriverHelper</span><span class="p">(</span><span class="n">value_object</span><span class="p">,</span> <span class="n">__selectors</span><span class="p">)</span>
+                    <span class="n">items</span> <span class="o">=</span> <span class="n">__driver</span><span class="o">.</span><span class="n">get_items</span><span class="p">()</span>
+
+                    <span class="n">_title</span> <span class="o">=</span> <span class="kc">None</span>
+                    <span class="k">if</span> <span class="s1">&#39;title_jp&#39;</span> <span class="ow">in</span> <span class="n">items</span><span class="p">:</span>
+                        <span class="n">_title</span> <span class="o">=</span> <span class="n">items</span><span class="p">[</span><span class="s1">&#39;title_jp&#39;</span><span class="p">]</span>
+                    <span class="n">title_sub</span> <span class="o">=</span> <span class="kc">None</span>
+                    <span class="k">if</span> <span class="s1">&#39;title_en&#39;</span> <span class="ow">in</span> <span class="n">items</span><span class="p">:</span>
+                        <span class="n">title_sub</span> <span class="o">=</span> <span class="n">items</span><span class="p">[</span><span class="s1">&#39;title_en&#39;</span><span class="p">]</span>
+                    <span class="n">image_urls</span> <span class="o">=</span> <span class="kc">None</span>
+                    <span class="k">if</span> <span class="s1">&#39;image_urls&#39;</span> <span class="ow">in</span> <span class="n">items</span><span class="p">:</span>
+                        <span class="n">image_urls</span> <span class="o">=</span> <span class="n">items</span><span class="p">[</span><span class="s1">&#39;image_urls&#39;</span><span class="p">]</span>
+                    <span class="n">last_image_url</span> <span class="o">=</span> <span class="kc">None</span>
+                    <span class="k">if</span> <span class="s1">&#39;image_url&#39;</span> <span class="ow">in</span> <span class="n">items</span><span class="p">:</span>
+                        <span class="n">last_image_url</span> <span class="o">=</span> <span class="n">items</span><span class="p">[</span><span class="s1">&#39;image_url&#39;</span><span class="p">]</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="n">_title</span><span class="p">,</span> <span class="n">title_sub</span><span class="p">,</span> <span class="n">last_image_url</span><span class="p">,</span> <span class="n">image_urls</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">_title</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">_title</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                        <span class="n">_title</span> <span class="o">=</span> <span class="n">_title</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">title_sub</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">title_sub</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                        <span class="n">title_sub</span> <span class="o">=</span> <span class="n">title_sub</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">last_image_url</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">last_image_url</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                        <span class="n">last_image_url</span> <span class="o">=</span> <span class="n">last_image_url</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">image_urls</span> <span class="ow">and</span> <span class="n">image_urls</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+                        <span class="n">last_image_url</span> <span class="o">=</span> <span class="n">image_urls</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">last_image_url</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;エラー:last_image_urlが不正[</span><span class="si">{</span><span class="n">last_image_url</span><span class="si">}</span><span class="s2">]&quot;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">_title</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="ow">not</span> <span class="n">title_sub</span><span class="p">:</span>
+                            <span class="c1"># タイトルが得られない時は、タイトルを日時文字列にする</span>
+                            <span class="n">now</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+                            <span class="n">_title</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">now</span><span class="si">:</span><span class="s1">%Y%m%d_%H%M%S</span><span class="si">}</span><span class="s1">&#39;</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">_title</span> <span class="o">=</span> <span class="n">title_sub</span>
+                    <span class="n">__title</span> <span class="o">=</span> <span class="n">__driver</span><span class="o">.</span><span class="n">fixed_file_name</span><span class="p">(</span><span class="n">_title</span><span class="p">)</span>
+                    <span class="n">url_title</span> <span class="o">=</span> <span class="n">__driver</span><span class="o">.</span><span class="n">fixed_file_name</span><span class="p">(</span><span class="n">page_url</span><span class="p">)</span>
+                    <span class="n">target_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">__title</span><span class="si">}</span><span class="s1">：</span><span class="si">{</span><span class="n">url_title</span><span class="si">}</span><span class="s1">.html&#39;</span>
+                    <span class="n">__driver</span><span class="o">.</span><span class="n">save_source</span><span class="p">(</span><span class="n">target_path</span><span class="p">)</span>
+                    <span class="n">__image_url</span> <span class="o">=</span> <span class="n">last_image_url</span>
+                <span class="n">__image_urls</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__deployment</span><span class="p">(</span><span class="n">__image_url</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">value_object</span> <span class="o">=</span> <span class="n">UrlDeploymentValue</span><span class="p">(</span><span class="n">value_object</span><span class="p">,</span>
+                                                       <span class="n">__selectors</span><span class="p">,</span>
+                                                       <span class="n">__title</span><span class="p">,</span>
+                                                       <span class="n">__image_urls</span><span class="p">,</span>
+                                                       <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__deployment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image_url</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;末尾画像URLを展開して、URLリスト=url_listを作る</span>
+<span class="sd">        :param image_url: str 末尾画像URL</span>
+<span class="sd">        :return: list 展開した画像URLリスト</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">image_url</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;引数が不正です。空です。&#39;</span><span class="p">)</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">__parse</span> <span class="o">=</span> <span class="n">urlparse</span><span class="p">(</span><span class="n">image_url</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">__parse</span><span class="o">.</span><span class="n">scheme</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;引数が不正です。URLではない？&#39;</span><span class="p">)</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="c1"># pathを/前後で分ける</span>
+        <span class="n">__path_before_name</span> <span class="o">=</span> <span class="n">__parse</span><span class="o">.</span><span class="n">path</span><span class="p">[:</span><span class="n">__parse</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">rfind</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+        <span class="n">__path_after_name</span> <span class="o">=</span> <span class="n">__parse</span><span class="o">.</span><span class="n">path</span><span class="p">[</span><span class="n">__parse</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">rfind</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:]</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">__path_before_name</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">__path_after_name</span><span class="p">)</span>
+        <span class="c1"># path_after_nameを.前後で分ける</span>
+        <span class="n">__base_name</span> <span class="o">=</span> <span class="n">__path_after_name</span><span class="p">[:</span><span class="n">__path_after_name</span><span class="o">.</span><span class="n">rfind</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)]</span>
+        <span class="n">__extend_name</span> <span class="o">=</span> <span class="n">__path_after_name</span><span class="p">[</span><span class="n">__path_after_name</span><span class="o">.</span><span class="n">rfind</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">):]</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">__base_name</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">__extend_name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">__base_name</span><span class="o">.</span><span class="n">isdecimal</span><span class="p">():</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;引数が不正です。数値ではない？&#39;</span><span class="p">)</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">__count</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">__base_name</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">d_count</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">__count</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">url_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">urlunparse</span><span class="p">((</span><span class="n">__parse</span><span class="o">.</span><span class="n">scheme</span><span class="p">,</span>
+                                             <span class="n">__parse</span><span class="o">.</span><span class="n">netloc</span><span class="p">,</span>
+                                             <span class="n">__path_before_name</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">d_count</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">__extend_name</span><span class="p">,</span>
+                                             <span class="n">__parse</span><span class="o">.</span><span class="n">params</span><span class="p">,</span>
+                                             <span class="n">__parse</span><span class="o">.</span><span class="n">query</span><span class="p">,</span>
+                                             <span class="n">__parse</span><span class="o">.</span><span class="n">fragment</span><span class="p">)))</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">url_list</span>
+
+<div class="viewcode-block" id="UrlDeployment.get_title">
+<a class="viewcode-back" href="../../helper.urlDeployment.html#helper.urlDeployment.UrlDeployment.get_title">[ドキュメント]</a>
+    <span class="k">def</span> <span class="nf">get_title</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;タイトル取得</span>
+<span class="sd">        :return: str タイトル</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value_object</span><span class="o">.</span><span class="n">title</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="UrlDeployment.get_image_urls">
+<a class="viewcode-back" href="../../helper.urlDeployment.html#helper.urlDeployment.UrlDeployment.get_image_urls">[ドキュメント]</a>
+    <span class="k">def</span> <span class="nf">get_image_urls</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;画像リスト取得</span>
+<span class="sd">        :return: list 画像リスト</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value_object</span><span class="o">.</span><span class="n">image_urls</span><span class="p">)</span></div>
+</div>
+
+
+
+<span class="c1"># 検証コード</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>  <span class="c1"># インポート時には動かない</span>
+    <span class="n">folder_path</span> <span class="o">=</span> <span class="n">OUTPUT_FOLDER_PATH</span>
+    <span class="n">url_list</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">main_title</span> <span class="o">=</span> <span class="s1">&#39;[] a&#39;</span>
+    <span class="n">list_file_path</span> <span class="o">=</span> <span class="s1">&#39;../irvine_download_list.txt&#39;</span>
+    <span class="c1"># 引数チェック</span>
+    <span class="k">if</span> <span class="mi">3</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">):</span>
+        <span class="c1"># Pythonに以下の3つ引数を渡す想定</span>
+        <span class="c1"># 0は固定でスクリプト名</span>
+        <span class="c1"># 1.対象のURL</span>
+        <span class="c1"># 2.対象のタイトル(後にファイル名にする)</span>
+        <span class="n">paste_str</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">main_title</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="mi">2</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">):</span>
+        <span class="c1"># Pythonに以下の2つ引数を渡す想定</span>
+        <span class="c1"># 0は固定でスクリプト名</span>
+        <span class="c1"># 1.対象のURL</span>
+        <span class="n">paste_str</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="mi">1</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">):</span>
+        <span class="c1"># 引数がなければ、クリップボードからURLを得る</span>
+        <span class="n">paste_str</span> <span class="o">=</span> <span class="n">pyperclip</span><span class="o">.</span><span class="n">paste</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;引数が不正です。&#39;</span><span class="p">)</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># スクレイピングして末尾画像のナンバーから全ての画像URLを推測して展開する</span>
+    <span class="n">url_deployment</span> <span class="o">=</span> <span class="n">UrlDeployment</span><span class="p">(</span><span class="n">paste_str</span><span class="p">,</span> <span class="n">SELECTORS</span><span class="p">)</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="n">url_deployment</span><span class="o">.</span><span class="n">get_title</span><span class="p">()</span>
+    <span class="n">url_title</span> <span class="o">=</span> <span class="n">chromeDriverHelper</span><span class="o">.</span><span class="n">ChromeDriverHelper</span><span class="o">.</span><span class="n">fixed_file_name</span><span class="p">(</span><span class="n">paste_str</span><span class="p">)</span>
+    <span class="n">url_list</span> <span class="o">=</span> <span class="n">url_deployment</span><span class="o">.</span><span class="n">get_image_urls</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">url_list</span><span class="p">)</span>
+    <span class="n">web_file_list</span> <span class="o">=</span> <span class="n">webFileListHelper</span><span class="o">.</span><span class="n">WebFileListHelper</span><span class="p">(</span><span class="n">url_list</span><span class="p">)</span>
+    <span class="n">web_file_list</span><span class="o">.</span><span class="n">download_irvine</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">count</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">webFileHelper</span><span class="o">.</span><span class="n">WebFileHelper</span><span class="o">.</span><span class="n">ext_list</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">web_file_list</span><span class="o">.</span><span class="n">is_exist</span><span class="p">():</span>
+            <span class="k">break</span>
+        <span class="c1"># ダウンロードに失敗しているときは、失敗しているファイルの拡張子を変えてダウンロードしなおす</span>
+        <span class="n">web_file_list</span><span class="o">.</span><span class="n">rename_url_ext_shift</span><span class="p">()</span>
+        <span class="n">web_file_list</span><span class="o">.</span><span class="n">download_irvine</span><span class="p">()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">web_file_list</span><span class="o">.</span><span class="n">make_zip_file</span><span class="p">():</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">web_file_list</span><span class="o">.</span><span class="n">rename_zip_file</span><span class="p">(</span><span class="n">title</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">web_file_list</span><span class="o">.</span><span class="n">rename_zip_file</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s1">：</span><span class="si">{</span><span class="n">url_title</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">):</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
+    <span class="n">web_file_list</span><span class="o">.</span><span class="n">delete_local_files</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Ryosuke Igarashi.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

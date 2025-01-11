@@ -1,0 +1,407 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="ja" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>helper.crawling module &mdash; Web_scraping 1.0.0 ドキュメント</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=144c8c96"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/translations.js?v=4755f45a"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="索引" href="genindex.html" />
+    <link rel="search" title="検索" href="search.html" />
+    <link rel="next" title="helper.egoser_zipper module" href="helper.egoser_zipper.html" />
+    <link rel="prev" title="helper.chromeDriverHelper module" href="helper.chromeDriverHelper.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Web_scraping
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="helper.html">helper package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="helper.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="helper.chromeDriverHelper.html">helper.chromeDriverHelper module</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">helper.crawling module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#helper.crawling.Crawling"><code class="docutils literal notranslate"><span class="pre">Crawling</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#helper.crawling.CrawlingValue"><code class="docutils literal notranslate"><span class="pre">CrawlingValue</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="helper.egoser_zipper.html">helper.egoser_zipper module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="helper.irvineHelper.html">helper.irvineHelper module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="helper.line_message_api.html">helper.line_message_api module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="helper.scraping.html">helper.scraping module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="helper.slack_message_api.html">helper.slack_message_api module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="helper.spreadsheet.html">helper.spreadsheet module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="helper.tenki.html">helper.tenki module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="helper.uriHelper.html">helper.uriHelper module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="helper.urlDeployment.html">helper.urlDeployment module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="helper.webFileHelper.html">helper.webFileHelper module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="helper.webFileListHelper.html">helper.webFileListHelper module</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="helper.html#module-helper">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Web_scraping</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="helper.html">helper package</a></li>
+      <li class="breadcrumb-item active">helper.crawling module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/helper.crawling.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-helper.crawling">
+<span id="helper-crawling-module"></span><h1>helper.crawling module<a class="headerlink" href="#module-helper.crawling" title="Link to this heading"></a></h1>
+<dl class="simple">
+<dt>クローリング</dt><dd><ul class="simple">
+<li><p>指定サイト(site_url)をセレクタ(site_selectors)でクローリングする(ChromeDriverHelperを使用)</p></li>
+<li><p>クローリング結果を、crawling_file_pathに保存する</p></li>
+<li><p>crawling_file_pathのpage_urlsは、スクレイピングする対象urlリストである</p></li>
+<li><p>crawling_file_pathのexclusion_urlsは、スクレイピングの除外urlリストである</p></li>
+<li><p>zip保存まで終わると、page_urlsからexclusion_urlsにurlを移す</p></li>
+<li><p>セレクタを、image_urlで定義すると、crawling_url_deploymentでスクレイピングして末尾画像URLの展開URLでダウンロードして、zipに保存する</p></li>
+<li><p>セレクタを、image_urlsで定義すると、crawling_urlsでスクレイピングしてダウンロードして、zipに保存する</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition-todo admonition" id="id1">
+<p class="admonition-title">課題</p>
+<ul class="simple">
+<li><p>docstringを整える</p></li>
+</ul>
+</div>
+<dl class="py class">
+<dt class="sig sig-object py" id="helper.crawling.Crawling">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">helper.crawling.</span></span><span class="sig-name descname"><span class="pre">Crawling</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value_object</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">site_selectors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crawling_items</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crawling_file_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'D:/git/igaponr/training/python/Web_scraping/helper/../crawling_list.txt'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/crawling.html#Crawling"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.crawling.Crawling" title="Link to this definition"></a></dt>
+<dd><p>ベースクラス: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>クローリングクラス</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="helper.crawling.Crawling.URLS_EXCLUSION">
+<span class="sig-name descname"><span class="pre">URLS_EXCLUSION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'exclusion_urls'</span></em><a class="headerlink" href="#helper.crawling.Crawling.URLS_EXCLUSION" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="helper.crawling.Crawling.URLS_FAILURE">
+<span class="sig-name descname"><span class="pre">URLS_FAILURE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'failure_urls'</span></em><a class="headerlink" href="#helper.crawling.Crawling.URLS_FAILURE" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="helper.crawling.Crawling.URLS_TARGET">
+<span class="sig-name descname"><span class="pre">URLS_TARGET</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'page_urls'</span></em><a class="headerlink" href="#helper.crawling.Crawling.URLS_TARGET" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="helper.crawling.Crawling.crawling_file_path">
+<span class="sig-name descname"><span class="pre">crawling_file_path</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'D:/git/igaponr/training/python/Web_scraping/helper/../crawling_list.txt'</span></em><a class="headerlink" href="#helper.crawling.Crawling.crawling_file_path" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="helper.crawling.Crawling.crawling_items">
+<span class="sig-name descname"><span class="pre">crawling_items</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'exclusion_urls':</span> <span class="pre">[],</span> <span class="pre">'failure_urls':</span> <span class="pre">[],</span> <span class="pre">'page_urls':</span> <span class="pre">[]}</span></em><a class="headerlink" href="#helper.crawling.Crawling.crawling_items" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helper.crawling.Crawling.crawling_url_deployment">
+<span class="sig-name descname"><span class="pre">crawling_url_deployment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">page_selectors</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_selectors</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">notification_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/crawling.html#Crawling.crawling_url_deployment"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.crawling.Crawling.crawling_url_deployment" title="Link to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>各ページをスクレイピングして、末尾画像のナンバーから、URLを予測して、画像ファイルをダウンロード＆圧縮する</dt><dd><p># crawling_itemsに、page_urlsがあり、各page_urlをpage_selectorsでスクレイピングする
+# タイトルとURLでダウンロード除外または済みかをチェックして、
+# ダウンロードしない場合は、以降の処理をスキップする
+# 各page_urlをimage_selectorsでスクレイピングしてダウンロードする画像URLリストを作る。
+# 画像URLリストをirvineHelperでダウンロードして、zipファイルにする</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>page_selectors</strong></p></li>
+<li><p><strong>image_selectors</strong></p></li>
+<li><p><strong>notification_id</strong></p></li>
+</ul>
+</dd>
+<dt class="field-even">戻り値<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helper.crawling.Crawling.crawling_urls">
+<span class="sig-name descname"><span class="pre">crawling_urls</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">page_selectors</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_selectors</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/crawling.html#Crawling.crawling_urls"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.crawling.Crawling.crawling_urls" title="Link to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>各ページをスクレイピングして、画像ファイルをダウンロード＆圧縮する</dt><dd><p># crawling_itemsに、page_urlsがあり、各page_urlをpage_selectorsでスクレイピングする
+# タイトルとURLでダウンロード除外または済みかをチェックして、
+# ダウンロードしない場合は、以降の処理をスキップする
+# 各page_urlをimage_selectorsでスクレイピングしてダウンロードする画像URLリストを作る。
+# 画像URLリストをirvineHelperでダウンロードして、zipファイルにする</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>page_selectors</strong></p></li>
+<li><p><strong>image_selectors</strong></p></li>
+</ul>
+</dd>
+<dt class="field-even">戻り値<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helper.crawling.Crawling.create_save_text">
+<span class="sig-name descname"><span class="pre">create_save_text</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/crawling.html#Crawling.create_save_text"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.crawling.Crawling.create_save_text" title="Link to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>保存用文字列の作成</dt><dd><ul class="simple">
+<li><p>サイトURL</p></li>
+<li><p>セレクタ</p></li>
+<li><p>saveファイルのフルパス</p></li>
+<li><p>クローリング結果urls</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">戻り値<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str 保存用文字列の作成</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helper.crawling.Crawling.dict_merge">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dict_merge</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dict1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dict2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/crawling.html#Crawling.dict_merge"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.crawling.Crawling.dict_merge" title="Link to this definition"></a></dt>
+<dd><p>dict2をdict1にマージする。dictは値がlistであること。list内の重複は削除。list内の順序を維持</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helper.crawling.Crawling.download_chrome_driver">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">download_chrome_driver</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">web_file_list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/crawling.html#Crawling.download_chrome_driver"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.crawling.Crawling.download_chrome_driver" title="Link to this definition"></a></dt>
+<dd><p>selenium chromeDriverを用いて、画像をデフォルトダウンロードフォルダにダウンロードして、指定のフォルダに移動する
+:return:</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helper.crawling.Crawling.get_crawling_file_path">
+<span class="sig-name descname"><span class="pre">get_crawling_file_path</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/crawling.html#Crawling.get_crawling_file_path"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.crawling.Crawling.get_crawling_file_path" title="Link to this definition"></a></dt>
+<dd><p>値オブジェクトのプロパティcrawling_file_path取得</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helper.crawling.Crawling.get_crawling_items">
+<span class="sig-name descname"><span class="pre">get_crawling_items</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/crawling.html#Crawling.get_crawling_items"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.crawling.Crawling.get_crawling_items" title="Link to this definition"></a></dt>
+<dd><p>値オブジェクトのプロパティcrawling_items取得</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helper.crawling.Crawling.get_site_selectors">
+<span class="sig-name descname"><span class="pre">get_site_selectors</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/crawling.html#Crawling.get_site_selectors"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.crawling.Crawling.get_site_selectors" title="Link to this definition"></a></dt>
+<dd><p>値オブジェクトのプロパティsite_selectors取得</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helper.crawling.Crawling.get_site_url">
+<span class="sig-name descname"><span class="pre">get_site_url</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/crawling.html#Crawling.get_site_url"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.crawling.Crawling.get_site_url" title="Link to this definition"></a></dt>
+<dd><p>値オブジェクトのプロパティsite_url取得</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helper.crawling.Crawling.get_value_object">
+<span class="sig-name descname"><span class="pre">get_value_object</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/crawling.html#Crawling.get_value_object"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.crawling.Crawling.get_value_object" title="Link to this definition"></a></dt>
+<dd><p>値オブジェクトを取得する</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helper.crawling.Crawling.is_url_included_exclusion_list">
+<span class="sig-name descname"><span class="pre">is_url_included_exclusion_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/crawling.html#Crawling.is_url_included_exclusion_list"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.crawling.Crawling.is_url_included_exclusion_list" title="Link to this definition"></a></dt>
+<dd><p>除外リストに含まれるURLならTrueを返す
+:param url:
+:return:</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helper.crawling.Crawling.is_url_included_failure_list">
+<span class="sig-name descname"><span class="pre">is_url_included_failure_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/crawling.html#Crawling.is_url_included_failure_list"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.crawling.Crawling.is_url_included_failure_list" title="Link to this definition"></a></dt>
+<dd><p>失敗リストに含まれるURLならTrueを返す
+:param url:
+:return:</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helper.crawling.Crawling.load_text">
+<span class="sig-name descname"><span class="pre">load_text</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">selectors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crawling_file_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'D:/git/igaponr/training/python/Web_scraping/helper/../crawling_list.txt'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/crawling.html#Crawling.load_text"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.crawling.Crawling.load_text" title="Link to this definition"></a></dt>
+<dd><p>独自フォーマットなファイルからデータを読み込み、value_objectを作り直す
+作成されるvalue_objectは、引数を最優先して、次にvalue_objectの値を優先して、最後にファイルの値を適用する
+ファイルがなかったり、ファイルが空だったらFalseを返す。
+読み込みに失敗したらファイル名に日時分を付けてバックアップしてFalseを返す。
+crawling_file_pathで指定したファイルを読み込む
+crawling_itemsはマージする
+:return: bool 成功/失敗=True/False</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helper.crawling.Crawling.marge_crawling_items">
+<span class="sig-name descname"><span class="pre">marge_crawling_items</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/crawling.html#Crawling.marge_crawling_items"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.crawling.Crawling.marge_crawling_items" title="Link to this definition"></a></dt>
+<dd><p>crawling_itemsのpage_urlsにexclusion_urlsがあったら削除する
+:return:</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helper.crawling.Crawling.move_url_from_page_urls_to_exclusion_urls">
+<span class="sig-name descname"><span class="pre">move_url_from_page_urls_to_exclusion_urls</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/crawling.html#Crawling.move_url_from_page_urls_to_exclusion_urls"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.crawling.Crawling.move_url_from_page_urls_to_exclusion_urls" title="Link to this definition"></a></dt>
+<dd><p>ターゲットリスト(page_urls)から除外リスト(exclusion_urls)にURLを移動する
+:param url:
+:return:</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helper.crawling.Crawling.move_url_from_page_urls_to_failure_urls">
+<span class="sig-name descname"><span class="pre">move_url_from_page_urls_to_failure_urls</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/crawling.html#Crawling.move_url_from_page_urls_to_failure_urls"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.crawling.Crawling.move_url_from_page_urls_to_failure_urls" title="Link to this definition"></a></dt>
+<dd><p>ターゲットリスト(page_urls)から失敗リスト(failure_urls)にURLを移動する
+:param url:
+:return:</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helper.crawling.Crawling.save_text">
+<span class="sig-name descname"><span class="pre">save_text</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/crawling.html#Crawling.save_text"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.crawling.Crawling.save_text" title="Link to this definition"></a></dt>
+<dd><p>クローリング情報をファイルに、保存する
+:return: bool 成功/失敗=True/False</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helper.crawling.Crawling.scraping">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">scraping</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">selectors</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/crawling.html#Crawling.scraping"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.crawling.Crawling.scraping" title="Link to this definition"></a></dt>
+<dd><p>ChromeDriverHelperを使ってスクレイピングする</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="helper.crawling.Crawling.site_selectors">
+<span class="sig-name descname"><span class="pre">site_selectors</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#helper.crawling.Crawling.site_selectors" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helper.crawling.Crawling.take_out">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">take_out</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">items</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">item_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/crawling.html#Crawling.take_out"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.crawling.Crawling.take_out" title="Link to this definition"></a></dt>
+<dd><p>crawling_itemsから指定のitemを取り出す</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helper.crawling.Crawling.validate_title">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">validate_title</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">items</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title_sub</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/crawling.html#Crawling.validate_title"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.crawling.Crawling.validate_title" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="helper.crawling.Crawling.value_object">
+<span class="sig-name descname"><span class="pre">value_object</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#helper.crawling.CrawlingValue" title="helper.crawling.CrawlingValue"><span class="pre">CrawlingValue</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#helper.crawling.Crawling.value_object" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="helper.crawling.CrawlingValue">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">helper.crawling.</span></span><span class="sig-name descname"><span class="pre">CrawlingValue</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">site_url</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">site_selectors</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crawling_items</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crawling_file_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/crawling.html#CrawlingValue"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.crawling.CrawlingValue" title="Link to this definition"></a></dt>
+<dd><p>ベースクラス: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Crawlingの値オブジェクトクラス</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="helper.crawling.CrawlingValue.crawling_file_path">
+<span class="sig-name descname"><span class="pre">crawling_file_path</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#helper.crawling.CrawlingValue.crawling_file_path" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="helper.crawling.CrawlingValue.crawling_items">
+<span class="sig-name descname"><span class="pre">crawling_items</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#helper.crawling.CrawlingValue.crawling_items" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="helper.crawling.CrawlingValue.site_selectors">
+<span class="sig-name descname"><span class="pre">site_selectors</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#helper.crawling.CrawlingValue.site_selectors" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="helper.crawling.CrawlingValue.site_url">
+<span class="sig-name descname"><span class="pre">site_url</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#helper.crawling.CrawlingValue.site_url" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="helper.chromeDriverHelper.html" class="btn btn-neutral float-left" title="helper.chromeDriverHelper module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="helper.egoser_zipper.html" class="btn btn-neutral float-right" title="helper.egoser_zipper module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Ryosuke Igarashi.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

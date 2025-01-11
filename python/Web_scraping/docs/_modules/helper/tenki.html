@@ -1,0 +1,616 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="ja" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>helper.tenki &mdash; Web_scraping 1.0.0 ドキュメント</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=144c8c96"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/translations.js?v=4755f45a"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="索引" href="../../genindex.html" />
+    <link rel="search" title="検索" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Web_scraping
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../helper.html">helper package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Web_scraping</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">モジュールコード</a></li>
+      <li class="breadcrumb-item active">helper.tenki</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>helper.tenki のソースコード</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python3</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">requests-htmlでスクレイピング</span>
+<span class="sd">requestsでスクレイピングできないページのスクレイピング</span>
+
+<span class="sd">参考資料</span>
+<span class="sd">https://gammasoft.jp/blog/how-to-download-web-page-created-javascript/</span>
+<span class="sd">https://docs.python-requests.org/projects/requests-html/en/latest/</span>
+<span class="sd">https://commte.net/7628</span>
+<span class="sd">https://qiita.com/uitspitss/items/f131ea79dffd58bc01ae</span>
+<span class="sd">https://computer.masas-record-storage-container.com/2021/03/01/requestshtml/</span>
+
+<span class="sd">Documents</span>
+<span class="sd">https://requests.readthedocs.io/projects/requests-html/en/latest/</span>
+
+<span class="sd">requests-htmlのGitHub</span>
+<span class="sd">https://github.com/kennethreitz/requests-html</span>
+
+<span class="sd">Todo:</span>
+<span class="sd">    - docstringを整える</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">import</span> <span class="nn">pyperclip</span>
+<span class="kn">from</span> <span class="nn">requests_html</span> <span class="kn">import</span> <span class="n">HTMLSession</span>
+<span class="kn">from</span> <span class="nn">helper</span> <span class="kn">import</span> <span class="n">spreadsheet</span>
+
+
+<div class="viewcode-block" id="is_num">
+<a class="viewcode-back" href="../../helper.tenki.html#helper.tenki.is_num">[ドキュメント]</a>
+<span class="k">def</span> <span class="nf">is_num</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="nb">float</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+
+
+<div class="viewcode-block" id="TenkiValue">
+<a class="viewcode-back" href="../../helper.tenki.html#helper.tenki.TenkiValue">[ドキュメント]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">TenkiValue</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    クローリング値オブジェクト</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">target_url</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">css_root</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">css_selectors</span><span class="p">:</span> <span class="nb">dict</span>
+    <span class="n">attrs</span><span class="p">:</span> <span class="nb">dict</span>
+    <span class="n">title</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">forecasts</span><span class="p">:</span> <span class="nb">dict</span>
+    <span class="n">counters</span><span class="p">:</span> <span class="nb">dict</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target_url</span><span class="p">,</span> <span class="n">css_root</span><span class="p">,</span> <span class="n">css_selectors</span><span class="p">,</span> <span class="n">attrs</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">forecasts</span><span class="p">,</span> <span class="n">counters</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        完全コンストラクタパターン</span>
+
+<span class="sd">        :param target_url: str 処理対象サイトURL</span>
+<span class="sd">        :param css_root: str スクレイピングする際のルートCSSセレクタ</span>
+<span class="sd">        :param css_selectors: dict スクレイピングする際のCSSセレクタ辞書</span>
+<span class="sd">        :param attrs: dict スクレイピングする際の属性辞書</span>
+<span class="sd">        :param title: str 対象サイトタイトル</span>
+<span class="sd">        :param forecasts: dict スクレイピングして得た属性のリスト</span>
+<span class="sd">        :param counters: dict スクレイピングして得た属性のリストの個数リスト</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">target_url</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;target_url&quot;</span><span class="p">,</span> <span class="n">target_url</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">css_root</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;css_root&quot;</span><span class="p">,</span> <span class="n">css_root</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">css_selectors</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;css_selectors&quot;</span><span class="p">,</span> <span class="n">css_selectors</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">attrs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;attrs&quot;</span><span class="p">,</span> <span class="n">attrs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">title</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;title&quot;</span><span class="p">,</span> <span class="n">title</span><span class="p">)</span>
+        <span class="k">if</span> <span class="mi">0</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">forecasts</span><span class="p">):</span>
+            <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;forecasts&quot;</span><span class="p">,</span> <span class="n">forecasts</span><span class="p">)</span>
+        <span class="k">if</span> <span class="mi">0</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">counters</span><span class="p">):</span>
+            <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;counters&quot;</span><span class="p">,</span> <span class="n">counters</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="Tenki">
+<a class="viewcode-back" href="../../helper.tenki.html#helper.tenki.Tenki">[ドキュメント]</a>
+<span class="k">class</span> <span class="nc">Tenki</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    クローリングのユーティリティ</span>
+<span class="sd">        * 指定のサイトを読み込む</span>
+<span class="sd">        * 指定のCSSセレクタ(css_selectors)と属性でクローリング(attrs)する</span>
+<span class="sd">        * クローリング結果でTenkiValueを生成する</span>
+<span class="sd">        * TenkiValueをファイルに保存したり読み込んだりできる</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">tenki_value</span><span class="p">:</span> <span class="n">TenkiValue</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">target_url</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">css_root</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">css_selectors</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">attrs</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target_value</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">css_root</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">css_selectors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">attrs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        コンストラクタ</span>
+
+<span class="sd">        :param target_value: str 対象となるサイトURL、または、TenkiValue 値オブジェクト</span>
+<span class="sd">        :param css_root: str スクレイピングする際のルートCSSセレクタ</span>
+<span class="sd">        :param css_selectors: dict スクレイピングする際のCSSセレクタ</span>
+<span class="sd">        :param attrs: dict スクレイピングする際の属性</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">target_value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">target_value</span><span class="p">,</span> <span class="n">TenkiValue</span><span class="p">):</span>
+                <span class="n">tenki_value</span> <span class="o">=</span> <span class="n">target_value</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">tenki_value</span> <span class="o">=</span> <span class="n">tenki_value</span>
+                <span class="k">if</span> <span class="n">tenki_value</span><span class="o">.</span><span class="n">target_url</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">target_url</span> <span class="o">=</span> <span class="n">tenki_value</span><span class="o">.</span><span class="n">target_url</span>
+                <span class="k">if</span> <span class="n">tenki_value</span><span class="o">.</span><span class="n">css_root</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">css_root</span> <span class="o">=</span> <span class="n">tenki_value</span><span class="o">.</span><span class="n">css_root</span>
+                <span class="k">if</span> <span class="n">tenki_value</span><span class="o">.</span><span class="n">css_selectors</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">css_selectors</span> <span class="o">=</span> <span class="n">tenki_value</span><span class="o">.</span><span class="n">css_selectors</span>
+                <span class="k">if</span> <span class="n">tenki_value</span><span class="o">.</span><span class="n">attrs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">attrs</span> <span class="o">=</span> <span class="n">tenki_value</span><span class="o">.</span><span class="n">attrs</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">target_value</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">target_url</span> <span class="o">=</span> <span class="n">target_value</span>
+                    <span class="k">if</span> <span class="n">css_root</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">css_root</span> <span class="o">=</span> <span class="n">css_root</span>
+                        <span class="k">if</span> <span class="n">css_selectors</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">css_selectors</span> <span class="o">=</span> <span class="n">css_selectors</span>
+                            <span class="k">if</span> <span class="n">attrs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">attrs</span> <span class="o">=</span> <span class="n">attrs</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="p">()</span>
+
+<div class="viewcode-block" id="Tenki.special_func_temp">
+<a class="viewcode-back" href="../../helper.tenki.html#helper.tenki.Tenki.special_func_temp">[ドキュメント]</a>
+    <span class="k">def</span> <span class="nf">special_func_temp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        特別製</span>
+<span class="sd">        temp_itemのjava-scriptを解析して、</span>
+<span class="sd">        データとカウンターを整える（元のデータを書き換える）</span>
+
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">temp_item_forecasts</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">temp_item_counters</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">left_find</span> <span class="o">=</span> <span class="s1">&#39;data: [&#39;</span>
+        <span class="n">sp_key</span> <span class="o">=</span> <span class="s1">&#39;temp_item&#39;</span>
+        <span class="c1"># 初日の予報なしに対応</span>
+        <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">tenki_value</span><span class="o">.</span><span class="n">counters</span><span class="p">[</span><span class="n">sp_key</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">value</span><span class="p">:</span>
+                <span class="k">break</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">temp_item_counters</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="c1"># スクリプトの中から気温を探して登録しなおす</span>
+        <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">tenki_value</span><span class="o">.</span><span class="n">forecasts</span><span class="p">[</span><span class="n">sp_key</span><span class="p">]:</span>
+            <span class="n">left</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">left_find</span><span class="p">)</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">left_find</span><span class="p">)</span>
+            <span class="n">right</span> <span class="o">=</span> <span class="n">left</span> <span class="o">+</span> <span class="n">value</span><span class="p">[</span><span class="n">left</span><span class="p">:]</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;]&#39;</span><span class="p">)</span>
+            <span class="n">new_list</span> <span class="o">=</span> <span class="n">value</span><span class="p">[</span><span class="n">left</span><span class="p">:</span><span class="n">right</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">new_list</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">is_num</span><span class="p">(</span><span class="n">item</span><span class="p">):</span>
+                    <span class="n">temp_item_forecasts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;℃&quot;</span><span class="p">)</span>
+                    <span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">temp_item_counters</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">count</span><span class="p">)</span>
+        <span class="c1"># 末日の予報なしに対応</span>
+        <span class="n">pre</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">tenki_value</span><span class="o">.</span><span class="n">counters</span><span class="p">[</span><span class="n">sp_key</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">value</span> <span class="o">==</span> <span class="n">pre</span><span class="p">:</span>
+                <span class="n">temp_item_counters</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">count</span><span class="p">)</span>
+            <span class="n">pre</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tenki_value</span><span class="o">.</span><span class="n">forecasts</span><span class="p">[</span><span class="n">sp_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">temp_item_forecasts</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tenki_value</span><span class="o">.</span><span class="n">counters</span><span class="p">[</span><span class="n">sp_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">temp_item_counters</span></div>
+
+
+<div class="viewcode-block" id="Tenki.create_LINE_BOT_TOBA_format">
+<a class="viewcode-back" href="../../helper.tenki.html#helper.tenki.Tenki.create_LINE_BOT_TOBA_format">[ドキュメント]</a>
+    <span class="k">def</span> <span class="nf">create_LINE_BOT_TOBA_format</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        時間毎の天気予報配列を作る</span>
+
+<span class="sd">        :return data: dict 天気予報配列</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">forecasts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_result_forecasts</span><span class="p">()</span>
+        <span class="n">counters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_result_counters</span><span class="p">()</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="c1"># 日付列作成</span>
+        <span class="n">sp_key</span> <span class="o">=</span> <span class="s1">&#39;forecast_item&#39;</span>  <span class="c1"># 日付以外で数が少ない項目を使用する</span>
+        <span class="n">target_key</span> <span class="o">=</span> <span class="s1">&#39;days_item&#39;</span>
+        <span class="n">data</span><span class="p">[</span><span class="n">target_key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">sub_key</span> <span class="o">=</span> <span class="s1">&#39;week_item&#39;</span>
+        <span class="n">data</span><span class="p">[</span><span class="n">sub_key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">pre</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">counters</span><span class="p">[</span><span class="n">sp_key</span><span class="p">])):</span>
+            <span class="n">num</span> <span class="o">=</span> <span class="n">counters</span><span class="p">[</span><span class="n">sp_key</span><span class="p">][</span><span class="n">index</span><span class="p">]</span> <span class="o">-</span> <span class="n">pre</span>
+            <span class="k">if</span> <span class="n">num</span><span class="p">:</span>  <span class="c1"># 0または、増加していない時以外</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num</span><span class="p">):</span>
+                    <span class="n">num1</span> <span class="o">=</span> <span class="n">counters</span><span class="p">[</span><span class="n">target_key</span><span class="p">][</span><span class="n">index</span><span class="p">]</span>
+                    <span class="n">_buff</span> <span class="o">=</span> <span class="n">forecasts</span><span class="p">[</span><span class="n">target_key</span><span class="p">][</span><span class="n">num1</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+                    <span class="n">left</span> <span class="o">=</span> <span class="n">_buff</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;(&#39;</span><span class="p">)</span>
+                    <span class="n">right</span> <span class="o">=</span> <span class="n">_buff</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;)&#39;</span><span class="p">)</span>
+                    <span class="n">data</span><span class="p">[</span><span class="n">target_key</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_buff</span><span class="p">[:</span><span class="n">left</span><span class="p">])</span>
+                    <span class="n">data</span><span class="p">[</span><span class="n">sub_key</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_buff</span><span class="p">[</span><span class="n">left</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span><span class="n">right</span><span class="p">])</span>
+                <span class="n">pre</span> <span class="o">=</span> <span class="n">counters</span><span class="p">[</span><span class="n">sp_key</span><span class="p">][</span><span class="n">index</span><span class="p">]</span>
+
+        <span class="c1"># 時間列作成</span>
+        <span class="n">cycle</span> <span class="o">=</span> <span class="mi">4</span>
+        <span class="n">target_key</span> <span class="o">=</span> <span class="s1">&#39;time_item&#39;</span>
+        <span class="n">data</span><span class="p">[</span><span class="n">target_key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">pre_sp_key</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">pre_target_key</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">counters</span><span class="p">[</span><span class="n">sp_key</span><span class="p">])):</span>
+            <span class="n">num</span> <span class="o">=</span> <span class="n">counters</span><span class="p">[</span><span class="n">sp_key</span><span class="p">][</span><span class="n">index</span><span class="p">]</span> <span class="o">-</span> <span class="n">pre_sp_key</span>
+            <span class="n">start</span> <span class="o">=</span> <span class="n">pre_target_key</span> <span class="o">+</span> <span class="n">cycle</span> <span class="o">-</span> <span class="n">num</span>
+            <span class="n">end</span> <span class="o">=</span> <span class="n">counters</span><span class="p">[</span><span class="n">target_key</span><span class="p">][</span><span class="n">index</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="n">num</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">):</span>
+                    <span class="n">_buff</span> <span class="o">=</span> <span class="n">forecasts</span><span class="p">[</span><span class="n">target_key</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;時-&#39;</span> <span class="o">+</span> <span class="n">forecasts</span><span class="p">[</span><span class="n">target_key</span><span class="p">][</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;時&#39;</span>
+                    <span class="n">data</span><span class="p">[</span><span class="n">target_key</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_buff</span><span class="p">)</span>
+                <span class="n">pre_target_key</span> <span class="o">=</span> <span class="n">counters</span><span class="p">[</span><span class="n">target_key</span><span class="p">][</span><span class="n">index</span><span class="p">]</span>
+                <span class="n">pre_sp_key</span> <span class="o">=</span> <span class="n">counters</span><span class="p">[</span><span class="n">sp_key</span><span class="p">][</span><span class="n">index</span><span class="p">]</span>
+
+        <span class="c1"># 天気、湿度、降水量列作成</span>
+        <span class="n">target_keys</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;天気&#39;</span><span class="p">:</span> <span class="s1">&#39;forecast_item&#39;</span><span class="p">,</span> <span class="s1">&#39;温度&#39;</span><span class="p">:</span> <span class="s1">&#39;prob_precip_item&#39;</span><span class="p">,</span> <span class="s1">&#39;降水量&#39;</span><span class="p">:</span> <span class="s1">&#39;precip_item&#39;</span><span class="p">}</span>
+        <span class="k">for</span> <span class="n">target_key</span> <span class="ow">in</span> <span class="n">target_keys</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="n">data</span><span class="p">[</span><span class="n">target_key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">pre_target_key</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">counters</span><span class="p">[</span><span class="n">sp_key</span><span class="p">])):</span>
+                <span class="n">num</span> <span class="o">=</span> <span class="n">counters</span><span class="p">[</span><span class="n">target_key</span><span class="p">][</span><span class="n">index</span><span class="p">]</span> <span class="o">-</span> <span class="n">pre_target_key</span>
+                <span class="n">start</span> <span class="o">=</span> <span class="n">pre_target_key</span>
+                <span class="n">end</span> <span class="o">=</span> <span class="n">counters</span><span class="p">[</span><span class="n">target_key</span><span class="p">][</span><span class="n">index</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">num</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">):</span>
+                        <span class="n">_buff</span> <span class="o">=</span> <span class="n">forecasts</span><span class="p">[</span><span class="n">target_key</span><span class="p">][</span><span class="n">i</span><span class="p">]</span>
+                        <span class="n">data</span><span class="p">[</span><span class="n">target_key</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_buff</span><span class="p">)</span>
+                    <span class="n">pre_target_key</span> <span class="o">=</span> <span class="n">counters</span><span class="p">[</span><span class="n">target_key</span><span class="p">][</span><span class="n">index</span><span class="p">]</span>
+
+        <span class="c1"># 気温、風向、風力列作成</span>
+        <span class="n">target_keys</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;気温&#39;</span><span class="p">:</span> <span class="s1">&#39;temp_item&#39;</span><span class="p">,</span> <span class="s1">&#39;風向&#39;</span><span class="p">:</span> <span class="s1">&#39;wind_item_blow&#39;</span><span class="p">,</span> <span class="s1">&#39;風力&#39;</span><span class="p">:</span> <span class="s1">&#39;wind_item_speed&#39;</span><span class="p">}</span>
+        <span class="k">for</span> <span class="n">target_key</span> <span class="ow">in</span> <span class="n">target_keys</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="n">data</span><span class="p">[</span><span class="n">target_key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">pre_sp_key</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">pre_target_key</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">counters</span><span class="p">[</span><span class="n">sp_key</span><span class="p">])):</span>
+                <span class="n">num</span> <span class="o">=</span> <span class="n">counters</span><span class="p">[</span><span class="n">sp_key</span><span class="p">][</span><span class="n">index</span><span class="p">]</span> <span class="o">-</span> <span class="n">pre_sp_key</span>
+                <span class="n">start</span> <span class="o">=</span> <span class="n">pre_target_key</span>
+                <span class="n">end</span> <span class="o">=</span> <span class="n">counters</span><span class="p">[</span><span class="n">target_key</span><span class="p">][</span><span class="n">index</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span>
+                <span class="k">if</span> <span class="n">num</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">):</span>
+                        <span class="n">_buff</span> <span class="o">=</span> <span class="n">forecasts</span><span class="p">[</span><span class="n">target_key</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;-&#39;</span> <span class="o">+</span> <span class="n">forecasts</span><span class="p">[</span><span class="n">target_key</span><span class="p">][</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+                        <span class="n">data</span><span class="p">[</span><span class="n">target_key</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_buff</span><span class="p">)</span>
+                    <span class="n">pre_target_key</span> <span class="o">=</span> <span class="n">counters</span><span class="p">[</span><span class="n">target_key</span><span class="p">][</span><span class="n">index</span><span class="p">]</span>
+                    <span class="n">pre_sp_key</span> <span class="o">=</span> <span class="n">counters</span><span class="p">[</span><span class="n">sp_key</span><span class="p">][</span><span class="n">index</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">data</span></div>
+
+
+<div class="viewcode-block" id="Tenki.get_value_objects">
+<a class="viewcode-back" href="../../helper.tenki.html#helper.tenki.Tenki.get_value_objects">[ドキュメント]</a>
+    <span class="k">def</span> <span class="nf">get_value_objects</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        値オブジェクトを取得する</span>
+
+<span class="sd">        :return: TenkiValue 値オブジェクト</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tenki_value</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Tenki.get_result_forecasts">
+<a class="viewcode-back" href="../../helper.tenki.html#helper.tenki.Tenki.get_result_forecasts">[ドキュメント]</a>
+    <span class="k">def</span> <span class="nf">get_result_forecasts</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        クローリング結果を取得する</span>
+
+<span class="sd">        :return: dict クローリング結果</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tenki_value</span><span class="o">.</span><span class="n">forecasts</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Tenki.get_result_counters">
+<a class="viewcode-back" href="../../helper.tenki.html#helper.tenki.Tenki.get_result_counters">[ドキュメント]</a>
+    <span class="k">def</span> <span class="nf">get_result_counters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        クローリング結果を取得する</span>
+
+<span class="sd">        :return: dict クローリング結果</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tenki_value</span><span class="o">.</span><span class="n">counters</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Tenki.get_title">
+<a class="viewcode-back" href="../../helper.tenki.html#helper.tenki.Tenki.get_title">[ドキュメント]</a>
+    <span class="k">def</span> <span class="nf">get_title</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        対象サイトタイトルを取得する</span>
+
+<span class="sd">        :return: str 対象サイトタイトル</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">tenki_value</span><span class="o">.</span><span class="n">title</span></div>
+
+
+<div class="viewcode-block" id="Tenki.request">
+<a class="viewcode-back" href="../../helper.tenki.html#helper.tenki.Tenki.request">[ドキュメント]</a>
+    <span class="k">def</span> <span class="nf">request</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        target_urlに接続して、スクレイピングして、tenki_valueを更新する</span>
+
+<span class="sd">        :return: bool 成功/失敗=True/False</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">script</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">            () =&gt; {</span>
+<span class="s2">                return {</span>
+<span class="s2">                    width: document.documentElement.clientWidth,</span>
+<span class="s2">                    height: document.documentElement.clientHeight,</span>
+<span class="s2">                    deviceScaleFactor: window.devicePixelRatio,</span>
+<span class="s2">                }</span>
+<span class="s2">            }</span>
+<span class="s2">        &quot;&quot;&quot;</span>
+        <span class="n">forecasts</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">counters</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">session</span> <span class="o">=</span> <span class="n">HTMLSession</span><span class="p">()</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">target_url</span><span class="p">)</span>
+        <span class="c1"># Chromiumで応答を再読み込みし、JavaScriptを実行して、HTMLコンテンツを更新されたバージョンに置き換える</span>
+        <span class="n">response</span><span class="o">.</span><span class="n">html</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="n">script</span><span class="o">=</span><span class="n">script</span><span class="p">,</span>  <span class="c1"># ページ読み込み時に実行するJavaScript</span>
+                             <span class="n">reload</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>  <span class="c1"># Falseの場合、コンテンツはブラウザからロードされず、メモリから提供される</span>
+                             <span class="n">timeout</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>  <span class="c1"># 0は無制限</span>
+                             <span class="n">wait</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>  <span class="c1"># ページレンダリング前のスリープ秒数</span>
+                             <span class="n">sleep</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span>  <span class="c1"># ページレンダリング後のスリープ秒数</span>
+                             <span class="p">)</span>
+        <span class="c1"># スクレイピング</span>
+        <span class="n">title</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">html</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;html &gt; head &gt; title&quot;</span><span class="p">,</span> <span class="n">first</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">text</span>
+
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">css_selectors</span><span class="p">:</span>
+            <span class="n">forecasts</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">counters</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">target_rows</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">html</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">css_root</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">target_rows</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">target_rows</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">css_selectors</span><span class="p">:</span>
+                    <span class="n">buffer</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">css_selectors</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+                        <span class="k">for</span> <span class="n">buf</span> <span class="ow">in</span> <span class="n">buffer</span><span class="p">:</span>
+                            <span class="n">alt</span> <span class="o">=</span> <span class="n">buf</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="n">key</span><span class="p">]]</span>
+                            <span class="k">if</span> <span class="n">alt</span><span class="p">:</span>
+                                <span class="n">forecasts</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">alt</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">for</span> <span class="n">buf</span> <span class="ow">in</span> <span class="n">buffer</span><span class="p">:</span>
+                            <span class="n">forecasts</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">buf</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+                    <span class="n">counters</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">forecasts</span><span class="p">[</span><span class="n">key</span><span class="p">]))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tenki_value</span> <span class="o">=</span> <span class="n">TenkiValue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">target_url</span><span class="p">,</span>
+                                      <span class="bp">self</span><span class="o">.</span><span class="n">css_root</span><span class="p">,</span>
+                                      <span class="bp">self</span><span class="o">.</span><span class="n">css_selectors</span><span class="p">,</span>
+                                      <span class="bp">self</span><span class="o">.</span><span class="n">attrs</span><span class="p">,</span>
+                                      <span class="n">title</span><span class="p">,</span>
+                                      <span class="n">forecasts</span><span class="p">,</span>
+                                      <span class="n">counters</span><span class="p">,</span>
+                                      <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Tenki.create_save_text">
+<a class="viewcode-back" href="../../helper.tenki.html#helper.tenki.Tenki.create_save_text">[ドキュメント]</a>
+    <span class="k">def</span> <span class="nf">create_save_text</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        保存用文字列の作成</span>
+
+<span class="sd">        :return: str 保存用文字列の作成</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">buff</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tenki_value</span><span class="o">.</span><span class="n">target_url</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>  <span class="c1"># サイトURL追加</span>
+        <span class="n">buff</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tenki_value</span><span class="o">.</span><span class="n">css_root</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>  <span class="c1"># ルートcssセレクタ追加</span>
+        <span class="n">buff</span> <span class="o">+=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tenki_value</span><span class="o">.</span><span class="n">css_selectors</span><span class="p">,</span> <span class="n">ensure_ascii</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>  <span class="c1"># cssセレクタ追加</span>
+        <span class="n">buff</span> <span class="o">+=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tenki_value</span><span class="o">.</span><span class="n">attrs</span><span class="p">,</span> <span class="n">ensure_ascii</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>  <span class="c1"># 属性追加</span>
+        <span class="n">buff</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tenki_value</span><span class="o">.</span><span class="n">title</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>  <span class="c1"># タイトル追加</span>
+        <span class="n">buff</span> <span class="o">+=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tenki_value</span><span class="o">.</span><span class="n">forecasts</span><span class="p">,</span> <span class="n">ensure_ascii</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>  <span class="c1"># 画像URL追加</span>
+        <span class="n">buff</span> <span class="o">+=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tenki_value</span><span class="o">.</span><span class="n">counters</span><span class="p">,</span> <span class="n">ensure_ascii</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>  <span class="c1"># 画像URL追加</span>
+        <span class="k">return</span> <span class="n">buff</span></div>
+
+
+<div class="viewcode-block" id="Tenki.clip_copy">
+<a class="viewcode-back" href="../../helper.tenki.html#helper.tenki.Tenki.clip_copy">[ドキュメント]</a>
+    <span class="k">def</span> <span class="nf">clip_copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        クローリング結果をクリップボードにコピーする</span>
+
+<span class="sd">        :return: bool 成功/失敗=True/False</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tenki_value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="n">buff</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_save_text</span><span class="p">()</span>
+        <span class="n">pyperclip</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">buff</span><span class="p">)</span>  <span class="c1"># クリップボードへのコピー</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="Tenki.save_text">
+<a class="viewcode-back" href="../../helper.tenki.html#helper.tenki.Tenki.save_text">[ドキュメント]</a>
+    <span class="k">def</span> <span class="nf">save_text</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">save_path</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        データをファイルに、以下の独自フォーマットで保存する</span>
+<span class="sd">            * 処理対象サイトURL</span>
+<span class="sd">            * ルートCSSセレクタ</span>
+<span class="sd">            * CSSセレクタ</span>
+<span class="sd">            * 属性</span>
+<span class="sd">            * タイトル</span>
+<span class="sd">            * クローリング結果</span>
+
+<span class="sd">        :param save_path: str セーブする独自フォーマットなファイルのパス</span>
+<span class="sd">        :return: bool 成功/失敗=True/False</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tenki_value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">save_path</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">work_file</span><span class="p">:</span>
+            <span class="n">buff</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_save_text</span><span class="p">()</span>
+            <span class="n">work_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">buff</span><span class="p">)</span>  <span class="c1"># ファイルへの保存</span>
+            <span class="k">return</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="Tenki.load_text">
+<a class="viewcode-back" href="../../helper.tenki.html#helper.tenki.Tenki.load_text">[ドキュメント]</a>
+    <span class="k">def</span> <span class="nf">load_text</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">load_path</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        独自フォーマットなファイルからデータを読み込む</span>
+
+<span class="sd">        :param load_path: str ロードする独自フォーマットなファイルのパス</span>
+<span class="sd">        :return: bool 成功/失敗=True/False</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">load_path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">work_file</span><span class="p">:</span>
+            <span class="n">buff</span> <span class="o">=</span> <span class="n">work_file</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">target_url</span> <span class="o">=</span> <span class="n">buff</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">del</span> <span class="n">buff</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">css_root</span> <span class="o">=</span> <span class="n">buff</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">del</span> <span class="n">buff</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">css_selectors</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">buff</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">))</span>
+            <span class="k">del</span> <span class="n">buff</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">attrs</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">buff</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">))</span>
+            <span class="k">del</span> <span class="n">buff</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">title</span> <span class="o">=</span> <span class="n">buff</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">del</span> <span class="n">buff</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">forecasts</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">buff</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">))</span>
+            <span class="k">del</span> <span class="n">buff</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">counters</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">buff</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tenki_value</span> <span class="o">=</span> <span class="n">TenkiValue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">target_url</span><span class="p">,</span>
+                                          <span class="bp">self</span><span class="o">.</span><span class="n">css_root</span><span class="p">,</span>
+                                          <span class="bp">self</span><span class="o">.</span><span class="n">css_selectors</span><span class="p">,</span>
+                                          <span class="bp">self</span><span class="o">.</span><span class="n">attrs</span><span class="p">,</span>
+                                          <span class="n">title</span><span class="p">,</span>
+                                          <span class="n">forecasts</span><span class="p">,</span>
+                                          <span class="n">counters</span><span class="p">,</span>
+                                          <span class="p">)</span>
+            <span class="k">return</span> <span class="kc">True</span></div>
+</div>
+
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>  <span class="c1"># インポート時には動かない</span>
+    <span class="n">RESULT_FILE_PATH</span> <span class="o">=</span> <span class="s1">&#39;./result.txt&#39;</span>
+    <span class="n">main_url</span> <span class="o">=</span> <span class="s2">&quot;https://tenki.jp/forecast/4/20/5620/17202/10days.html&quot;</span>
+    <span class="n">main_css_root</span> <span class="o">=</span> <span class="s2">&quot;dd.forecast10days-actab&quot;</span>
+    <span class="n">main_css_selectors</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;days_item&quot;</span><span class="p">:</span> <span class="s2">&quot;div.days&quot;</span><span class="p">,</span>
+                          <span class="s2">&quot;time_item&quot;</span><span class="p">:</span> <span class="s2">&quot;dd.time-item &gt; span&quot;</span><span class="p">,</span>
+                          <span class="s2">&quot;forecast_item&quot;</span><span class="p">:</span> <span class="s2">&quot;dd.forecast-item &gt; p &gt; img&quot;</span><span class="p">,</span>
+                          <span class="s2">&quot;prob_precip_item&quot;</span><span class="p">:</span> <span class="s2">&quot;dd.prob-precip-item &gt; span &gt; span&quot;</span><span class="p">,</span>
+                          <span class="s2">&quot;precip_item&quot;</span><span class="p">:</span> <span class="s2">&quot;dd.precip-item &gt; span &gt; span&quot;</span><span class="p">,</span>
+                          <span class="s2">&quot;temp_item&quot;</span><span class="p">:</span> <span class="s2">&quot;dd.temp-item &gt; script&quot;</span><span class="p">,</span>
+                          <span class="s2">&quot;wind_item_blow&quot;</span><span class="p">:</span> <span class="s2">&quot;dd.wind-item &gt; p &gt; img&quot;</span><span class="p">,</span>
+                          <span class="s2">&quot;wind_item_speed&quot;</span><span class="p">:</span> <span class="s2">&quot;dd.wind-item &gt; p &gt; span&quot;</span><span class="p">,</span>
+                          <span class="p">}</span>
+    <span class="n">main_attrs</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;days_item&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+                  <span class="s2">&quot;time_item&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+                  <span class="s2">&quot;forecast_item&quot;</span><span class="p">:</span> <span class="s2">&quot;alt&quot;</span><span class="p">,</span>
+                  <span class="s2">&quot;prob_precip_item&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+                  <span class="s2">&quot;precip_item&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+                  <span class="s2">&quot;temp_item&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+                  <span class="s2">&quot;wind_item_blow&quot;</span><span class="p">:</span> <span class="s2">&quot;alt&quot;</span><span class="p">,</span>
+                  <span class="s2">&quot;wind_item_speed&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+                  <span class="p">}</span>
+    <span class="n">tenki1</span> <span class="o">=</span> <span class="n">Tenki</span><span class="p">(</span><span class="n">main_url</span><span class="p">,</span>
+                   <span class="n">main_css_root</span><span class="p">,</span>
+                   <span class="n">main_css_selectors</span><span class="p">,</span>
+                   <span class="n">main_attrs</span><span class="p">,</span>
+                   <span class="p">)</span>
+    <span class="n">tenki1</span><span class="o">.</span><span class="n">save_text</span><span class="p">(</span><span class="n">RESULT_FILE_PATH</span> <span class="o">+</span> <span class="s1">&#39;tenki1.txt&#39;</span><span class="p">)</span>
+
+    <span class="n">json_keyfile_name</span> <span class="o">=</span> <span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span> <span class="o">+</span> <span class="sa">r</span><span class="s2">&quot;\..\..\..\json\tenki-347610-1bc0fec79f90.json&quot;</span><span class="p">)</span>
+    <span class="n">workbook_name</span> <span class="o">=</span> <span class="s1">&#39;天気予報&#39;</span>
+    <span class="n">worksheet_name</span> <span class="o">=</span> <span class="s1">&#39;七尾市和倉町data&#39;</span>
+    <span class="n">spreadsheet1</span> <span class="o">=</span> <span class="n">spreadsheet</span><span class="o">.</span><span class="n">Spreadsheet</span><span class="p">(</span><span class="n">json_keyfile_name</span><span class="p">,</span>
+                                           <span class="n">workbook_name</span><span class="p">,</span>
+                                           <span class="n">worksheet_name</span><span class="p">,</span>
+                                           <span class="p">)</span>
+    <span class="n">spreadsheet1</span><span class="o">.</span><span class="n">save_text</span><span class="p">(</span><span class="n">RESULT_FILE_PATH</span> <span class="o">+</span> <span class="s1">&#39;spreadsheet1.txt&#39;</span><span class="p">)</span>
+    <span class="n">spreadsheet1</span><span class="o">.</span><span class="n">clear_worksheet</span><span class="p">()</span>
+    <span class="n">spreadsheet1</span><span class="o">.</span><span class="n">write_dict_columns</span><span class="p">(</span><span class="n">tenki1</span><span class="o">.</span><span class="n">get_result_forecasts</span><span class="p">(),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="n">main_num</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">tenki1</span><span class="o">.</span><span class="n">get_result_forecasts</span><span class="p">())</span>
+    <span class="n">spreadsheet1</span><span class="o">.</span><span class="n">write_dict_columns</span><span class="p">(</span><span class="n">tenki1</span><span class="o">.</span><span class="n">get_result_counters</span><span class="p">(),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">main_num</span><span class="p">))</span>
+    <span class="n">worksheet_name</span> <span class="o">=</span> <span class="s1">&#39;七尾市和倉町conv&#39;</span>
+    <span class="n">spreadsheet1</span> <span class="o">=</span> <span class="n">spreadsheet</span><span class="o">.</span><span class="n">Spreadsheet</span><span class="p">(</span><span class="n">json_keyfile_name</span><span class="p">,</span>
+                                           <span class="n">workbook_name</span><span class="p">,</span>
+                                           <span class="n">worksheet_name</span><span class="p">,</span>
+                                           <span class="p">)</span>
+    <span class="n">spreadsheet1</span><span class="o">.</span><span class="n">save_text</span><span class="p">(</span><span class="n">RESULT_FILE_PATH</span> <span class="o">+</span> <span class="s1">&#39;spreadsheet2.txt&#39;</span><span class="p">)</span>
+    <span class="n">tenki1</span><span class="o">.</span><span class="n">special_func_temp</span><span class="p">()</span>
+    <span class="n">spreadsheet1</span><span class="o">.</span><span class="n">clear_worksheet</span><span class="p">()</span>
+    <span class="n">spreadsheet1</span><span class="o">.</span><span class="n">write_dict_columns</span><span class="p">(</span><span class="n">tenki1</span><span class="o">.</span><span class="n">get_result_forecasts</span><span class="p">(),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="n">main_num</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">tenki1</span><span class="o">.</span><span class="n">get_result_forecasts</span><span class="p">())</span>
+    <span class="n">spreadsheet1</span><span class="o">.</span><span class="n">write_dict_columns</span><span class="p">(</span><span class="n">tenki1</span><span class="o">.</span><span class="n">get_result_counters</span><span class="p">(),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">main_num</span><span class="p">))</span>
+    <span class="n">worksheet_name</span> <span class="o">=</span> <span class="s1">&#39;七尾市和倉町&#39;</span>
+    <span class="n">spreadsheet1</span> <span class="o">=</span> <span class="n">spreadsheet</span><span class="o">.</span><span class="n">Spreadsheet</span><span class="p">(</span><span class="n">json_keyfile_name</span><span class="p">,</span>
+                                           <span class="n">workbook_name</span><span class="p">,</span>
+                                           <span class="n">worksheet_name</span><span class="p">,</span>
+                                           <span class="p">)</span>
+    <span class="n">spreadsheet1</span><span class="o">.</span><span class="n">save_text</span><span class="p">(</span><span class="n">RESULT_FILE_PATH</span> <span class="o">+</span> <span class="s1">&#39;spreadsheet3.txt&#39;</span><span class="p">)</span>
+    <span class="n">spreadsheet1</span><span class="o">.</span><span class="n">clear_worksheet</span><span class="p">()</span>
+    <span class="n">spreadsheet1</span><span class="o">.</span><span class="n">write_dict_columns</span><span class="p">(</span><span class="n">tenki1</span><span class="o">.</span><span class="n">create_LINE_BOT_TOBA_format</span><span class="p">(),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Ryosuke Igarashi.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,684 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="ja" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>helper.crawling &mdash; Web_scraping 1.0.0 ドキュメント</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=144c8c96"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/translations.js?v=4755f45a"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="索引" href="../../genindex.html" />
+    <link rel="search" title="検索" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Web_scraping
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../helper.html">helper package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Web_scraping</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">モジュールコード</a></li>
+      <li class="breadcrumb-item active">helper.crawling</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>helper.crawling のソースコード</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python3</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">クローリング</span>
+<span class="sd">    * 指定サイト(site_url)をセレクタ(site_selectors)でクローリングする(ChromeDriverHelperを使用)</span>
+<span class="sd">    * クローリング結果を、crawling_file_pathに保存する</span>
+<span class="sd">    * crawling_file_pathのpage_urlsは、スクレイピングする対象urlリストである</span>
+<span class="sd">    * crawling_file_pathのexclusion_urlsは、スクレイピングの除外urlリストである</span>
+<span class="sd">    * zip保存まで終わると、page_urlsからexclusion_urlsにurlを移す</span>
+<span class="sd">    * セレクタを、image_urlで定義すると、crawling_url_deploymentでスクレイピングして末尾画像URLの展開URLでダウンロードして、zipに保存する</span>
+<span class="sd">    * セレクタを、image_urlsで定義すると、crawling_urlsでスクレイピングしてダウンロードして、zipに保存する</span>
+
+<span class="sd">Todo:</span>
+<span class="sd">    - docstringを整える</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">inspect</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span> <span class="nn">helper</span> <span class="kn">import</span> <span class="n">chromeDriverHelper</span>
+<span class="kn">from</span> <span class="nn">helper</span> <span class="kn">import</span> <span class="n">webFileListHelper</span>
+<span class="kn">from</span> <span class="nn">helper</span> <span class="kn">import</span> <span class="n">webFileHelper</span>
+<span class="kn">from</span> <span class="nn">helper</span> <span class="kn">import</span> <span class="n">line_message_api</span>
+<span class="kn">from</span> <span class="nn">helper</span> <span class="kn">import</span> <span class="n">slack_message_api</span>
+<span class="kn">from</span> <span class="nn">helper.status</span> <span class="kn">import</span> <span class="n">Status</span>
+
+
+<div class="viewcode-block" id="CrawlingValue">
+<a class="viewcode-back" href="../../helper.crawling.html#helper.crawling.CrawlingValue">[ドキュメント]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">CrawlingValue</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Crawlingの値オブジェクトクラス&quot;&quot;&quot;</span>
+    <span class="n">site_url</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">site_selectors</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">crawling_items</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">crawling_file_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">site_url</span><span class="p">,</span> <span class="n">site_selectors</span><span class="p">,</span> <span class="n">crawling_items</span><span class="p">,</span> <span class="n">crawling_file_path</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;完全コンストラクタパターン&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">site_url</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">inspect</span><span class="o">.</span><span class="n">stack</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">function</span><span class="si">}</span><span class="s2">&quot;</span>
+                             <span class="sa">f</span><span class="s2">&quot;引数エラー:site_url=None&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">site_selectors</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">inspect</span><span class="o">.</span><span class="n">stack</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">function</span><span class="si">}</span><span class="s2">&quot;</span>
+                             <span class="sa">f</span><span class="s2">&quot;引数エラー:site_selectors=None&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">crawling_items</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">inspect</span><span class="o">.</span><span class="n">stack</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">function</span><span class="si">}</span><span class="s2">&quot;</span>
+                             <span class="sa">f</span><span class="s2">&quot;引数エラー:crawling_items=None&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">crawling_file_path</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">inspect</span><span class="o">.</span><span class="n">stack</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">function</span><span class="si">}</span><span class="s2">&quot;</span>
+                             <span class="sa">f</span><span class="s2">&quot;引数エラー:crawling_file_path=None&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">site_url</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">inspect</span><span class="o">.</span><span class="n">stack</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">function</span><span class="si">}</span><span class="s2">&quot;</span>
+                             <span class="sa">f</span><span class="s2">&quot;引数エラー:site_urlがstrではない&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">site_selectors</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">inspect</span><span class="o">.</span><span class="n">stack</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">function</span><span class="si">}</span><span class="s2">&quot;</span>
+                             <span class="sa">f</span><span class="s2">&quot;引数エラー:site_selectorsがdictではない&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">crawling_items</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">inspect</span><span class="o">.</span><span class="n">stack</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">function</span><span class="si">}</span><span class="s2">&quot;</span>
+                             <span class="sa">f</span><span class="s2">&quot;引数エラー:crawling_itemsがdictではない&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">crawling_file_path</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">inspect</span><span class="o">.</span><span class="n">stack</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">function</span><span class="si">}</span><span class="s2">&quot;</span>
+                             <span class="sa">f</span><span class="s2">&quot;引数エラー:crawling_file_pathがstrではない&quot;</span><span class="p">)</span>
+        <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;site_url&quot;</span><span class="p">,</span> <span class="n">site_url</span><span class="p">)</span>
+        <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;site_selectors&quot;</span><span class="p">,</span> <span class="n">site_selectors</span><span class="p">)</span>
+        <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;crawling_items&quot;</span><span class="p">,</span> <span class="n">crawling_items</span><span class="p">)</span>
+        <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;crawling_file_path&quot;</span><span class="p">,</span> <span class="n">crawling_file_path</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="Crawling">
+<a class="viewcode-back" href="../../helper.crawling.html#helper.crawling.Crawling">[ドキュメント]</a>
+<span class="k">class</span> <span class="nc">Crawling</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;クローリングクラス&quot;&quot;&quot;</span>
+    <span class="n">URLS_TARGET</span> <span class="o">=</span> <span class="s2">&quot;page_urls&quot;</span>
+    <span class="n">URLS_EXCLUSION</span> <span class="o">=</span> <span class="s2">&quot;exclusion_urls&quot;</span>
+    <span class="n">URLS_FAILURE</span> <span class="o">=</span> <span class="s2">&quot;failure_urls&quot;</span>
+    <span class="n">value_object</span><span class="p">:</span> <span class="n">CrawlingValue</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">site_selectors</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">crawling_items</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="p">{</span><span class="n">URLS_TARGET</span><span class="p">:</span> <span class="p">[],</span> <span class="n">URLS_EXCLUSION</span><span class="p">:</span> <span class="p">[],</span> <span class="n">URLS_FAILURE</span><span class="p">:</span> <span class="p">[]}</span>
+    <span class="c1"># crawling_file_path: str = &#39;../crawling_list.txt&#39;</span>
+    <span class="n">crawling_file_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)),</span>
+                                           <span class="s1">&#39;../crawling_list.txt&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">,</span> <span class="s1">&#39;/&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">value_object</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">site_selectors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">crawling_items</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">crawling_file_path</span><span class="o">=</span><span class="n">crawling_file_path</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">value_object</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value_object</span><span class="p">,</span> <span class="n">CrawlingValue</span><span class="p">):</span>
+                <span class="n">value_object</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">value_object</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">value_object</span> <span class="o">=</span> <span class="n">value_object</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">load_text</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">save_text</span><span class="p">()</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value_object</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">site_selectors</span><span class="p">:</span>
+                    <span class="n">site_selectors</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">site_selectors</span><span class="p">)</span>
+                    <span class="n">site_url</span> <span class="o">=</span> <span class="n">value_object</span>
+                    <span class="k">if</span> <span class="n">crawling_items</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">crawling_items</span> <span class="o">=</span> <span class="n">Crawling</span><span class="o">.</span><span class="n">crawling_items</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">value_object</span> <span class="o">=</span> <span class="n">CrawlingValue</span><span class="p">(</span><span class="n">site_url</span><span class="p">,</span>
+                                                      <span class="n">site_selectors</span><span class="p">,</span>
+                                                      <span class="n">crawling_items</span><span class="p">,</span>
+                                                      <span class="n">crawling_file_path</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">load_text</span><span class="p">()</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">save_text</span><span class="p">()</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">inspect</span><span class="o">.</span><span class="n">stack</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">function</span><span class="si">}</span><span class="s2">&quot;</span>
+                                     <span class="sa">f</span><span class="s2">&quot;引数エラー:site_selectors=None&quot;</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value_object</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                <span class="n">site_selectors</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">value_object</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">load_text</span><span class="p">(</span><span class="n">site_selectors</span><span class="p">,</span> <span class="n">crawling_file_path</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">save_text</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">inspect</span><span class="o">.</span><span class="n">stack</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">function</span><span class="si">}</span><span class="s2">&quot;</span>
+                                 <span class="sa">f</span><span class="s2">&quot;引数エラー:value_objectが無効な型&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">inspect</span><span class="o">.</span><span class="n">stack</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">function</span><span class="si">}</span><span class="s2">&quot;</span>
+                             <span class="sa">f</span><span class="s2">&quot;引数エラー:value_object=None&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Crawling.scraping">
+<a class="viewcode-back" href="../../helper.crawling.html#helper.crawling.Crawling.scraping">[ドキュメント]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">scraping</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">selectors</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;ChromeDriverHelperを使ってスクレイピングする&quot;&quot;&quot;</span>
+        <span class="n">selectors</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">selectors</span><span class="p">)</span>
+        <span class="n">chrome_driver</span> <span class="o">=</span> <span class="n">chromeDriverHelper</span><span class="o">.</span><span class="n">ChromeDriverHelper</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">selectors</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">chrome_driver</span><span class="o">.</span><span class="n">get_items</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Crawling.dict_merge">
+<a class="viewcode-back" href="../../helper.crawling.html#helper.crawling.Crawling.dict_merge">[ドキュメント]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">dict_merge</span><span class="p">(</span><span class="n">dict1</span><span class="p">,</span> <span class="n">dict2</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;dict2をdict1にマージする。dictは値がlistであること。list内の重複は削除。list内の順序を維持&quot;&quot;&quot;</span>
+        <span class="n">dict1</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">dict1</span><span class="p">)</span>
+        <span class="n">dict2</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">dict2</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">dict2</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">dict1</span><span class="p">:</span>
+                <span class="n">dict1</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+                <span class="n">dict1</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">dict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">(</span><span class="n">dict1</span><span class="p">[</span><span class="n">key</span><span class="p">]))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">dict1</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="k">return</span> <span class="n">dict1</span></div>
+
+
+<div class="viewcode-block" id="Crawling.take_out">
+<a class="viewcode-back" href="../../helper.crawling.html#helper.crawling.Crawling.take_out">[ドキュメント]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">take_out</span><span class="p">(</span><span class="n">items</span><span class="p">,</span> <span class="n">item_name</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;crawling_itemsから指定のitemを取り出す&quot;&quot;&quot;</span>
+        <span class="n">ret_value</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">item_name</span> <span class="ow">in</span> <span class="n">items</span><span class="p">:</span>
+            <span class="n">ret_value</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">items</span><span class="p">[</span><span class="n">item_name</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">ret_value</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ret_value</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ret_value</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="c1"># listの中身が一つしかない時</span>
+                <span class="n">ret_value</span> <span class="o">=</span> <span class="n">ret_value</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">ret_value</span></div>
+
+
+<div class="viewcode-block" id="Crawling.validate_title">
+<a class="viewcode-back" href="../../helper.crawling.html#helper.crawling.Crawling.validate_title">[ドキュメント]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">validate_title</span><span class="p">(</span><span class="n">items</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">title</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">title_sub</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">title</span> <span class="o">=</span> <span class="n">Crawling</span><span class="o">.</span><span class="n">take_out</span><span class="p">(</span><span class="n">items</span><span class="p">,</span> <span class="n">title</span><span class="p">)</span>
+        <span class="n">title_sub</span> <span class="o">=</span> <span class="n">Crawling</span><span class="o">.</span><span class="n">take_out</span><span class="p">(</span><span class="n">items</span><span class="p">,</span> <span class="n">title_sub</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">title</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">title_sub</span><span class="p">:</span>
+                <span class="c1"># タイトルが得られない時は、タイトルを日時文字列にする</span>
+                <span class="n">now</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+                <span class="n">title</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">now</span><span class="si">:</span><span class="s1">%Y%m%d_%H%M%S</span><span class="si">}</span><span class="s1">&#39;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">title</span> <span class="o">=</span> <span class="n">title_sub</span>
+        <span class="k">return</span> <span class="n">chromeDriverHelper</span><span class="o">.</span><span class="n">ChromeDriverHelper</span><span class="o">.</span><span class="n">fixed_file_name</span><span class="p">(</span><span class="n">title</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Crawling.download_chrome_driver">
+<a class="viewcode-back" href="../../helper.crawling.html#helper.crawling.Crawling.download_chrome_driver">[ドキュメント]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">download_chrome_driver</span><span class="p">(</span><span class="n">web_file_list</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;selenium chromeDriverを用いて、画像をデフォルトダウンロードフォルダにダウンロードして、指定のフォルダに移動する</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">chromedriver</span> <span class="o">=</span> <span class="n">chromeDriverHelper</span><span class="o">.</span><span class="n">ChromeDriverHelper</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">url</span><span class="p">,</span> <span class="n">path</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">web_file_list</span><span class="o">.</span><span class="n">get_url_list</span><span class="p">(),</span> <span class="n">web_file_list</span><span class="o">.</span><span class="n">get_path_list</span><span class="p">()):</span>
+            <span class="n">chromedriver</span><span class="o">.</span><span class="n">download_image</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Crawling.get_value_object">
+<a class="viewcode-back" href="../../helper.crawling.html#helper.crawling.Crawling.get_value_object">[ドキュメント]</a>
+    <span class="k">def</span> <span class="nf">get_value_object</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;値オブジェクトを取得する&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">value_object</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value_object</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">inspect</span><span class="o">.</span><span class="n">stack</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">function</span><span class="si">}</span><span class="s2">&quot;</span>
+                         <span class="sa">f</span><span class="s2">&quot;オブジェクトエラー:value_object&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Crawling.get_site_url">
+<a class="viewcode-back" href="../../helper.crawling.html#helper.crawling.Crawling.get_site_url">[ドキュメント]</a>
+    <span class="k">def</span> <span class="nf">get_site_url</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;値オブジェクトのプロパティsite_url取得&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_value_object</span><span class="p">()</span><span class="o">.</span><span class="n">site_url</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_value_object</span><span class="p">()</span><span class="o">.</span><span class="n">site_url</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">inspect</span><span class="o">.</span><span class="n">stack</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">function</span><span class="si">}</span><span class="s2">&quot;</span>
+                         <span class="sa">f</span><span class="s2">&quot;オブジェクトエラー:site_url&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Crawling.get_site_selectors">
+<a class="viewcode-back" href="../../helper.crawling.html#helper.crawling.Crawling.get_site_selectors">[ドキュメント]</a>
+    <span class="k">def</span> <span class="nf">get_site_selectors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;値オブジェクトのプロパティsite_selectors取得&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_value_object</span><span class="p">()</span><span class="o">.</span><span class="n">site_selectors</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_value_object</span><span class="p">()</span><span class="o">.</span><span class="n">site_selectors</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">inspect</span><span class="o">.</span><span class="n">stack</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">function</span><span class="si">}</span><span class="s2">&quot;</span>
+                         <span class="sa">f</span><span class="s2">&quot;オブジェクトエラー:site_selectors&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Crawling.get_crawling_items">
+<a class="viewcode-back" href="../../helper.crawling.html#helper.crawling.Crawling.get_crawling_items">[ドキュメント]</a>
+    <span class="k">def</span> <span class="nf">get_crawling_items</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;値オブジェクトのプロパティcrawling_items取得&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_value_object</span><span class="p">()</span><span class="o">.</span><span class="n">crawling_items</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_value_object</span><span class="p">()</span><span class="o">.</span><span class="n">crawling_items</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">inspect</span><span class="o">.</span><span class="n">stack</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">function</span><span class="si">}</span><span class="s2">&quot;</span>
+                         <span class="sa">f</span><span class="s2">&quot;オブジェクトエラー:crawling_items&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Crawling.get_crawling_file_path">
+<a class="viewcode-back" href="../../helper.crawling.html#helper.crawling.Crawling.get_crawling_file_path">[ドキュメント]</a>
+    <span class="k">def</span> <span class="nf">get_crawling_file_path</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;値オブジェクトのプロパティcrawling_file_path取得&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_value_object</span><span class="p">()</span><span class="o">.</span><span class="n">crawling_file_path</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_value_object</span><span class="p">()</span><span class="o">.</span><span class="n">crawling_file_path</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">inspect</span><span class="o">.</span><span class="n">stack</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">function</span><span class="si">}</span><span class="s2">&quot;</span>
+                         <span class="sa">f</span><span class="s2">&quot;オブジェクトエラー:crawling_file_path&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Crawling.create_save_text">
+<a class="viewcode-back" href="../../helper.crawling.html#helper.crawling.Crawling.create_save_text">[ドキュメント]</a>
+    <span class="k">def</span> <span class="nf">create_save_text</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;保存用文字列の作成</span>
+<span class="sd">            * サイトURL</span>
+<span class="sd">            * セレクタ</span>
+<span class="sd">            * saveファイルのフルパス</span>
+<span class="sd">            * クローリング結果urls</span>
+<span class="sd">        :return: str 保存用文字列の作成</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">__buff</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_site_url</span><span class="p">(),</span> <span class="n">ensure_ascii</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>  <span class="c1"># サイトURL</span>
+        <span class="c1"># TODO: selectorsはjson.dumpsでシリアライズできないオブジェクトたぶんlambdaを含んでいる。pickleでもだめらしい。</span>
+        <span class="c1">#  代替方法dillとか https://github.com/uqfoundation/dill</span>
+        <span class="c1">#  marshalとか検討する</span>
+        <span class="c1"># __buff += json.dumps(self.value_object.site_selectors, ensure_ascii=False) + &#39;\n&#39;  # セレクタ</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_value_object</span><span class="p">()</span><span class="o">.</span><span class="n">crawling_file_path</span><span class="p">:</span>
+            <span class="n">__buff</span> <span class="o">+=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_crawling_file_path</span><span class="p">(),</span> <span class="n">ensure_ascii</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>  <span class="c1"># クローリング結果保存パス</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">__buff</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>  <span class="c1"># クローリング結果パス追加</span>
+        <span class="n">__buff</span> <span class="o">+=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_crawling_items</span><span class="p">(),</span> <span class="n">ensure_ascii</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>  <span class="c1"># クローリング結果</span>
+        <span class="k">return</span> <span class="n">__buff</span></div>
+
+
+<div class="viewcode-block" id="Crawling.save_text">
+<a class="viewcode-back" href="../../helper.crawling.html#helper.crawling.Crawling.save_text">[ドキュメント]</a>
+    <span class="k">def</span> <span class="nf">save_text</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;クローリング情報をファイルに、保存する</span>
+<span class="sd">        :return: bool 成功/失敗=True/False</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_crawling_file_path</span><span class="p">(),</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">__work_file</span><span class="p">:</span>
+            <span class="n">__buff</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_save_text</span><span class="p">()</span>
+            <span class="n">__work_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">__buff</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="Crawling.load_text">
+<a class="viewcode-back" href="../../helper.crawling.html#helper.crawling.Crawling.load_text">[ドキュメント]</a>
+    <span class="k">def</span> <span class="nf">load_text</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">selectors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">crawling_file_path</span><span class="o">=</span><span class="n">crawling_file_path</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;独自フォーマットなファイルからデータを読み込み、value_objectを作り直す</span>
+<span class="sd">        作成されるvalue_objectは、引数を最優先して、次にvalue_objectの値を優先して、最後にファイルの値を適用する</span>
+<span class="sd">        ファイルがなかったり、ファイルが空だったらFalseを返す。</span>
+<span class="sd">        読み込みに失敗したらファイル名に日時分を付けてバックアップしてFalseを返す。</span>
+<span class="sd">        crawling_file_pathで指定したファイルを読み込む</span>
+<span class="sd">        crawling_itemsはマージする</span>
+<span class="sd">        :return: bool 成功/失敗=True/False</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">crawling_file_path</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">stat</span><span class="p">(</span><span class="n">crawling_file_path</span><span class="p">)</span><span class="o">.</span><span class="n">st_size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">crawling_file_path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">__work_file</span><span class="p">:</span>
+                <span class="n">__buff</span> <span class="o">=</span> <span class="n">__work_file</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
+                <span class="n">__site_url</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">__buff</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">))</span>
+                <span class="c1"># TODO: site_selectors</span>
+                <span class="c1"># del __buff[0]</span>
+                <span class="c1"># __selectors = json.loads(__buff[0].rstrip(&#39;\n&#39;))</span>
+                <span class="k">del</span> <span class="n">__buff</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">__crawling_file_path</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">__buff</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">))</span>
+                <span class="k">del</span> <span class="n">__buff</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">__crawling_items</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">__buff</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">))</span>
+                <span class="k">del</span> <span class="n">__buff</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">__selectors</span> <span class="o">=</span> <span class="n">selectors</span>
+                <span class="n">__crawling_items2</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">value_object</span><span class="p">:</span>
+                    <span class="n">__site_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_site_url</span><span class="p">()</span>
+                    <span class="n">__selectors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_site_selectors</span><span class="p">()</span>
+                    <span class="n">__crawling_items2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_crawling_items</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">__crawling_items2</span><span class="p">:</span>
+                    <span class="n">__crawling_items</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dict_merge</span><span class="p">(</span><span class="n">__crawling_items</span><span class="p">,</span> <span class="n">__crawling_items2</span><span class="p">)</span>
+                <span class="n">__crawling_file_path</span> <span class="o">=</span> <span class="n">crawling_file_path</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">value_object</span> <span class="o">=</span> <span class="n">CrawlingValue</span><span class="p">(</span><span class="n">__site_url</span><span class="p">,</span> <span class="n">__selectors</span><span class="p">,</span> <span class="n">__crawling_items</span><span class="p">,</span> <span class="n">__crawling_file_path</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">now</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y%m</span><span class="si">%d</span><span class="s1">%H%M&#39;</span><span class="p">)</span>
+            <span class="n">file_name</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">crawling_file_path</span><span class="p">)</span>
+            <span class="n">backup_file_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">now</span><span class="si">}{</span><span class="n">ext</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">crawling_file_path</span><span class="p">,</span> <span class="n">backup_file_path</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;ファイルの読み込みに失敗しました。バックアップを作成しました: </span><span class="si">{</span><span class="n">backup_file_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;エラー内容: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="Crawling.is_url_included_exclusion_list">
+<a class="viewcode-back" href="../../helper.crawling.html#helper.crawling.Crawling.is_url_included_exclusion_list">[ドキュメント]</a>
+    <span class="k">def</span> <span class="nf">is_url_included_exclusion_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;除外リストに含まれるURLならTrueを返す</span>
+<span class="sd">        :param url:</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">crawling_items</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_crawling_items</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">URLS_EXCLUSION</span> <span class="ow">in</span> <span class="n">crawling_items</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">url</span> <span class="ow">in</span> <span class="n">crawling_items</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">URLS_EXCLUSION</span><span class="p">]:</span>
+                <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="Crawling.move_url_from_page_urls_to_exclusion_urls">
+<a class="viewcode-back" href="../../helper.crawling.html#helper.crawling.Crawling.move_url_from_page_urls_to_exclusion_urls">[ドキュメント]</a>
+    <span class="k">def</span> <span class="nf">move_url_from_page_urls_to_exclusion_urls</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;ターゲットリスト(page_urls)から除外リスト(exclusion_urls)にURLを移動する</span>
+<span class="sd">        :param url:</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">site_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_site_url</span><span class="p">()</span>
+        <span class="n">selectors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_site_selectors</span><span class="p">()</span>
+        <span class="n">crawling_file_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_crawling_file_path</span><span class="p">()</span>
+        <span class="n">crawling_items</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_crawling_items</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">URLS_EXCLUSION</span> <span class="ow">in</span> <span class="n">crawling_items</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">url</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">crawling_items</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">URLS_EXCLUSION</span><span class="p">]:</span>
+                <span class="n">crawling_items</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">URLS_EXCLUSION</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">crawling_items</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">URLS_EXCLUSION</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">url</span><span class="p">]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">URLS_TARGET</span> <span class="ow">in</span> <span class="n">crawling_items</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">url</span> <span class="ow">in</span> <span class="n">crawling_items</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">URLS_TARGET</span><span class="p">]:</span>
+                <span class="n">crawling_items</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">URLS_TARGET</span><span class="p">]</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value_object</span> <span class="o">=</span> <span class="n">CrawlingValue</span><span class="p">(</span><span class="n">site_url</span><span class="p">,</span> <span class="n">selectors</span><span class="p">,</span> <span class="n">crawling_items</span><span class="p">,</span> <span class="n">crawling_file_path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">save_text</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Crawling.is_url_included_failure_list">
+<a class="viewcode-back" href="../../helper.crawling.html#helper.crawling.Crawling.is_url_included_failure_list">[ドキュメント]</a>
+    <span class="k">def</span> <span class="nf">is_url_included_failure_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;失敗リストに含まれるURLならTrueを返す</span>
+<span class="sd">        :param url:</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">crawling_items</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_crawling_items</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">URLS_FAILURE</span> <span class="ow">in</span> <span class="n">crawling_items</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">url</span> <span class="ow">in</span> <span class="n">crawling_items</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">URLS_FAILURE</span><span class="p">]:</span>
+                <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="Crawling.move_url_from_page_urls_to_failure_urls">
+<a class="viewcode-back" href="../../helper.crawling.html#helper.crawling.Crawling.move_url_from_page_urls_to_failure_urls">[ドキュメント]</a>
+    <span class="k">def</span> <span class="nf">move_url_from_page_urls_to_failure_urls</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;ターゲットリスト(page_urls)から失敗リスト(failure_urls)にURLを移動する</span>
+<span class="sd">        :param url:</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">site_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_site_url</span><span class="p">()</span>
+        <span class="n">selectors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_site_selectors</span><span class="p">()</span>
+        <span class="n">crawling_file_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_crawling_file_path</span><span class="p">()</span>
+        <span class="n">crawling_items</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_crawling_items</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">URLS_FAILURE</span> <span class="ow">in</span> <span class="n">crawling_items</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">url</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">crawling_items</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">URLS_FAILURE</span><span class="p">]:</span>
+                <span class="n">crawling_items</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">URLS_FAILURE</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">crawling_items</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">URLS_FAILURE</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">url</span><span class="p">]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">URLS_TARGET</span> <span class="ow">in</span> <span class="n">crawling_items</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">url</span> <span class="ow">in</span> <span class="n">crawling_items</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">URLS_TARGET</span><span class="p">]:</span>
+                <span class="n">crawling_items</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">URLS_TARGET</span><span class="p">]</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value_object</span> <span class="o">=</span> <span class="n">CrawlingValue</span><span class="p">(</span><span class="n">site_url</span><span class="p">,</span> <span class="n">selectors</span><span class="p">,</span> <span class="n">crawling_items</span><span class="p">,</span> <span class="n">crawling_file_path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">save_text</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Crawling.marge_crawling_items">
+<a class="viewcode-back" href="../../helper.crawling.html#helper.crawling.Crawling.marge_crawling_items">[ドキュメント]</a>
+    <span class="k">def</span> <span class="nf">marge_crawling_items</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;crawling_itemsのpage_urlsにexclusion_urlsがあったら削除する</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">crawling_items</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_crawling_items</span><span class="p">()</span>
+        <span class="n">page_urls</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">URLS_TARGET</span> <span class="ow">in</span> <span class="n">crawling_items</span><span class="p">:</span>
+            <span class="n">page_urls</span> <span class="o">=</span> <span class="n">crawling_items</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">URLS_TARGET</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">page_url</span> <span class="ow">in</span> <span class="n">page_urls</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">page_url</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_url_included_exclusion_list</span><span class="p">(</span><span class="n">page_url</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">move_url_from_page_urls_to_exclusion_urls</span><span class="p">(</span><span class="n">page_url</span><span class="p">)</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_url_included_failure_list</span><span class="p">(</span><span class="n">page_url</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">move_url_from_page_urls_to_failure_urls</span><span class="p">(</span><span class="n">page_url</span><span class="p">)</span>
+                <span class="k">continue</span></div>
+
+
+<div class="viewcode-block" id="Crawling.crawling_url_deployment">
+<a class="viewcode-back" href="../../helper.crawling.html#helper.crawling.Crawling.crawling_url_deployment">[ドキュメント]</a>
+    <span class="k">def</span> <span class="nf">crawling_url_deployment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">page_selectors</span><span class="p">,</span> <span class="n">image_selectors</span><span class="p">,</span> <span class="n">notification_id</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;各ページをスクレイピングして、末尾画像のナンバーから、URLを予測して、画像ファイルをダウンロード＆圧縮する</span>
+<span class="sd">            # crawling_itemsに、page_urlsがあり、各page_urlをpage_selectorsでスクレイピングする</span>
+<span class="sd">            # タイトルとURLでダウンロード除外または済みかをチェックして、</span>
+<span class="sd">            # ダウンロードしない場合は、以降の処理をスキップする</span>
+<span class="sd">            # 各page_urlをimage_selectorsでスクレイピングしてダウンロードする画像URLリストを作る。</span>
+<span class="sd">            # 画像URLリストをirvineHelperでダウンロードして、zipファイルにする</span>
+<span class="sd">        :param page_selectors:</span>
+<span class="sd">        :param image_selectors:</span>
+<span class="sd">        :param notification_id:</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">crawling_items</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_crawling_items</span><span class="p">()</span>
+        <span class="n">page_urls</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">URLS_TARGET</span> <span class="ow">in</span> <span class="n">crawling_items</span><span class="p">:</span>
+            <span class="n">page_urls</span> <span class="o">=</span> <span class="n">crawling_items</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">URLS_TARGET</span><span class="p">]</span>
+        <span class="n">total_pages</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">page_urls</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">page_url</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">page_urls</span><span class="p">):</span>
+            <span class="n">status</span> <span class="o">=</span> <span class="n">Status</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">status</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">status</span><span class="o">.</span><span class="n">is_running</span><span class="p">():</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;stop status&quot;</span><span class="p">)</span>
+                <span class="k">break</span>
+            <span class="n">current_page</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="n">remaining_pages</span> <span class="o">=</span> <span class="n">total_pages</span> <span class="o">-</span> <span class="n">current_page</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">page_url</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_url_included_exclusion_list</span><span class="p">(</span><span class="n">page_url</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">move_url_from_page_urls_to_exclusion_urls</span><span class="p">(</span><span class="n">page_url</span><span class="p">)</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_url_included_failure_list</span><span class="p">(</span><span class="n">page_url</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">move_url_from_page_urls_to_failure_urls</span><span class="p">(</span><span class="n">page_url</span><span class="p">)</span>
+                <span class="k">continue</span>
+            <span class="n">items</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scraping</span><span class="p">(</span><span class="n">page_url</span><span class="p">,</span> <span class="n">page_selectors</span><span class="p">)</span>
+            <span class="n">languages</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">take_out</span><span class="p">(</span><span class="n">items</span><span class="p">,</span> <span class="s1">&#39;languages&#39;</span><span class="p">)</span>
+            <span class="n">title</span> <span class="o">=</span> <span class="n">Crawling</span><span class="o">.</span><span class="n">validate_title</span><span class="p">(</span><span class="n">items</span><span class="p">,</span> <span class="s1">&#39;title_jp&#39;</span><span class="p">,</span> <span class="s1">&#39;title_en&#39;</span><span class="p">)</span>
+            <span class="n">url_title</span> <span class="o">=</span> <span class="n">chromeDriverHelper</span><span class="o">.</span><span class="n">ChromeDriverHelper</span><span class="o">.</span><span class="n">fixed_file_name</span><span class="p">(</span><span class="n">page_url</span><span class="p">)</span>
+
+            <span class="c1"># フォルダがなかったらフォルダを作る</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">webFileListHelper</span><span class="o">.</span><span class="n">WebFileListHelper</span><span class="o">.</span><span class="n">work_path</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">target_file_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">webFileListHelper</span><span class="o">.</span><span class="n">WebFileListHelper</span><span class="o">.</span><span class="n">work_path</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s1">：</span><span class="si">{</span><span class="n">url_title</span><span class="si">}</span><span class="s1">.html&#39;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">languages</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">languages</span> <span class="ow">and</span> <span class="n">languages</span> <span class="o">==</span> <span class="s1">&#39;japanese&#39;</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">target_file_name</span><span class="p">):</span>
+                <span class="c1"># ダウンロードするときだけ通知する</span>
+                <span class="c1"># _line_message_api = LineMessageAPI(access_token=&quot;&quot;, channel_secret=&quot;&quot;)</span>
+                <span class="c1"># _line_message_api.send_message(</span>
+                <span class="c1">#     notification_id,</span>
+                <span class="c1">#     f&#39;crawling :現在{current_page}ページ目 / 全{total_pages}ページ中 (残り{remaining_pages}ページ)&#39;)</span>
+                <span class="n">_slack_message_api</span> <span class="o">=</span> <span class="n">slack_message_api</span><span class="o">.</span><span class="n">SlackMessageAPI</span><span class="p">(</span><span class="n">access_token</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+                <span class="n">_slack_message_api</span><span class="o">.</span><span class="n">send_message</span><span class="p">(</span>
+                    <span class="n">notification_id</span><span class="p">,</span>
+                    <span class="sa">f</span><span class="s1">&#39;crawling :現在</span><span class="si">{</span><span class="n">current_page</span><span class="si">}</span><span class="s1">ページ目 / 全</span><span class="si">{</span><span class="n">total_pages</span><span class="si">}</span><span class="s1">ページ中 (残り</span><span class="si">{</span><span class="n">remaining_pages</span><span class="si">}</span><span class="s1">ページ)&#39;</span><span class="p">)</span>
+                <span class="n">image_items</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scraping</span><span class="p">(</span><span class="n">page_url</span><span class="p">,</span> <span class="n">image_selectors</span><span class="p">)</span>
+                <span class="n">image_urls</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">take_out</span><span class="p">(</span><span class="n">image_items</span><span class="p">,</span> <span class="s1">&#39;image_urls&#39;</span><span class="p">)</span>
+                <span class="n">last_image_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">take_out</span><span class="p">(</span><span class="n">image_items</span><span class="p">,</span> <span class="s1">&#39;image_url&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">last_image_url</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;エラー:last_image_urlが不正[</span><span class="si">{</span><span class="n">last_image_url</span><span class="si">}</span><span class="s2">]&quot;</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">last_image_url</span><span class="p">,</span> <span class="n">image_urls</span><span class="p">)</span>
+                <span class="n">web_file_list</span> <span class="o">=</span> <span class="n">webFileListHelper</span><span class="o">.</span><span class="n">WebFileListHelper</span><span class="p">([</span><span class="n">last_image_url</span><span class="p">])</span>
+                <span class="c1"># 末尾画像のナンバーから全ての画像URLを推測して展開する</span>
+                <span class="n">web_file_list</span><span class="o">.</span><span class="n">update_value_object_by_deployment_url_list</span><span class="p">()</span>
+                <span class="n">url_list</span> <span class="o">=</span> <span class="n">web_file_list</span><span class="o">.</span><span class="n">get_url_list</span><span class="p">()</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">url_list</span><span class="p">)</span>
+
+                <span class="n">web_file_list</span><span class="o">.</span><span class="n">download_irvine</span><span class="p">()</span>
+                <span class="k">for</span> <span class="n">count</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">webFileHelper</span><span class="o">.</span><span class="n">WebFileHelper</span><span class="o">.</span><span class="n">ext_list</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">web_file_list</span><span class="o">.</span><span class="n">is_exist</span><span class="p">():</span>
+                        <span class="k">break</span>
+                    <span class="c1"># ダウンロードに失敗しているときは、失敗しているファイルの拡張子を変えてダウンロードしなおす</span>
+                    <span class="n">web_file_list</span><span class="o">.</span><span class="n">rename_url_ext_shift</span><span class="p">()</span>
+                    <span class="n">web_file_list</span><span class="o">.</span><span class="n">download_irvine</span><span class="p">()</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">web_file_list</span><span class="o">.</span><span class="n">make_zip_file</span><span class="p">():</span>
+                    <span class="n">web_file_list</span><span class="o">.</span><span class="n">delete_local_files</span><span class="p">()</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">move_url_from_page_urls_to_failure_urls</span><span class="p">(</span><span class="n">page_url</span><span class="p">)</span>
+                    <span class="k">continue</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">web_file_list</span><span class="o">.</span><span class="n">rename_zip_file</span><span class="p">(</span><span class="n">title</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">web_file_list</span><span class="o">.</span><span class="n">rename_zip_file</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s1">：</span><span class="si">{</span><span class="n">url_title</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">):</span>
+                        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
+                <span class="n">web_file_list</span><span class="o">.</span><span class="n">delete_local_files</span><span class="p">()</span>
+                <span class="c1"># 成功したらチェック用ファイルを残す</span>
+                <span class="n">chromeDriverHelper</span><span class="o">.</span><span class="n">ChromeDriverHelper</span><span class="p">()</span><span class="o">.</span><span class="n">save_source</span><span class="p">(</span><span class="n">target_file_name</span><span class="p">)</span>
+                <span class="c1"># page_urlsからexclusion_urlsにURLを移して保存する</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">move_url_from_page_urls_to_exclusion_urls</span><span class="p">(</span><span class="n">page_url</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># page_urlsからexclusion_urlsにURLを移して保存する</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">move_url_from_page_urls_to_exclusion_urls</span><span class="p">(</span><span class="n">page_url</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Crawling.crawling_urls">
+<a class="viewcode-back" href="../../helper.crawling.html#helper.crawling.Crawling.crawling_urls">[ドキュメント]</a>
+    <span class="k">def</span> <span class="nf">crawling_urls</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">page_selectors</span><span class="p">,</span> <span class="n">image_selectors</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;各ページをスクレイピングして、画像ファイルをダウンロード＆圧縮する</span>
+<span class="sd">            # crawling_itemsに、page_urlsがあり、各page_urlをpage_selectorsでスクレイピングする</span>
+<span class="sd">            # タイトルとURLでダウンロード除外または済みかをチェックして、</span>
+<span class="sd">            # ダウンロードしない場合は、以降の処理をスキップする</span>
+<span class="sd">            # 各page_urlをimage_selectorsでスクレイピングしてダウンロードする画像URLリストを作る。</span>
+<span class="sd">            # 画像URLリストをirvineHelperでダウンロードして、zipファイルにする</span>
+<span class="sd">        :param page_selectors:</span>
+<span class="sd">        :param image_selectors:</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">crawling_items</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_crawling_items</span><span class="p">()</span>
+        <span class="n">page_urls</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">URLS_TARGET</span> <span class="ow">in</span> <span class="n">crawling_items</span><span class="p">:</span>
+            <span class="n">page_urls</span> <span class="o">=</span> <span class="n">crawling_items</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">URLS_TARGET</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">page_url</span> <span class="ow">in</span> <span class="n">page_urls</span><span class="p">:</span>
+            <span class="n">status</span> <span class="o">=</span> <span class="n">Status</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">status</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">status</span><span class="o">.</span><span class="n">is_running</span><span class="p">():</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;stop status&quot;</span><span class="p">)</span>
+                <span class="k">break</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">page_url</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_url_included_exclusion_list</span><span class="p">(</span><span class="n">page_url</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">move_url_from_page_urls_to_exclusion_urls</span><span class="p">(</span><span class="n">page_url</span><span class="p">)</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_url_included_failure_list</span><span class="p">(</span><span class="n">page_url</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">move_url_from_page_urls_to_failure_urls</span><span class="p">(</span><span class="n">page_url</span><span class="p">)</span>
+                <span class="k">continue</span>
+            <span class="n">items</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scraping</span><span class="p">(</span><span class="n">page_url</span><span class="p">,</span> <span class="n">page_selectors</span><span class="p">)</span>
+            <span class="n">title</span> <span class="o">=</span> <span class="n">Crawling</span><span class="o">.</span><span class="n">validate_title</span><span class="p">(</span><span class="n">items</span><span class="p">,</span> <span class="s1">&#39;title_jp&#39;</span><span class="p">,</span> <span class="s1">&#39;title_en&#39;</span><span class="p">)</span>
+            <span class="n">url_title</span> <span class="o">=</span> <span class="n">chromeDriverHelper</span><span class="o">.</span><span class="n">ChromeDriverHelper</span><span class="o">.</span><span class="n">fixed_file_name</span><span class="p">(</span><span class="n">page_url</span><span class="p">)</span>
+
+            <span class="c1"># フォルダがなかったらフォルダを作る</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">webFileListHelper</span><span class="o">.</span><span class="n">WebFileListHelper</span><span class="o">.</span><span class="n">work_path</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">target_file_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">webFileListHelper</span><span class="o">.</span><span class="n">WebFileListHelper</span><span class="o">.</span><span class="n">work_path</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s1">：</span><span class="si">{</span><span class="n">url_title</span><span class="si">}</span><span class="s1">.html&#39;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">target_file_name</span><span class="p">):</span>
+                <span class="n">image_items</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scraping</span><span class="p">(</span><span class="n">page_url</span><span class="p">,</span> <span class="n">image_selectors</span><span class="p">)</span>
+                <span class="n">image_urls</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">take_out</span><span class="p">(</span><span class="n">image_items</span><span class="p">,</span> <span class="s1">&#39;image_urls&#39;</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">image_urls</span><span class="p">)</span>
+                <span class="n">web_file_list</span> <span class="o">=</span> <span class="n">webFileListHelper</span><span class="o">.</span><span class="n">WebFileListHelper</span><span class="p">(</span><span class="n">image_urls</span><span class="p">)</span>
+                <span class="n">web_file_list</span><span class="o">.</span><span class="n">download_irvine</span><span class="p">()</span>
+                <span class="k">for</span> <span class="n">count</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">webFileHelper</span><span class="o">.</span><span class="n">WebFileHelper</span><span class="o">.</span><span class="n">ext_list</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">web_file_list</span><span class="o">.</span><span class="n">is_exist</span><span class="p">():</span>
+                        <span class="k">break</span>
+                    <span class="c1"># ダウンロードに失敗しているときは、失敗しているファイルの拡張子を変えてダウンロードしなおす</span>
+                    <span class="n">web_file_list</span><span class="o">.</span><span class="n">rename_url_ext_shift</span><span class="p">()</span>
+                    <span class="n">web_file_list</span><span class="o">.</span><span class="n">download_irvine</span><span class="p">()</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">web_file_list</span><span class="o">.</span><span class="n">make_zip_file</span><span class="p">():</span>
+                    <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">web_file_list</span><span class="o">.</span><span class="n">rename_zip_file</span><span class="p">(</span><span class="n">title</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">web_file_list</span><span class="o">.</span><span class="n">rename_zip_file</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s1">：</span><span class="si">{</span><span class="n">url_title</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">):</span>
+                        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
+                <span class="n">web_file_list</span><span class="o">.</span><span class="n">delete_local_files</span><span class="p">()</span>
+                <span class="c1"># 成功したらチェック用ファイルを残す</span>
+                <span class="n">chromeDriverHelper</span><span class="o">.</span><span class="n">ChromeDriverHelper</span><span class="p">()</span><span class="o">.</span><span class="n">save_source</span><span class="p">(</span><span class="n">target_file_name</span><span class="p">)</span>
+            <span class="c1"># page_urlsからexclusion_urlsにURLを移して保存する</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">move_url_from_page_urls_to_exclusion_urls</span><span class="p">(</span><span class="n">page_url</span><span class="p">)</span></div>
+</div>
+
+
+
+<span class="c1"># 検証コード</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>  <span class="c1"># インポート時には動かない</span>
+    <span class="n">load_path</span> <span class="o">=</span> <span class="s1">&#39;../downloadlist.txt&#39;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">load_path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">work_file</span><span class="p">:</span>
+        <span class="n">buff</span> <span class="o">=</span> <span class="n">work_file</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">buff</span><span class="p">:</span>
+            <span class="n">target_url</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="c1"># subprocess.run([&#39;python&#39;, &#39;imgdl.py&#39;, target_url])</span>
+            <span class="c1"># 画像が連番の場合、selenium</span>
+            <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="s1">&#39;python&#39;</span><span class="p">,</span> <span class="s1">&#39;urlDeployment.py&#39;</span><span class="p">,</span> <span class="n">target_url</span><span class="p">])</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Ryosuke Igarashi.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

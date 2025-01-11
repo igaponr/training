@@ -1,0 +1,546 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="ja" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>helper.webFileHelper &mdash; Web_scraping 1.0.0 ドキュメント</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=144c8c96"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/translations.js?v=4755f45a"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="索引" href="../../genindex.html" />
+    <link rel="search" title="検索" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Web_scraping
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../helper.html">helper package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Web_scraping</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">モジュールコード</a></li>
+      <li class="breadcrumb-item active">helper.webFileHelper</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>helper.webFileHelper のソースコード</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python3</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;webファイルのヘルパー</span>
+
+<span class="sd">Todo:</span>
+<span class="sd">    - docstringを整える</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">inspect</span>
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span> <span class="nn">urllib.parse</span> <span class="kn">import</span> <span class="n">urlparse</span>
+<span class="kn">from</span> <span class="nn">urllib.parse</span> <span class="kn">import</span> <span class="n">urlunparse</span>
+
+<span class="c1"># 3rd party packages</span>
+<span class="kn">import</span> <span class="nn">requests</span>  <span class="c1"># HTTP通信</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">from</span> <span class="nn">helper</span> <span class="kn">import</span> <span class="n">uriHelper</span>
+<span class="kn">from</span> <span class="nn">datauri</span> <span class="kn">import</span> <span class="n">DataURI</span>
+
+
+<div class="viewcode-block" id="WebFileHelperValue">
+<a class="viewcode-back" href="../../helper.webFileHelper.html#helper.webFileHelper.WebFileHelperValue">[ドキュメント]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">WebFileHelperValue</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;webファイルヘルパー値オブジェクト&quot;&quot;&quot;</span>
+    <span class="n">url</span><span class="p">:</span> <span class="n">uriHelper</span><span class="o">.</span><span class="n">UriHelper</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">download_file_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">start_ext</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;.jpg&#39;</span>
+    <span class="n">download_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)),</span>
+                                      <span class="s1">&#39;../download&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">,</span> <span class="s1">&#39;/&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">url</span><span class="p">:</span> <span class="n">uriHelper</span><span class="o">.</span><span class="n">UriHelper</span> <span class="o">=</span> <span class="n">url</span><span class="p">,</span>
+                 <span class="n">download_file_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">download_file_name</span><span class="p">,</span>
+                 <span class="n">start_ext</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">start_ext</span><span class="p">,</span>
+                 <span class="n">download_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">download_path</span><span class="p">,</span>
+                 <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;完全コンストラクタパターン&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">url</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">inspect</span><span class="o">.</span><span class="n">stack</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">function</span><span class="si">}</span><span class="s2">&quot;</span>
+                             <span class="sa">f</span><span class="s2">&quot;引数エラー:url=None&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">download_file_name</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">inspect</span><span class="o">.</span><span class="n">stack</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">function</span><span class="si">}</span><span class="s2">&quot;</span>
+                             <span class="sa">f</span><span class="s2">&quot;引数エラー:download_file_name=None&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">start_ext</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">inspect</span><span class="o">.</span><span class="n">stack</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">function</span><span class="si">}</span><span class="s2">&quot;</span>
+                             <span class="sa">f</span><span class="s2">&quot;引数エラー:start_ext=None&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">download_path</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">inspect</span><span class="o">.</span><span class="n">stack</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">function</span><span class="si">}</span><span class="s2">&quot;</span>
+                             <span class="sa">f</span><span class="s2">&quot;引数エラー:download_path=None&quot;</span><span class="p">)</span>
+        <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;url&quot;</span><span class="p">,</span> <span class="n">url</span><span class="p">)</span>
+        <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;download_file_name&quot;</span><span class="p">,</span> <span class="n">download_file_name</span><span class="p">)</span>
+        <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;start_ext&quot;</span><span class="p">,</span> <span class="n">start_ext</span><span class="p">)</span>
+        <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;download_path&quot;</span><span class="p">,</span> <span class="n">download_path</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">,</span> <span class="s1">&#39;/&#39;</span><span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="WebFileHelper">
+<a class="viewcode-back" href="../../helper.webFileHelper.html#helper.webFileHelper.WebFileHelper">[ドキュメント]</a>
+<span class="k">class</span> <span class="nc">WebFileHelper</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;webファイルのヘルパー&quot;&quot;&quot;</span>
+    <span class="n">value_object</span><span class="p">:</span> <span class="n">WebFileHelperValue</span> <span class="ow">or</span> <span class="n">uriHelper</span><span class="o">.</span><span class="n">UriHelper</span> <span class="ow">or</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">download_file_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">start_ext</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">WebFileHelperValue</span><span class="o">.</span><span class="n">start_ext</span>
+    <span class="n">download_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">WebFileHelperValue</span><span class="o">.</span><span class="n">download_path</span>
+
+    <span class="c1"># ext_list: list = [&#39;.jpg&#39;, &#39;.png&#39;, &#39;.jpeg&#39;, &#39;.webp&#39;, &#39;.svg&#39;, &#39;.svgz&#39;, &#39;.gif&#39;, &#39;.tif&#39;, &#39;.tiff&#39;, &#39;.psd&#39;, &#39;.bmp&#39;]</span>
+    <span class="n">ext_list</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="p">[</span><span class="n">WebFileHelperValue</span><span class="o">.</span><span class="n">start_ext</span><span class="p">,</span> <span class="s1">&#39;.png&#39;</span><span class="p">,</span> <span class="s1">&#39;.gif&#39;</span><span class="p">,</span> <span class="s1">&#39;.webp&#39;</span><span class="p">]</span>  <span class="c1"># これを画像とする</span>
+    <span class="n">ext_dict</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="p">{</span><span class="n">ext_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span> <span class="n">ext_list</span><span class="p">,</span>
+                      <span class="n">ext_list</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="p">[</span><span class="n">ext_list</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">ext_list</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">ext_list</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">ext_list</span><span class="p">[</span><span class="mi">3</span><span class="p">]],</span>
+                      <span class="n">ext_list</span><span class="p">[</span><span class="mi">2</span><span class="p">]:</span> <span class="p">[</span><span class="n">ext_list</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">ext_list</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">ext_list</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">ext_list</span><span class="p">[</span><span class="mi">3</span><span class="p">]],</span>
+                      <span class="n">ext_list</span><span class="p">[</span><span class="mi">3</span><span class="p">]:</span> <span class="p">[</span><span class="n">ext_list</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">ext_list</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">ext_list</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">ext_list</span><span class="p">[</span><span class="mi">2</span><span class="p">]],</span>
+                      <span class="p">}</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">value_object</span><span class="p">:</span> <span class="n">WebFileHelperValue</span> <span class="ow">or</span> <span class="n">uriHelper</span><span class="o">.</span><span class="n">UriHelper</span> <span class="ow">or</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">value_object</span><span class="p">,</span>
+                 <span class="n">download_file_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">download_file_name</span><span class="p">,</span>
+                 <span class="n">start_ext</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">start_ext</span><span class="p">,</span>
+                 <span class="n">download_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">download_path</span><span class="p">,</span>
+                 <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;値オブジェクトからの復元、</span>
+<span class="sd">        または、urlとfolder_pathより、値オブジェクトを作成する</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">value_object</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value_object</span><span class="p">,</span> <span class="n">WebFileHelperValue</span><span class="p">):</span>
+                <span class="n">value_object</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">value_object</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">value_object</span> <span class="o">=</span> <span class="n">value_object</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value_object</span><span class="p">,</span> <span class="n">uriHelper</span><span class="o">.</span><span class="n">UriHelper</span><span class="p">):</span>
+                <span class="n">uri</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">value_object</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">download_file_name</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">uri</span><span class="o">.</span><span class="n">is_enable_filename</span><span class="p">():</span>
+                        <span class="n">download_file_name</span> <span class="o">=</span> <span class="n">uri</span><span class="o">.</span><span class="n">get_filename</span><span class="p">()</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">inspect</span><span class="o">.</span><span class="n">stack</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">function</span><span class="si">}</span><span class="s2">&quot;</span>
+                                         <span class="sa">f</span><span class="s2">&quot;引数エラー:download_file_name=None&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">start_ext</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">uri</span><span class="o">.</span><span class="n">is_enable_filename</span><span class="p">():</span>
+                        <span class="n">start_ext</span> <span class="o">=</span> <span class="n">uri</span><span class="o">.</span><span class="n">get_ext</span><span class="p">()</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">inspect</span><span class="o">.</span><span class="n">stack</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">function</span><span class="si">}</span><span class="s2">&quot;</span>
+                                         <span class="sa">f</span><span class="s2">&quot;引数エラー:start_ext=None&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">download_path</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">inspect</span><span class="o">.</span><span class="n">stack</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">function</span><span class="si">}</span><span class="s2">&quot;</span>
+                                     <span class="sa">f</span><span class="s2">&quot;引数エラー:download_path=None&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">value_object</span> <span class="o">=</span> <span class="n">WebFileHelperValue</span><span class="p">(</span><span class="n">uri</span><span class="p">,</span> <span class="n">download_file_name</span><span class="p">,</span> <span class="n">start_ext</span><span class="p">,</span> <span class="n">download_path</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value_object</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="n">url</span> <span class="o">=</span> <span class="n">value_object</span>
+                <span class="n">uri</span> <span class="o">=</span> <span class="n">uriHelper</span><span class="o">.</span><span class="n">UriHelper</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">download_file_name</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">uri</span><span class="o">.</span><span class="n">is_enable_filename</span><span class="p">():</span>
+                        <span class="n">download_file_name</span> <span class="o">=</span> <span class="n">uri</span><span class="o">.</span><span class="n">get_filename</span><span class="p">()</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">inspect</span><span class="o">.</span><span class="n">stack</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">function</span><span class="si">}</span><span class="s2">&quot;</span>
+                                         <span class="sa">f</span><span class="s2">&quot;引数エラー:download_file_name=None&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">start_ext</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">uri</span><span class="o">.</span><span class="n">is_enable_filename</span><span class="p">():</span>
+                        <span class="n">start_ext</span> <span class="o">=</span> <span class="n">uri</span><span class="o">.</span><span class="n">get_ext</span><span class="p">()</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">inspect</span><span class="o">.</span><span class="n">stack</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">function</span><span class="si">}</span><span class="s2">&quot;</span>
+                                         <span class="sa">f</span><span class="s2">&quot;引数エラー:start_ext=None&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">download_path</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">inspect</span><span class="o">.</span><span class="n">stack</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">function</span><span class="si">}</span><span class="s2">&quot;</span>
+                                     <span class="sa">f</span><span class="s2">&quot;引数エラー:download_path=None&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">value_object</span> <span class="o">=</span> <span class="n">WebFileHelperValue</span><span class="p">(</span><span class="n">uri</span><span class="p">,</span> <span class="n">download_file_name</span><span class="p">,</span> <span class="n">start_ext</span><span class="p">,</span> <span class="n">download_path</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">inspect</span><span class="o">.</span><span class="n">stack</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">function</span><span class="si">}</span><span class="s2">&quot;</span>
+                                 <span class="sa">f</span><span class="s2">&quot;引数エラー:value_objectの型&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">inspect</span><span class="o">.</span><span class="n">stack</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">function</span><span class="si">}</span><span class="s2">&quot;</span>
+                             <span class="sa">f</span><span class="s2">&quot;引数エラー:value_object=None&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="WebFileHelper.fixed_path">
+<a class="viewcode-back" href="../../helper.webFileHelper.html#helper.webFileHelper.WebFileHelper.fixed_path">[ドキュメント]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">fixed_path</span><span class="p">(</span><span class="n">file_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;フォルダ名の禁止文字を全角文字に置き換える</span>
+<span class="sd">        :param file_path: str 置き換えたいフォルダパス</span>
+<span class="sd">        :return: str 置き換え後のフォルダパス</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">__file_path</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+        <span class="n">__file_path</span> <span class="o">=</span> <span class="n">__file_path</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">,</span> <span class="s1">&#39;：&#39;</span><span class="p">)</span>
+        <span class="n">__file_path</span> <span class="o">=</span> <span class="n">__file_path</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;*&#39;</span><span class="p">,</span> <span class="s1">&#39;＊&#39;</span><span class="p">)</span>
+        <span class="n">__file_path</span> <span class="o">=</span> <span class="n">__file_path</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;?&#39;</span><span class="p">,</span> <span class="s1">&#39;？&#39;</span><span class="p">)</span>
+        <span class="n">__file_path</span> <span class="o">=</span> <span class="n">__file_path</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;&quot;&#39;</span><span class="p">,</span> <span class="s1">&#39;”&#39;</span><span class="p">)</span>
+        <span class="n">__file_path</span> <span class="o">=</span> <span class="n">__file_path</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;&lt;&#39;</span><span class="p">,</span> <span class="s1">&#39;＜&#39;</span><span class="p">)</span>
+        <span class="n">__file_path</span> <span class="o">=</span> <span class="n">__file_path</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;&gt;&#39;</span><span class="p">,</span> <span class="s1">&#39;＞&#39;</span><span class="p">)</span>
+        <span class="n">__file_path</span> <span class="o">=</span> <span class="n">__file_path</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;|&#39;</span><span class="p">,</span> <span class="s1">&#39;｜&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">__file_path</span></div>
+
+
+<div class="viewcode-block" id="WebFileHelper.fixed_file_name">
+<a class="viewcode-back" href="../../helper.webFileHelper.html#helper.webFileHelper.WebFileHelper.fixed_file_name">[ドキュメント]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">fixed_file_name</span><span class="p">(</span><span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;ファイル名の禁止文字を全角文字に置き換える</span>
+<span class="sd">        :param file_name: str 置き換えたいファイル名</span>
+<span class="sd">        :return: str 置き換え後のファイル名</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">__file_name</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
+        <span class="n">__file_name</span> <span class="o">=</span> <span class="n">__file_name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">,</span> <span class="s1">&#39;￥&#39;</span><span class="p">)</span>
+        <span class="n">__file_name</span> <span class="o">=</span> <span class="n">__file_name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="s1">&#39;／&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">WebFileHelper</span><span class="o">.</span><span class="n">fixed_path</span><span class="p">(</span><span class="n">__file_name</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="WebFileHelper.is_jpeg_data_uri">
+<a class="viewcode-back" href="../../helper.webFileHelper.html#helper.webFileHelper.WebFileHelper.is_jpeg_data_uri">[ドキュメント]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">is_jpeg_data_uri</span><span class="p">(</span><span class="n">url</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Data URIのjpeg画像かつbase64であればTrue</span>
+<span class="sd">        :return: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">urlparse</span><span class="p">(</span><span class="n">url</span><span class="p">)</span><span class="o">.</span><span class="n">scheme</span> <span class="o">==</span> <span class="s1">&#39;data&#39;</span><span class="p">:</span>
+            <span class="n">uri</span> <span class="o">=</span> <span class="n">DataURI</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">uri</span><span class="o">.</span><span class="n">mimetype</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;image/jpeg&#39;</span><span class="p">]:</span>  <span class="c1"># &#39;image/png&#39;]:</span>
+                <span class="k">if</span> <span class="n">uri</span><span class="o">.</span><span class="n">is_base64</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="WebFileHelper.is_image">
+<a class="viewcode-back" href="../../helper.webFileHelper.html#helper.webFileHelper.WebFileHelper.is_image">[ドキュメント]</a>
+    <span class="k">def</span> <span class="nf">is_image</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;画像か判定する(ext_listにある拡張子か調べる)</span>
+<span class="sd">        :return: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">__parse</span> <span class="o">=</span> <span class="n">urlparse</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_url</span><span class="p">())</span>
+        <span class="k">for</span> <span class="n">__ext</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ext_list</span><span class="p">:</span>
+            <span class="n">offset</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">__ext</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">__parse</span><span class="o">.</span><span class="n">path</span><span class="p">[</span><span class="o">-</span><span class="n">offset</span><span class="p">:]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="n">__ext</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="WebFileHelper.is_exist">
+<a class="viewcode-back" href="../../helper.webFileHelper.html#helper.webFileHelper.WebFileHelper.is_exist">[ドキュメント]</a>
+    <span class="k">def</span> <span class="nf">is_exist</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;ファイルがローカルに存在すればTrueを返す</span>
+<span class="sd">        urlでダウンロードしたファイル、変名した後のファイルをチェックする</span>
+<span class="sd">        :return: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_path</span><span class="p">()):</span>
+            <span class="c1"># 変名後のファイルがある</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">value_object</span><span class="o">.</span><span class="n">url</span>
+        <span class="k">if</span> <span class="n">url</span><span class="o">.</span><span class="n">is_enable_filename</span><span class="p">():</span>
+            <span class="n">file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">download_path</span><span class="p">,</span> <span class="n">url</span><span class="o">.</span><span class="n">get_filename</span><span class="p">()</span> <span class="o">+</span> <span class="n">url</span><span class="o">.</span><span class="n">get_ext</span><span class="p">())</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">file_path</span><span class="p">):</span>
+                <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="WebFileHelper.get_value_object">
+<a class="viewcode-back" href="../../helper.webFileHelper.html#helper.webFileHelper.WebFileHelper.get_value_object">[ドキュメント]</a>
+    <span class="k">def</span> <span class="nf">get_value_object</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;valueオブジェクトを得る</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value_object</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="WebFileHelper.get_url">
+<a class="viewcode-back" href="../../helper.webFileHelper.html#helper.webFileHelper.WebFileHelper.get_url">[ドキュメント]</a>
+    <span class="k">def</span> <span class="nf">get_url</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;URLを得る</span>
+<span class="sd">        :return: str URL</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value_object</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">get_uri</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="WebFileHelper.get_download_path">
+<a class="viewcode-back" href="../../helper.webFileHelper.html#helper.webFileHelper.WebFileHelper.get_download_path">[ドキュメント]</a>
+    <span class="k">def</span> <span class="nf">get_download_path</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;ダウンロードパスを得る</span>
+<span class="sd">        :return: str download_path</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value_object</span><span class="o">.</span><span class="n">download_path</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="WebFileHelper.get_download_file_name">
+<a class="viewcode-back" href="../../helper.webFileHelper.html#helper.webFileHelper.WebFileHelper.get_download_file_name">[ドキュメント]</a>
+    <span class="k">def</span> <span class="nf">get_download_file_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;ダウンロードファイル名を得る</span>
+<span class="sd">        :return: str download_file_name</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value_object</span><span class="o">.</span><span class="n">download_file_name</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="WebFileHelper.get_start_ext">
+<a class="viewcode-back" href="../../helper.webFileHelper.html#helper.webFileHelper.WebFileHelper.get_start_ext">[ドキュメント]</a>
+    <span class="k">def</span> <span class="nf">get_start_ext</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;開始時の拡張子を得る</span>
+<span class="sd">        :return: str ファイルの拡張子(ドットを含む)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value_object</span><span class="o">.</span><span class="n">start_ext</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="WebFileHelper.get_path">
+<a class="viewcode-back" href="../../helper.webFileHelper.html#helper.webFileHelper.WebFileHelper.get_path">[ドキュメント]</a>
+    <span class="k">def</span> <span class="nf">get_path</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;現在のフルパスを得る</span>
+<span class="sd">        :return: str ファイルのフルパス(セパレータはスラッシュ)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_download_path</span><span class="p">(),</span>
+                                          <span class="bp">self</span><span class="o">.</span><span class="n">get_filename</span><span class="p">()</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_ext</span><span class="p">(),</span>
+                                          <span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">,</span> <span class="s1">&#39;/&#39;</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="WebFileHelper.get_filename">
+<a class="viewcode-back" href="../../helper.webFileHelper.html#helper.webFileHelper.WebFileHelper.get_filename">[ドキュメント]</a>
+    <span class="k">def</span> <span class="nf">get_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;現在のファイル名を得る</span>
+<span class="sd">        :return: str ファイル名(拡張子除く)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">download_file_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_download_file_name</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">download_file_name</span><span class="p">:</span>
+            <span class="n">download_file_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">value_object</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">get_filename</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">download_file_name</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="WebFileHelper.get_ext">
+<a class="viewcode-back" href="../../helper.webFileHelper.html#helper.webFileHelper.WebFileHelper.get_ext">[ドキュメント]</a>
+    <span class="k">def</span> <span class="nf">get_ext</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;現在の拡張子を得る</span>
+<span class="sd">        :return: str ファイルの拡張子(ドットを含む)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ext</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">value_object</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">get_ext</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">ext</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="WebFileHelper.rename_url_ext_shift">
+<a class="viewcode-back" href="../../helper.webFileHelper.html#helper.webFileHelper.WebFileHelper.rename_url_ext_shift">[ドキュメント]</a>
+    <span class="k">def</span> <span class="nf">rename_url_ext_shift</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;urlの画像拡張子を、ext_listの次の拡張子にシフトする</span>
+<span class="sd">        現在の拡張子はext_listの何番目か調べて、次の拡張子にurlを変更して、値オブジェクトを作り直す</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_image</span><span class="p">():</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;画像じゃないので処理をスキップ&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">__index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ext_dict</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">get_start_ext</span><span class="p">()]</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_ext</span><span class="p">())</span>
+            <span class="n">__index</span> <span class="o">=</span> <span class="p">(</span><span class="n">__index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ext_dict</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">get_start_ext</span><span class="p">()])</span>
+            <span class="n">__ext</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ext_dict</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">get_start_ext</span><span class="p">()][</span><span class="n">__index</span><span class="p">]</span>
+            <span class="c1"># [::-1] 配列を逆順にする</span>
+            <span class="n">__url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_url</span><span class="p">()[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_ext</span><span class="p">()[::</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">__ext</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">])[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">value_object</span> <span class="o">=</span> <span class="n">WebFileHelperValue</span><span class="p">(</span><span class="n">uriHelper</span><span class="o">.</span><span class="n">UriHelper</span><span class="p">(</span><span class="n">__url</span><span class="p">),</span>
+                                                   <span class="bp">self</span><span class="o">.</span><span class="n">get_filename</span><span class="p">(),</span>
+                                                   <span class="bp">self</span><span class="o">.</span><span class="n">get_start_ext</span><span class="p">(),</span>
+                                                   <span class="bp">self</span><span class="o">.</span><span class="n">get_download_path</span><span class="p">(),</span>
+                                                   <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="WebFileHelper.download_requests">
+<a class="viewcode-back" href="../../helper.webFileHelper.html#helper.webFileHelper.WebFileHelper.download_requests">[ドキュメント]</a>
+    <span class="k">def</span> <span class="nf">download_requests</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;requestsを用いて、ファイルをダウンロードする</span>
+<span class="sd">        :return: bool 成功/失敗=True/False</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># フォルダーがなければ作成する</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_download_path</span><span class="p">()):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_download_path</span><span class="p">())</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_exist</span><span class="p">():</span>
+                <span class="n">images</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_image_content_by_requests</span><span class="p">()</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_path</span><span class="p">(),</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">img_file</span><span class="p">:</span>
+                    <span class="n">img_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">images</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Skip &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_path</span><span class="p">())</span>
+        <span class="k">except</span> <span class="ne">KeyboardInterrupt</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;キーボード割込み&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_url</span><span class="p">()</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>  <span class="c1"># 改行なし</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="WebFileHelper.get_image_content_by_requests">
+<a class="viewcode-back" href="../../helper.webFileHelper.html#helper.webFileHelper.WebFileHelper.get_image_content_by_requests">[ドキュメント]</a>
+    <span class="k">def</span> <span class="nf">get_image_content_by_requests</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">30</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;requestsを用いて、imageのコンテンツを取得する。</span>
+<span class="sd">        サーバー落ちているとリダイレクトでエラー画像になることがあるのでリダイレクトFalse</span>
+<span class="sd">        :param timeout: int タイムアウト時間[s]</span>
+<span class="sd">        :return: bytes 読み込んだimageのバイナリデータ</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_url</span><span class="p">(),</span> <span class="n">allow_redirects</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="n">requests</span><span class="o">.</span><span class="n">codes</span><span class="o">.</span><span class="n">ok</span><span class="p">:</span>
+            <span class="n">e</span> <span class="o">=</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;HTTP status: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">))</span>  <span class="c1"># + &quot; &quot; + file_url + &quot; &quot; + response.url)</span>
+            <span class="k">raise</span> <span class="n">e</span>
+        <span class="n">content_type</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s2">&quot;content-type&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="s1">&#39;image&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">content_type</span><span class="p">:</span>
+            <span class="n">e</span> <span class="o">=</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Content-Type: &quot;</span> <span class="o">+</span> <span class="n">content_type</span><span class="p">)</span>  <span class="c1"># + &quot; &quot; + file_url + &quot; &quot; + response.url)</span>
+            <span class="k">raise</span> <span class="n">e</span>
+        <span class="k">return</span> <span class="n">response</span><span class="o">.</span><span class="n">content</span></div>
+
+
+<div class="viewcode-block" id="WebFileHelper.rename_filename">
+<a class="viewcode-back" href="../../helper.webFileHelper.html#helper.webFileHelper.WebFileHelper.rename_filename">[ドキュメント]</a>
+    <span class="k">def</span> <span class="nf">rename_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_file_name</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;dst_filenameに設定して、ローカルにあるファイルのファイル名も変更する</span>
+<span class="sd">        TODO: dst_file_nameにセットするときは、download_file_nameでvalue_objectを作り直すべきか</span>
+<span class="sd">        :param new_file_name: str 変更する新しいファイル名</span>
+<span class="sd">        :return: bool True/False=変更(した/しなかった)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_exist</span><span class="p">():</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;ファイルがローカルにないので処理をスキップします&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">dst_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_download_path</span><span class="p">(),</span> <span class="n">new_file_name</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_ext</span><span class="p">())</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">dst_path</span><span class="p">):</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;リネームファイル[</span><span class="si">{</span><span class="n">dst_path</span><span class="si">}</span><span class="s1">]が存在しています&#39;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="kc">False</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_path</span><span class="p">(),</span> <span class="n">dst_path</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">download_file_name</span> <span class="o">=</span> <span class="n">new_file_name</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">value_object</span> <span class="o">=</span> <span class="n">WebFileHelperValue</span><span class="p">(</span><span class="n">uriHelper</span><span class="o">.</span><span class="n">UriHelper</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_url</span><span class="p">()),</span>
+                                                   <span class="bp">self</span><span class="o">.</span><span class="n">get_filename</span><span class="p">(),</span>
+                                                   <span class="bp">self</span><span class="o">.</span><span class="n">get_start_ext</span><span class="p">(),</span>
+                                                   <span class="bp">self</span><span class="o">.</span><span class="n">get_download_path</span><span class="p">(),</span>
+                                                   <span class="p">)</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="WebFileHelper.delete_local_file">
+<a class="viewcode-back" href="../../helper.webFileHelper.html#helper.webFileHelper.WebFileHelper.delete_local_file">[ドキュメント]</a>
+    <span class="k">def</span> <span class="nf">delete_local_file</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;ローカルのファイルを削除する</span>
+<span class="sd">        :return: None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_path</span><span class="p">()):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_path</span><span class="p">())</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">value_object</span><span class="o">.</span><span class="n">url</span>
+        <span class="k">if</span> <span class="n">url</span><span class="o">.</span><span class="n">is_enable_filename</span><span class="p">():</span>
+            <span class="n">file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">download_path</span><span class="p">,</span> <span class="n">url</span><span class="o">.</span><span class="n">get_filename</span><span class="p">()</span> <span class="o">+</span> <span class="n">url</span><span class="o">.</span><span class="n">get_ext</span><span class="p">())</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">file_path</span><span class="p">):</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="WebFileHelper.move">
+<a class="viewcode-back" href="../../helper.webFileHelper.html#helper.webFileHelper.WebFileHelper.move">[ドキュメント]</a>
+    <span class="k">def</span> <span class="nf">move</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_path</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;ファイルを移動する(get_download_path()は変わらない)</span>
+<span class="sd">        :param new_path: 移動先のフォルダーパス</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_exist</span><span class="p">():</span>
+            <span class="c1"># TODO: 移動先のフォルダに同名のファイルが存在する場合の対応</span>
+            <span class="c1"># TODO: new_pathが存在しない場合</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_path</span><span class="p">(),</span> <span class="n">new_path</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;ローカルファイルが不足しているため、ファイルの移動を中止した&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="WebFileHelper.get_deployment_url_list">
+<a class="viewcode-back" href="../../helper.webFileHelper.html#helper.webFileHelper.WebFileHelper.get_deployment_url_list">[ドキュメント]</a>
+    <span class="k">def</span> <span class="nf">get_deployment_url_list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;ナンバリングされたURLであれば、数字部分を末尾とした、URL展開してURLリスト=url_listを作る</span>
+<span class="sd">        TODO: ナンバリングのチェック、1000以上ならエラーにするなど</span>
+<span class="sd">        :return: list 展開した画像URLリスト</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">__parse</span> <span class="o">=</span> <span class="n">urlparse</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_url</span><span class="p">())</span>
+        <span class="c1"># pathを/前後で分ける</span>
+        <span class="n">__path_before_name</span> <span class="o">=</span> <span class="n">__parse</span><span class="o">.</span><span class="n">path</span><span class="p">[:</span><span class="n">__parse</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">rfind</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+        <span class="n">__path_after_name</span> <span class="o">=</span> <span class="n">__parse</span><span class="o">.</span><span class="n">path</span><span class="p">[</span><span class="n">__parse</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">rfind</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:]</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">__path_before_name</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">__path_after_name</span><span class="p">)</span>
+        <span class="c1"># path_after_nameを.前後で分ける</span>
+        <span class="n">__base_name</span> <span class="o">=</span> <span class="n">__path_after_name</span><span class="p">[:</span><span class="n">__path_after_name</span><span class="o">.</span><span class="n">rfind</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)]</span>
+        <span class="n">__extend_name</span> <span class="o">=</span> <span class="n">__path_after_name</span><span class="p">[</span><span class="n">__path_after_name</span><span class="o">.</span><span class="n">rfind</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">):]</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">__base_name</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">__extend_name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">__base_name</span><span class="o">.</span><span class="n">isdecimal</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">inspect</span><span class="o">.</span><span class="n">stack</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">function</span><span class="si">}</span><span class="s2">&quot;</span>
+                             <span class="sa">f</span><span class="s2">&quot;エラー:urlがナンバリングされていない[</span><span class="si">{</span><span class="n">__base_name</span><span class="si">}</span><span class="s2">]&quot;</span><span class="p">)</span>
+        <span class="n">__count</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">__base_name</span><span class="p">)</span>
+        <span class="n">url_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">d_count</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">__count</span><span class="p">):</span>
+            <span class="n">url_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">urlunparse</span><span class="p">((</span><span class="n">__parse</span><span class="o">.</span><span class="n">scheme</span><span class="p">,</span>
+                                        <span class="n">__parse</span><span class="o">.</span><span class="n">netloc</span><span class="p">,</span>
+                                        <span class="n">__path_before_name</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">d_count</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">__extend_name</span><span class="p">,</span>
+                                        <span class="n">__parse</span><span class="o">.</span><span class="n">params</span><span class="p">,</span>
+                                        <span class="n">__parse</span><span class="o">.</span><span class="n">query</span><span class="p">,</span>
+                                        <span class="n">__parse</span><span class="o">.</span><span class="n">fragment</span><span class="p">)))</span>
+        <span class="k">return</span> <span class="n">url_list</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Ryosuke Igarashi.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
