@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 requests-htmlでスクレイピング
@@ -16,6 +16,9 @@ https://requests.readthedocs.io/projects/requests-html/en/latest/
 
 requests-htmlのGitHub
 https://github.com/kennethreitz/requests-html
+
+Todo:
+    - docstringを整える
 """
 import copy
 import json

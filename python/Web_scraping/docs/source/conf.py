@@ -8,7 +8,10 @@
 import os
 import sys
 from recommonmark.parser import CommonMarkParser
-source_suffix = ['.rst', '.md']
+source_suffix = {
+    '.rst': 'restructuredtext',
+    '.md': 'markdown',
+}
 source_parsers = {
     '.md': CommonMarkParser,
 }
@@ -24,11 +27,14 @@ release = '1.0.0'
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.napoleon',
+    'sphinx.ext.todo',
+    'sphinx.ext.viewcode',
     'myst_parser'
 ]
 templates_path = ['_templates']
 exclude_patterns = []
 language = 'ja'
+todo_include_todos = True
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output

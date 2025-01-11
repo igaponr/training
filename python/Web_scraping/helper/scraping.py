@@ -1,8 +1,11 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 スクレイピングユーティリティ
     * サイトURLと、selectorsを指定して、スクレイピングする
+
+Todo:
+    - docstringを整える
 """
 # standard library
 # 3rd party packages

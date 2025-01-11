@@ -1,3 +1,10 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""statusファイル
+
+Todo:
+    - docstringを整える
+"""
 import json
 import time
 from dataclasses import dataclass

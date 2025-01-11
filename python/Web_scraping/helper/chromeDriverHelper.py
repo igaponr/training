@@ -1,43 +1,44 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """Selenium Chromeドライバのヘルパー
-先にChrome.batを実行して、Chromeを起動しておくと、その続きから操作できる。
-コンストラクタで引数を指定するとスクレイピングまで実施されてget_value_objectが有効になる
-    fixed_path (staticmethod)フォルダ名の禁止文字を全角文字に置き換える
-    fixed_file_name (staticmethod)ファイル名の禁止文字を全角文字に置き換える
-    scraping (staticmethod、画面依存)現在表示のURLにスクレイピングする
-    scroll_element (画面遷移有)指定のelementまでスクロールする
-    get_value_object 値オブジェクトを取得する
-    get_url URLを取得する
-    get_selectors セレクタを取得する
-    get_items スクレイピング結果を取得する
-    destroy Chromeを閉じる
-    get_source Chromeで表示しているタブのsourceを取得する
-    save_source Chromeで表示しているタブのsourceをファイルに保存する
-    back (画面遷移有)ブラウザの戻るボタン押下と同じ動作
-    forward (画面遷移有)ブラウザの進むボタン押下と同じ動作
-    next_tab (画面遷移有)openで作ったタブ(__window_handle_list)の内、一つ後のタブを表示する
-    previous_tab (画面遷移有)openで作ったタブ(__window_handle_list)の内、一つ前のタブを表示する
-    download_image (画面遷移有)urlの画像を保存する(open_new_tab → save_image → closeする)
-    open_current_tab (画面依存)現在表示されているタブでurlを開く
-    open_new_tab (画面遷移有)新しいタブでurlを開く
-    open_new_tabs (画面遷移有)新しいタブでurlリストを開く
-    close (画面遷移有)指定の画面か、現在の画面を閉じる
-    save_image (画面依存)表示されている画像を保存する(Chromeデフォルトダウンロードフォルダに保存)
 
-参考記事
-https://note.nkmk.me/python/
-https://maku77.github.io/python/
-https://nikkie-ftnext.hatenablog.com/entry/value-object-python-dataclass
-https://blog.wotakky.net/2018/08/12/post-4829/
-https://www.zacoding.com/post/selenium-custom-wait/
-https://stackoverflow-com.translate.goog/questions/63421086/modulenotfounderror-no-module-named-webdriver-manager-error-even-after-instal?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja&_x_tr_pto=sc
-参考リファレンス
-https://selenium-python.readthedocs.io/
-https://www.seleniumqref.com/api/webdriver_gyaku.html
-https://www.selenium.dev/ja/documentation/webdriver/getting_started/
-https://kurozumi.github.io/selenium-python/index.html
+- コンストラクタで引数を指定するとスクレイピングまで実施されてget_value_objectが有効になる
+    - fixed_path (staticmethod)フォルダ名の禁止文字を全角文字に置き換える
+    - fixed_file_name (staticmethod)ファイル名の禁止文字を全角文字に置き換える
+    - scraping (staticmethod、画面依存)現在表示のURLにスクレイピングする
+    - scroll_element (画面遷移有)指定のelementまでスクロールする
+    - get_value_object 値オブジェクトを取得する
+    - get_url URLを取得する
+    - get_selectors セレクタを取得する
+    - get_items スクレイピング結果を取得する
+    - destroy Chromeを閉じる
+    - get_source Chromeで表示しているタブのsourceを取得する
+    - save_source Chromeで表示しているタブのsourceをファイルに保存する
+    - back (画面遷移有)ブラウザの戻るボタン押下と同じ動作
+    - forward (画面遷移有)ブラウザの進むボタン押下と同じ動作
+    - next_tab (画面遷移有)openで作ったタブ(__window_handle_list)の内、一つ後のタブを表示する
+    - previous_tab (画面遷移有)openで作ったタブ(__window_handle_list)の内、一つ前のタブを表示する
+    - download_image (画面遷移有)urlの画像を保存する(open_new_tab → save_image → closeする)
+    - open_current_tab (画面依存)現在表示されているタブでurlを開く
+    - open_new_tab (画面遷移有)新しいタブでurlを開く
+    - open_new_tabs (画面遷移有)新しいタブでurlリストを開く
+    - close (画面遷移有)指定の画面か、現在の画面を閉じる
+    - save_image (画面依存)表示されている画像を保存する(Chromeデフォルトダウンロードフォルダに保存)
+- 参考記事
+    - https://note.nkmk.me/python/
+    - https://maku77.github.io/python/
+    - https://nikkie-ftnext.hatenablog.com/entry/value-object-python-dataclass
+    - https://blog.wotakky.net/2018/08/12/post-4829/
+    - https://www.zacoding.com/post/selenium-custom-wait/
+    - https://stackoverflow-com.translate.goog/questions/63421086/modulenotfounderror-no-module-named-webdriver-manager-error-even-after-instal?_x_tr_sl=en&_x_tr_tl=ja&_x_tr_hl=ja&_x_tr_pto=sc
+- 参考リファレンス
+    - https://selenium-python.readthedocs.io/
+    - https://www.seleniumqref.com/api/webdriver_gyaku.html
+    - https://www.selenium.dev/ja/documentation/webdriver/getting_started/
+    - https://kurozumi.github.io/selenium-python/index.html
 
+Todo:
+    - docstringを整える
 """
 import os
 import copy

@@ -1,9 +1,12 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 google Spreadsheetを操作する
 
 参考資料料
+
+Todo:
+    - docstringを整える
 """
 import sys
 import copy

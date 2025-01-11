@@ -1,30 +1,28 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-# Irvineのヘルパー
+"""Irvineのヘルパー
 
-## 説明
+- 説明
+    - Irvineを使ってurlリストのファイルをダウンロードする　https://qiita.com/igapon1/items/4d92950259083ae6ba41
+        - urlリストを渡してIrvineHelperインスタンスを作る。urlリストはIrvineHelperのlist_pathのファイルに保存される
+            - 既にurlリストがファイルになっていれば、そのファイルパスを渡してIrvineHelperインスタンスを作る
+        - downloadメソッドを呼ぶ。list_pathのファイルを引数に、irvineを起動する
+            - あらかじめIrvineの設定を行っておくこと
 
-- Irvineを使ってurlリストのファイルをダウンロードする
-    - urlリストを渡してIrvineHelperインスタンスを作る。urlリストはIrvineHelperのlist_pathのファイルに保存される
-        - 既にurlリストがファイルになっていれば、そのファイルパスを渡してIrvineHelperインスタンスを作る
-    - downloadメソッドを呼ぶ。list_pathのファイルを引数に、irvineを起動する
-        - あらかじめIrvineの設定を行っておくこと
+- list_pathのファイルフォーマット
+    - タブ区切りフォーマット
+        - URL
+        - 保存フォルダ
+        - 別名で保存
+        - 以降不明(17フィールド)
 
-## Irvineの設定
+- Irvineの設定
+    - キューフォルダにフォーカスを当ててIrvineを終了しておく。Irvine起動時にフォーカスの当たっているキューフォルダにurlリストが追加される
+    - ダウンロードが終わったらIrvineを終了する
+        - [オプション設定]-[イベント]-[OnDeactivateQueue]に新規作成で以下のスクリプトを書き込む
+        - [全て終了時にIrvineを終了]をチェックする
 
-- キューフォルダにフォーカスを当ててIrvineを終了しておく。Irvine起動時にフォーカスの当たっているキューフォルダにurlリストが追加される
-- ダウンロードが終わったらIrvineを終了する
-    - [オプション設定]-[イベント]-[OnDeactivateQueue]に新規作成で以下のスクリプトを書き込む
-    - [全て終了時にIrvineを終了]をチェックする
-
-## list_pathのファイルフォーマット
-
-- タブ区切りフォーマット
-    - URL
-    - 保存フォルダ
-    - 別名で保存
-    - 以降不明(17フィールド)
+- Irvineに設定するスクリプト
 
 doneclose.dms:
 ```
@@ -39,14 +37,13 @@ match=
 author=
 synchronize=0
 */
-
 function OnDeactivateQueue(irvine){
 //すべてのダウンロード終了イベント
 irvine.ExecuteAction('actFileClose');
 }
 ```
 
-## 参考
+# 参考
 
 - [Irvine公式](http://hp.vector.co.jp/authors/VA024591/)
 - [Irvineマニュアル](http://hp.vector.co.jp/authors/VA024591/doc/manual.html)
@@ -54,7 +51,6 @@ irvine.ExecuteAction('actFileClose');
 - [Irvineの設定](https://w.atwiki.jp/irvinewiki/pages/32.html)
 - [Irvine Uploader](https://u1.getuploader.com/irvn/)
 - [Irvine Part36スレ](https://mevius.5ch.net/test/read.cgi/win/1545612410)
-
 """
 # standard library
 import sys  # 終了時のエラー有無
@@ -75,16 +71,21 @@ sys.setrecursionlimit(10000)
 
 @dataclass(frozen=True)
 class IrvineHelperValue:
-    """Irvineの値オブジェクトクラス"""
+    """Irvineの値オブジェクトクラス
+
+        Args:
+            exe_path (str): (省略可)Irvine.exeのパス
+            list_path (str): (省略可)Irvineでダウンロードするファイルリストのファイルパス
+        Returns:
+            IrvineHelperValue: インスタンス
+        Raises:
+            ValueError: exe_pathとlist_pathのパスが存在しなければ例外を出す
+    """
     exe_path: str = r'c:\Program1\irvine1_3_0\irvine.exe'.replace(os.sep, '/')
     list_path: str = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                                   '../irvine_download_list.txt').replace(os.sep, '/')
 
     def __init__(self, exe_path=exe_path, list_path=list_path):
-        """完全コンストラクタパターン
-        :param exe_path: str Irvine.exeのパス
-        :param list_path: str Irvineでダウンロードするファイルリストのファイルパス
-        """
         if not exe_path or not os.path.isfile(exe_path):
             raise ValueError(f"{self.__class__.__name__}.{inspect.stack()[1].function}"
                              f"引数エラー:exe_path=[{exe_path}]")
@@ -98,7 +99,19 @@ class IrvineHelperValue:
 
 
 class IrvineHelper:
-    """Irvineのヘルパー"""
+    """Irvineのヘルパー
+
+        Args:
+            value_object (IrvineHelperValue or list): (省略可)IrvineHelperValueは値オブジェクト、listはIrvineでダウンロードするURLリスト
+            download_path (str): (省略可)ダウンロードするフォルダパス
+            download_file_name_list (list): (省略可)保存するファイル名リスト
+            exe_path (str): (省略可)Irvine.exeのパス
+            list_path (str): (省略可)Irvineでダウンロードするファイルリストのファイルパス
+        Returns:
+            value_object
+        Raises:
+            ValueError: value_objectが指定されないか、exe_pathとlist_pathのパスが存在しなければ、例外を出す
+    """
     value_object: IrvineHelperValue or list = None
     download_path: str = None
     download_file_name_list: list = ['']
@@ -113,15 +126,6 @@ class IrvineHelper:
                  exe_path: str = exe_path,
                  list_path: str = list_path,
                  ):
-        """コンストラクタ
-        :param value_object:
-            IrvineHelperValue 値オブジェクト
-            または、list IrvineでダウンロードするURLリスト
-        :param download_path: str ダウンロードするフォルダパス
-        :param download_file_name_list: list 保存するファイル名リスト
-        :param exe_path: str Irvine.exeのパス
-        :param list_path: str IrvineでダウンロードするURLリストが列挙されたファイルへのパス
-        """
         if download_file_name_list is None:
             download_file_name_list = self.download_file_name_list
         if isinstance(value_object, IrvineHelperValue):
@@ -148,9 +152,7 @@ class IrvineHelper:
                              f"引数エラー:value_object=[{self.value_object}]")
 
     def download(self):
-        """
-        irvineを起動して、終了されるのを待つ
-        :return:
+        """irvineを起動して、終了するまで待つ
         """
         cmd = self.value_object.exe_path
         cmd += ' '

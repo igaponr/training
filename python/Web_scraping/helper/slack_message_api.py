@@ -1,3 +1,7 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""slackにメッセージを送る
+"""
 import json
 from dataclasses import dataclass, asdict
 import os
@@ -9,21 +13,21 @@ from slack_sdk.errors import SlackApiError
 
 @dataclass(frozen=True)
 class SlackMessageAPI:
-    """
-    Slack API のトークンを保持し、メッセージ送信機能と、
-    設定情報のJSONファイル保存・ロード機能を提供するクラス。
-    設定情報指定せずにインスタンス作成時は、JSONファイルがあればロードし、
-    JSONファイルがなければエラー表示で終了します。
+    """Slackの設定情報を管理して、メッセージを送信するクラス。
+    access_tokenを指定せず、jsonファイルからaccess_tokenが読み込めない場合はアプリ終了する
+
+    Args:
+        access_token (str): (省略可)Slack API のトークンを指定する。指定しない場合はJSONファイルから読み込む
+        json_path (str): (省略可)設定情報を保存するjsonファイルのパス
+        client (WebClient): (省略可)Slack Clientのインスタンス
+    Returns:
+        SlackMessageAPI: インスタンス
     """
     access_token: str
     json_path: str = (os.path.dirname(__file__) + r"\..\json\slack_message_api_config.json")
     client: WebClient = None
 
     def __post_init__(self):
-        """
-        トークンが指定されていない場合、JSONファイルからロードを試みる。
-        JSONファイルが存在しない場合は、エラーメッセージを表示して終了する。
-        """
         if not self.access_token:
             try:
                 loaded_self = self.load_from_json()
@@ -36,14 +40,13 @@ class SlackMessageAPI:
         object.__setattr__(self, "client", WebClient(token=self.access_token))
 
     def send_message(self, _channel_id: str, _message: str) -> bool:
-        """
-        指定したチャンネルにメッセージを送信する。
+        """Slackにメッセージを送信する
 
         Args:
-            _channel_id: 送信先のチャンネルID。
-            _message: 送信するメッセージ。
+            _channel_id (str): 送信先のチャンネルID
+            _message (str): 送信するメッセージ
         Returns:
-            送信に成功した場合はTrue、失敗した場合はFalseを返す。
+            bool: 送信に成功した場合はTrue、失敗した場合はFalseを返す
         """
 
         try:
@@ -54,8 +57,8 @@ class SlackMessageAPI:
             return False
 
     def save_to_json(self) -> None:
-        """
-        設定情報をJSONファイルに保存する。
+        """設定情報をJSONファイルに保存する。
+        設定情報の保存に失敗した場合は、エラーを表示して処理を継続する
         """
         try:
             with open(self.json_path, 'w', encoding='utf-8') as f:
@@ -65,14 +68,14 @@ class SlackMessageAPI:
 
     @classmethod
     def load_from_json(cls, json_path: Optional[str] = None) -> "SlackMessageAPI":
-        """
-        JSONファイルから設定情報を読み込み、インスタンスを生成する。
+        """JSONファイルから設定情報を読み込み、インスタンスを生成する
 
         Args:
-            json_path: JSONファイルのパス。指定しない場合は、デフォルトのパスを使用する。
-
+            json_path (str): (省略可)JSONファイルのパス。指定しない場合は、デフォルトのパスを使用する
         Returns:
-            SlackMessageAPI インスタンス。
+            SlackMessageAPI: インスタンス
+        Raises:
+            FileNotFoundError: JSONファイルが見つからない、設定情報の保存に失敗した
         """
         path = json_path or cls.json_path
         if os.path.exists(path):
@@ -84,11 +87,16 @@ class SlackMessageAPI:
 
 
 def get_option():
+    """オプションをパースする
+
+    Returns:
+        Namespace: オプションのパース結果
+    """
     arg_parser = ArgumentParser()
     arg_parser.add_argument('-a', '--access_token', type=str, default="",
-                            help='Slack Notifyのアクセストークンを指定する')
+                            help='Slack Appsのアクセストークンを指定する')
     arg_parser.add_argument('-c', '--channel_id', type=str, default="#general",
-                            help='Slack Notifayを送るチャンネルのIDを指定する')
+                            help='メッセージを送るSlackチャンネルのIDを指定する')
     arg_parser.add_argument('-m', '--message', type=str, default="Hello from SlackMessageAPI!",
                             help='送るメッセージを指定する')
     return arg_parser.parse_args()

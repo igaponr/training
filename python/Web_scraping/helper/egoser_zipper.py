@@ -1,5 +1,10 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+"""エゴサzipper
+
+Todo:
+    - docstringを整える
+"""
 import os
 import sys
 import pyperclip  # クリップボード

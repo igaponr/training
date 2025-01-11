@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """uriのヘルパー
 https://pypi.org/project/python-datauri/
@@ -6,6 +6,9 @@ https://github.com/fcurella/python-datauri/tree/py3
 
 参考：
 https://qiita.com/TsubasaSato/items/908d4f5c241091ecbf9b
+
+Todo:
+    - docstringを整える
 """
 import copy
 import sys

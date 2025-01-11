@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 クローリング
@@ -9,6 +9,9 @@
     * zip保存まで終わると、page_urlsからexclusion_urlsにurlを移す
     * セレクタを、image_urlで定義すると、crawling_url_deploymentでスクレイピングして末尾画像URLの展開URLでダウンロードして、zipに保存する
     * セレクタを、image_urlsで定義すると、crawling_urlsでスクレイピングしてダウンロードして、zipに保存する
+
+Todo:
+    - docstringを整える
 """
 import os
 import sys

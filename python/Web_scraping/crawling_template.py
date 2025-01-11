@@ -10,6 +10,9 @@ site_selectors, page_selectors, image_selectorsをサイトに合わせて変更
 > python crawling_template.py -s start=1
 例. 終了ページの指定
 > python crawling_template.py -e end=10
+
+Todo:
+    - docstringを整える
 """
 from selenium.webdriver.common.by import By
 from helper.crawling import *

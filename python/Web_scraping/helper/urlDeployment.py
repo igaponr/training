@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 引数URLのサイトにアクセスして、タイトルと最終画像URLをスクレイピングする。
@@ -10,6 +10,9 @@ irvineが起動してダウンロードが開始されるので、ダウンロ�
 irvineが終了したらダウンロードファイルをチェックする。
 失敗している時は、拡張子を変えて、ファイルに保存して、irvineに渡す。
 成功している時は、リネームしてzipして削除する。
+
+Todo:
+    - docstringを整える
 """
 import sys
 import copy
