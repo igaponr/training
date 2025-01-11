@@ -62,9 +62,8 @@ def time_to_dt(time, tzinfo=None):
 
 def wav_to_subtitles(wav_filepath):
     """音声ファイルから文字起こしして返す(長いと失敗するので1分以下のファイルにする)
-        Todo
-            * wavHelperとかあってもいいかも。
-            * エラーの回避策がわからないので、とりあえず例外処理にした。
+        Todo　wavHelperとかあってもいいかも。エラーの回避策がわからないので、とりあえず例外処理にした。
+
     :param wav_filepath: str 音声ファイルのパス
     :return: str 文字起こし結果
     """

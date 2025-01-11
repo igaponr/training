@@ -14,6 +14,7 @@ ShotValue
     * playlistに追加するshotのodを作って返す create_shot_playlist
     * mltに追加するshotのodを作って返す create_shot_mlt
 MltValue
+    ValueObject
 """
 import datetime
 import glob
@@ -93,8 +94,7 @@ class MltValue:
 @dataclass(frozen=True)
 class ShotValue:
     """shot(動画やテロップなど操作の単位)の値オブジェクト
-
-    Todo: このクラスを継承させて、動画やテロップなどのクラスを、個別に用意したほうがいいか。そんなに頑張るつもりないので困るまで放置
+        Todo このクラスを継承させて、動画やテロップなどのクラスを、個別に用意したほうがいいか。そんなに頑張るつもりないので困るまで放置
     """
     index: int = 0
     contents: str = None
