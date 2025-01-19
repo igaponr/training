@@ -7,11 +7,11 @@ UriHelperクラスは、URI文字列またはUriHelperValueオブジェクトか
 Data URIのMIMEタイプ、データ、ファイル名、拡張子などを取得するメソッドが提供されています。
 
 python-datauriライブラリの説明とGitHub:
-    https://pypi.org/project/python-datauri/
-    https://github.com/fcurella/python-datauri/tree/py3
+    - https://pypi.org/project/python-datauri/
+    - https://github.com/fcurella/python-datauri/tree/py3
 
 参考:
-    https://qiita.com/TsubasaSato/items/908d4f5c241091ecbf9b
+    - https://qiita.com/TsubasaSato/items/908d4f5c241091ecbf9b
 
 Examples:
     >>> uri_helper = UriHelper("https://www.example.com/image.jpg")
