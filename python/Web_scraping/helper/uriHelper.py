@@ -27,8 +27,6 @@ Examples:
     >>> uri_helper.save_data_uri("image.jpg")
 """
 import copy
-import sys
-import inspect
 
 # 3rd party packages
 from urllib.parse import *  # URLパーサー

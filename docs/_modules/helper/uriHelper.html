@@ -72,15 +72,31 @@
   <h1>helper.uriHelper のソースコード</h1><div class="highlight"><pre>
 <span></span><span class="ch">#!/usr/bin/env python3</span>
 <span class="c1"># -*- coding: utf-8 -*-</span>
-<span class="sd">&quot;&quot;&quot;uriのヘルパー</span>
-<span class="sd">https://pypi.org/project/python-datauri/</span>
-<span class="sd">https://github.com/fcurella/python-datauri/tree/py3</span>
+<span class="sd">&quot;&quot;&quot;URIを扱うためのヘルパークラスを提供します。</span>
 
-<span class="sd">参考：</span>
-<span class="sd">https://qiita.com/TsubasaSato/items/908d4f5c241091ecbf9b</span>
+<span class="sd">このモジュールは、URI文字列を検証し、Data URIに関する情報を取得するための機能を提供します。</span>
+<span class="sd">UriHelperクラスは、URI文字列またはUriHelperValueオブジェクトからインスタンス化できます。</span>
+<span class="sd">Data URIのMIMEタイプ、データ、ファイル名、拡張子などを取得するメソッドが提供されています。</span>
 
-<span class="sd">Todo:</span>
-<span class="sd">    - docstringを整える</span>
+<span class="sd">python-datauriライブラリの説明とGitHub:</span>
+<span class="sd">    https://pypi.org/project/python-datauri/</span>
+<span class="sd">    https://github.com/fcurella/python-datauri/tree/py3</span>
+
+<span class="sd">参考:</span>
+<span class="sd">    https://qiita.com/TsubasaSato/items/908d4f5c241091ecbf9b</span>
+
+<span class="sd">Examples:</span>
+<span class="sd">    &gt;&gt;&gt; uri_helper = UriHelper(&quot;https://www.example.com/image.jpg&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; print(uri_helper.get_filename())</span>
+<span class="sd">    image</span>
+<span class="sd">    &gt;&gt;&gt; print(uri_helper.get_ext())</span>
+<span class="sd">    .jpg</span>
+
+<span class="sd">    &gt;&gt;&gt; data_uri = &quot;data:image/jpeg;base64,/9j/4AAQSkZJRgABAQ...&quot;</span>
+<span class="sd">    &gt;&gt;&gt; uri_helper = UriHelper(data_uri)</span>
+<span class="sd">    &gt;&gt;&gt; print(uri_helper.is_jpeg_data_uri())</span>
+<span class="sd">    True</span>
+<span class="sd">    &gt;&gt;&gt; uri_helper.save_data_uri(&quot;image.jpg&quot;)</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">copy</span>
 <span class="kn">import</span> <span class="nn">sys</span>
@@ -89,32 +105,39 @@
 <span class="c1"># 3rd party packages</span>
 <span class="kn">from</span> <span class="nn">urllib.parse</span> <span class="kn">import</span> <span class="o">*</span>  <span class="c1"># URLパーサー</span>
 <span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
-<span class="kn">from</span> <span class="nn">datauri</span> <span class="kn">import</span> <span class="n">DataURI</span>
+<span class="kn">from</span> <span class="nn">datauri</span> <span class="kn">import</span> <span class="n">DataURI</span><span class="p">,</span> <span class="n">InvalidDataURI</span>
 
 
 <div class="viewcode-block" id="UriHelperValue">
 <a class="viewcode-back" href="../../helper.uriHelper.html#helper.uriHelper.UriHelperValue">[ドキュメント]</a>
 <span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="k">class</span> <span class="nc">UriHelperValue</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Uriヘルパー値オブジェクト&quot;&quot;&quot;</span>
-    <span class="n">uri</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;URI文字列を保持する値オブジェクト。</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-                 <span class="n">uri</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">uri</span><span class="p">,</span>
-                 <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;完全コンストラクタパターン&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">uri</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">inspect</span><span class="o">.</span><span class="n">stack</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">function</span><span class="si">}</span><span class="s2">&quot;</span>
-                             <span class="sa">f</span><span class="s2">&quot;引数エラー:uri=None&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_uri_only</span><span class="p">(</span><span class="n">uri</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">inspect</span><span class="o">.</span><span class="n">stack</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">function</span><span class="si">}</span><span class="s2">&quot;</span>
-                             <span class="sa">f</span><span class="s2">&quot;引数エラー:uriがURIではない[</span><span class="si">{</span><span class="n">uri</span><span class="si">}</span><span class="s2">]&quot;</span><span class="p">)</span>
-        <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;uri&quot;</span><span class="p">,</span> <span class="n">uri</span><span class="p">)</span>
+<span class="sd">    Attributes:</span>
+<span class="sd">        uri: URI文字列</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">uri</span><span class="p">:</span> <span class="nb">str</span>
+
+    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;インスタンス作成後のバリデーションを行います。&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">uri</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;uriは必須です。&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_uri_only</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">uri</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;無効なURIです: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">uri</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
 <div class="viewcode-block" id="UriHelperValue.is_uri_only">
 <a class="viewcode-back" href="../../helper.uriHelper.html#helper.uriHelper.UriHelperValue.is_uri_only">[ドキュメント]</a>
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">is_uri_only</span><span class="p">(</span><span class="n">string</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;文字列がURIのみで構成されているかどうかを判定します。</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            string: 判定対象の文字列</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            URIのみで構成されている場合はTrue、そうでない場合はFalse</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">urlparse</span><span class="p">(</span><span class="n">string</span><span class="p">)</span><span class="o">.</span><span class="n">scheme</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span></div>
 </div>
 
@@ -123,151 +146,209 @@
 <div class="viewcode-block" id="UriHelper">
 <a class="viewcode-back" href="../../helper.uriHelper.html#helper.uriHelper.UriHelper">[ドキュメント]</a>
 <span class="k">class</span> <span class="nc">UriHelper</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Uriのヘルパー&quot;&quot;&quot;</span>
-    <span class="n">value_object</span><span class="p">:</span> <span class="n">UriHelperValue</span> <span class="ow">or</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;URIを扱うためのヘルパークラス。&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value_object</span><span class="p">:</span> <span class="n">UriHelperValue</span> <span class="o">|</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;UriHelperオブジェクトを初期化します。</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-                 <span class="n">value_object</span><span class="p">:</span> <span class="n">UriHelperValue</span> <span class="ow">or</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">value_object</span><span class="p">,</span>
-                 <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;値オブジェクトからの復元、</span>
-<span class="sd">        または、uriより、値オブジェクトを作成する</span>
-<span class="sd">        :param value_object: list 対象となるURI、または、値オブジェクト</span>
+<span class="sd">        Args:</span>
+<span class="sd">            value_object: URI文字列またはUriHelperValueオブジェクト。</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: value_objectが無効な値の場合。</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">value_object</span><span class="p">:</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value_object</span><span class="p">,</span> <span class="n">UriHelperValue</span><span class="p">):</span>
-                <span class="n">value_object</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">value_object</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">value_object</span> <span class="o">=</span> <span class="n">value_object</span>
-            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value_object</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-                <span class="n">uri</span> <span class="o">=</span> <span class="n">value_object</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">value_object</span> <span class="o">=</span> <span class="n">UriHelperValue</span><span class="p">(</span><span class="n">uri</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">inspect</span><span class="o">.</span><span class="n">stack</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">function</span><span class="si">}</span><span class="s2">&quot;</span>
-                                 <span class="sa">f</span><span class="s2">&quot;引数エラー:value_objectの型&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value_object</span><span class="p">,</span> <span class="n">UriHelperValue</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">value_object</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">value_object</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value_object</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">value_object</span> <span class="o">=</span> <span class="n">UriHelperValue</span><span class="p">(</span><span class="n">value_object</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">inspect</span><span class="o">.</span><span class="n">stack</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">function</span><span class="si">}</span><span class="s2">&quot;</span>
-                             <span class="sa">f</span><span class="s2">&quot;引数エラー:value_object=None&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;value_objectはUriHelperValueまたはstrでなければなりません: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">value_object</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
 <div class="viewcode-block" id="UriHelper.is_data_uri">
 <a class="viewcode-back" href="../../helper.uriHelper.html#helper.uriHelper.UriHelper.is_data_uri">[ドキュメント]</a>
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">is_data_uri</span><span class="p">(</span><span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Data URIのjpeg画像かつbase64であればTrue</span>
-<span class="sd">        :return: bool</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;指定されたURLがData URIかどうかを判定します。</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            url: 判定対象のURL。</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Data URIの場合はTrue、そうでない場合はFalse。</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">urlparse</span><span class="p">(</span><span class="n">url</span><span class="p">)</span><span class="o">.</span><span class="n">scheme</span> <span class="o">==</span> <span class="s1">&#39;data&#39;</span><span class="p">:</span>
-            <span class="n">uri</span> <span class="o">=</span> <span class="n">DataURI</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">uri</span><span class="o">.</span><span class="n">mimetype</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="k">return</span> <span class="kc">True</span>
-        <span class="k">return</span> <span class="kc">False</span></div>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">DataURI</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">except</span> <span class="n">InvalidDataURI</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
 
 
 <div class="viewcode-block" id="UriHelper.is_jpeg_data_uri">
 <a class="viewcode-back" href="../../helper.uriHelper.html#helper.uriHelper.UriHelper.is_jpeg_data_uri">[ドキュメント]</a>
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">is_jpeg_data_uri</span><span class="p">(</span><span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Data URIのjpeg画像かつbase64であればTrue</span>
-<span class="sd">        :return: bool</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;指定されたURLがJPEG形式のData URIかどうかを判定します。</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            url: 判定対象のURL。</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            JPEG形式のData URIの場合はTrue、そうでない場合はFalse。</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">urlparse</span><span class="p">(</span><span class="n">url</span><span class="p">)</span><span class="o">.</span><span class="n">scheme</span> <span class="o">==</span> <span class="s1">&#39;data&#39;</span><span class="p">:</span>
-            <span class="n">uri</span> <span class="o">=</span> <span class="n">DataURI</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">uri</span><span class="o">.</span><span class="n">mimetype</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;image/jpeg&#39;</span><span class="p">]:</span>
-                <span class="k">if</span> <span class="n">uri</span><span class="o">.</span><span class="n">is_base64</span><span class="p">:</span>
-                    <span class="k">return</span> <span class="kc">True</span>
-        <span class="k">return</span> <span class="kc">False</span></div>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">urlparse</span><span class="p">(</span><span class="n">url</span><span class="p">)</span><span class="o">.</span><span class="n">scheme</span> <span class="o">==</span> <span class="s1">&#39;data&#39;</span> <span class="ow">and</span> <span class="n">DataURI</span><span class="p">(</span><span class="n">url</span><span class="p">)</span><span class="o">.</span><span class="n">mimetype</span> <span class="o">==</span> <span class="s1">&#39;image/jpeg&#39;</span> <span class="ow">and</span> <span class="n">DataURI</span><span class="p">(</span><span class="n">url</span><span class="p">)</span><span class="o">.</span><span class="n">is_base64</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
 
 
 <div class="viewcode-block" id="UriHelper.is_png_data_uri">
 <a class="viewcode-back" href="../../helper.uriHelper.html#helper.uriHelper.UriHelper.is_png_data_uri">[ドキュメント]</a>
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">is_png_data_uri</span><span class="p">(</span><span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Data URIのpng画像かつbase64であればTrue</span>
-<span class="sd">        :return: bool</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;指定されたURLがPNG形式のData URIかどうかを判定します。</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            url: 判定対象のURL。</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            PNG形式のData URIの場合はTrue、そうでない場合はFalse。</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">urlparse</span><span class="p">(</span><span class="n">url</span><span class="p">)</span><span class="o">.</span><span class="n">scheme</span> <span class="o">==</span> <span class="s1">&#39;data&#39;</span><span class="p">:</span>
-            <span class="n">uri</span> <span class="o">=</span> <span class="n">DataURI</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">uri</span><span class="o">.</span><span class="n">mimetype</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;image/png&#39;</span><span class="p">]:</span>
-                <span class="k">if</span> <span class="n">uri</span><span class="o">.</span><span class="n">is_base64</span><span class="p">:</span>
-                    <span class="k">return</span> <span class="kc">True</span>
-        <span class="k">return</span> <span class="kc">False</span></div>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">urlparse</span><span class="p">(</span><span class="n">url</span><span class="p">)</span><span class="o">.</span><span class="n">scheme</span> <span class="o">==</span> <span class="s1">&#39;data&#39;</span> <span class="ow">and</span> <span class="n">DataURI</span><span class="p">(</span><span class="n">url</span><span class="p">)</span><span class="o">.</span><span class="n">mimetype</span> <span class="o">==</span> <span class="s1">&#39;image/png&#39;</span> <span class="ow">and</span> <span class="n">DataURI</span><span class="p">(</span><span class="n">url</span><span class="p">)</span><span class="o">.</span><span class="n">is_base64</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
 
 
 <div class="viewcode-block" id="UriHelper.get_uri">
 <a class="viewcode-back" href="../../helper.uriHelper.html#helper.uriHelper.UriHelper.get_uri">[ドキュメント]</a>
-    <span class="k">def</span> <span class="nf">get_uri</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;URIを得る</span>
-<span class="sd">        :return: str URI</span>
+    <span class="k">def</span> <span class="nf">get_uri</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;URIを取得します。</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            URI文字列。</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value_object</span><span class="o">.</span><span class="n">uri</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="UriHelper.get_data_uri">
 <a class="viewcode-back" href="../../helper.uriHelper.html#helper.uriHelper.UriHelper.get_data_uri">[ドキュメント]</a>
-    <span class="k">def</span> <span class="nf">get_data_uri</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">get_data_uri</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataURI</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;DataURIオブジェクトを取得します。</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            DataURIオブジェクト。</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">DataURI</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_uri</span><span class="p">())</span></div>
 
 
 <div class="viewcode-block" id="UriHelper.get_data">
 <a class="viewcode-back" href="../../helper.uriHelper.html#helper.uriHelper.UriHelper.get_data">[ドキュメント]</a>
-    <span class="k">def</span> <span class="nf">get_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">uri</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_data_uri</span><span class="p">()</span>
-        <span class="k">return</span> <span class="n">uri</span><span class="o">.</span><span class="n">data</span></div>
+    <span class="k">def</span> <span class="nf">get_data</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Data URIのデータを取得します。</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Data URIのデータ（バイト列）。</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_data_uri</span><span class="p">()</span><span class="o">.</span><span class="n">data</span></div>
 
 
 <div class="viewcode-block" id="UriHelper.save_data_uri">
 <a class="viewcode-back" href="../../helper.uriHelper.html#helper.uriHelper.UriHelper.save_data_uri">[ドキュメント]</a>
-    <span class="k">def</span> <span class="nf">save_data_uri</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target_file</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">save_data_uri</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Data URIのデータをファイルに保存します。</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            target_file: 保存先のファイルパス。</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">target_file</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">image_file</span><span class="p">:</span>
             <span class="n">image_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_data</span><span class="p">())</span></div>
 
 
 <div class="viewcode-block" id="UriHelper.is_enable_filename">
 <a class="viewcode-back" href="../../helper.uriHelper.html#helper.uriHelper.UriHelper.is_enable_filename">[ドキュメント]</a>
-    <span class="k">def</span> <span class="nf">is_enable_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;ファイル名が使用可能ならTrue</span>
-<span class="sd">        TODO: 改良の余地あり</span>
-<span class="sd">        :return:</span>
+    <span class="k">def</span> <span class="nf">is_enable_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;ファイル名を取得できるかどうかを判定します。</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            ファイル名を取得できる場合はTrue、そうでない場合はFalse。</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_data_uri</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_uri</span><span class="p">()):</span>
-            <span class="k">return</span> <span class="kc">False</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_filename</span><span class="p">():</span>
-            <span class="k">return</span> <span class="kc">False</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_ext</span><span class="p">():</span>
-            <span class="k">return</span> <span class="kc">False</span>
-        <span class="k">return</span> <span class="kc">True</span></div>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_data_uri</span><span class="p">()</span><span class="o">.</span><span class="n">name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">parsed_url</span> <span class="o">=</span> <span class="n">urlparse</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_uri</span><span class="p">())</span>
+            <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="n">parsed_url</span><span class="o">.</span><span class="n">path</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">parsed_url</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="UriHelper.get_filename">
 <a class="viewcode-back" href="../../helper.uriHelper.html#helper.uriHelper.UriHelper.get_filename">[ドキュメント]</a>
-    <span class="k">def</span> <span class="nf">get_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;ファイル名を得る</span>
-<span class="sd">        :return: str ファイル名(拡張子除く)</span>
+    <span class="k">def</span> <span class="nf">get_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;ファイル名を取得します。</span>
+
+<span class="sd">        拡張子は含まれません。Data URIの場合は、filenameパラメータから取得します。</span>
+<span class="sd">        ファイル名が存在しない場合はNoneを返します。</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            ファイル名（拡張子なし）。</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_jpeg_data_uri</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_uri</span><span class="p">()):</span>
-            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_data_uri</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_uri</span><span class="p">()):</span>
+            <span class="n">uri</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_uri</span><span class="p">()</span>
+            <span class="c1"># filenameパラメータが存在する場合</span>
+            <span class="k">if</span> <span class="s1">&#39;filename=&#39;</span> <span class="ow">in</span> <span class="n">uri</span><span class="p">:</span>
+                <span class="n">filename</span> <span class="o">=</span> <span class="n">uri</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;filename=&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="c1"># 最初の ; か , までをファイル名として抽出</span>
+                <span class="k">if</span> <span class="s1">&#39;;&#39;</span> <span class="ow">in</span> <span class="n">filename</span><span class="p">:</span>
+                    <span class="n">filename</span> <span class="o">=</span> <span class="n">filename</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;;&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="k">if</span> <span class="s1">&#39;,&#39;</span> <span class="ow">in</span> <span class="n">filename</span> <span class="p">:</span>
+                    <span class="n">filename</span> <span class="o">=</span> <span class="n">filename</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="k">return</span> <span class="n">filename</span>
+            <span class="k">else</span><span class="p">:</span>
+              <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_data_uri</span><span class="p">()</span><span class="o">.</span><span class="n">name</span> <span class="c1">#filenameがない場合は、従来のロジックを使用</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="c1"># TODO: URIにファイル名ない時もある</span>
-            <span class="n">__parse</span> <span class="o">=</span> <span class="n">urlparse</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_uri</span><span class="p">())</span>
-            <span class="n">__path_after_name</span> <span class="o">=</span> <span class="n">__parse</span><span class="o">.</span><span class="n">path</span><span class="p">[</span><span class="n">__parse</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">rfind</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:]</span>
-            <span class="n">__base_name</span> <span class="o">=</span> <span class="n">__path_after_name</span><span class="p">[:</span><span class="n">__path_after_name</span><span class="o">.</span><span class="n">rfind</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)]</span>
-            <span class="k">return</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">__base_name</span><span class="p">)</span></div>
+            <span class="n">parsed_url</span> <span class="o">=</span> <span class="n">urlparse</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_uri</span><span class="p">())</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="n">parsed_url</span><span class="o">.</span><span class="n">path</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span> <span class="ow">or</span> <span class="n">path</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">):</span>
+                <span class="k">return</span> <span class="kc">None</span>
+            <span class="n">filename</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">if</span> <span class="s1">&#39;=&#39;</span> <span class="ow">in</span> <span class="n">filename</span><span class="p">:</span>
+                <span class="n">filename</span> <span class="o">=</span> <span class="n">filename</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;=&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span> <span class="c1">#修正</span>
+            <span class="k">if</span> <span class="s1">&#39;;&#39;</span> <span class="ow">in</span> <span class="n">filename</span><span class="p">:</span>
+                <span class="n">filename</span> <span class="o">=</span> <span class="n">filename</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;;&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="c1">#修正</span>
+            <span class="k">if</span> <span class="s2">&quot;.&quot;</span> <span class="ow">in</span> <span class="n">filename</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">filename</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">filename</span></div>
 
 
 <div class="viewcode-block" id="UriHelper.get_ext">
 <a class="viewcode-back" href="../../helper.uriHelper.html#helper.uriHelper.UriHelper.get_ext">[ドキュメント]</a>
-    <span class="k">def</span> <span class="nf">get_ext</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;拡張子を得る</span>
-<span class="sd">        :return: str ファイルの拡張子(ドットを含む)</span>
+    <span class="k">def</span> <span class="nf">get_ext</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;拡張子を取得します。</span>
+
+<span class="sd">        ドット(.)を含みます。Data URIの場合は、DataURIオブジェクトのextension属性を参照します。</span>
+<span class="sd">          拡張子が存在しない場合はNoneを返します。</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">           拡張子（ドットを含む）</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_jpeg_data_uri</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_uri</span><span class="p">()):</span>
-            <span class="k">return</span> <span class="s1">&#39;.jpg&#39;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_png_data_uri</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_uri</span><span class="p">()):</span>
-            <span class="k">return</span> <span class="s1">&#39;.png&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_data_uri</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_uri</span><span class="p">()):</span>
+            <span class="n">data_uri</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_data_uri</span><span class="p">()</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">data_uri</span><span class="o">.</span><span class="n">extension</span>
+            <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span> <span class="c1"># extension属性がない場合の処理</span>
+                <span class="n">mimetype</span> <span class="o">=</span> <span class="n">data_uri</span><span class="o">.</span><span class="n">mimetype</span>
+                <span class="k">if</span> <span class="n">mimetype</span> <span class="o">==</span> <span class="s2">&quot;image/jpeg&quot;</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="s2">&quot;.jpg&quot;</span>
+                <span class="k">elif</span> <span class="n">mimetype</span> <span class="o">==</span> <span class="s2">&quot;image/png&quot;</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="s2">&quot;.png&quot;</span>
+                <span class="c1"># 他のmimetypeにも対応する場合、ここに追加する</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="kc">None</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="c1"># TODO: URIに拡張子ない時もある</span>
-            <span class="n">__parse</span> <span class="o">=</span> <span class="n">urlparse</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_uri</span><span class="p">())</span>
-            <span class="n">__path_after_name</span> <span class="o">=</span> <span class="n">__parse</span><span class="o">.</span><span class="n">path</span><span class="p">[</span><span class="n">__parse</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">rfind</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:]</span>
-            <span class="n">__extend_name</span> <span class="o">=</span> <span class="n">__path_after_name</span><span class="p">[</span><span class="n">__path_after_name</span><span class="o">.</span><span class="n">rfind</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">):]</span>
-            <span class="k">return</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">__extend_name</span><span class="p">)</span></div>
+            <span class="n">parsed_url</span> <span class="o">=</span> <span class="n">urlparse</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_uri</span><span class="p">())</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="n">parsed_url</span><span class="o">.</span><span class="n">path</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span> <span class="ow">or</span> <span class="n">path</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;.&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">path</span> <span class="p">:</span>
+                <span class="k">return</span> <span class="kc">None</span>
+            <span class="k">else</span><span class="p">:</span>
+              <span class="k">return</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="n">path</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span></div>
 </div>
 
 </pre></div>

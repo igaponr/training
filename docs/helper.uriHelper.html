@@ -98,107 +98,197 @@
              
   <section id="module-helper.uriHelper">
 <span id="helper-urihelper-module"></span><h1>helper.uriHelper module<a class="headerlink" href="#module-helper.uriHelper" title="Link to this heading"></a></h1>
-<p>uriのヘルパー
-<a class="reference external" href="https://pypi.org/project/python-datauri/">https://pypi.org/project/python-datauri/</a>
+<p>URIを扱うためのヘルパークラスを提供します。</p>
+<p>このモジュールは、URI文字列を検証し、Data URIに関する情報を取得するための機能を提供します。
+UriHelperクラスは、URI文字列またはUriHelperValueオブジェクトからインスタンス化できます。
+Data URIのMIMEタイプ、データ、ファイル名、拡張子などを取得するメソッドが提供されています。</p>
+<dl class="simple">
+<dt>python-datauriライブラリの説明とGitHub:</dt><dd><p><a class="reference external" href="https://pypi.org/project/python-datauri/">https://pypi.org/project/python-datauri/</a>
 <a class="reference external" href="https://github.com/fcurella/python-datauri/tree/py3">https://github.com/fcurella/python-datauri/tree/py3</a></p>
-<p>参考：
-<a class="reference external" href="https://qiita.com/TsubasaSato/items/908d4f5c241091ecbf9b">https://qiita.com/TsubasaSato/items/908d4f5c241091ecbf9b</a></p>
-<div class="admonition-todo admonition" id="id1">
-<p class="admonition-title">課題</p>
-<ul class="simple">
-<li><p>docstringを整える</p></li>
-</ul>
+</dd>
+<dt>参考:</dt><dd><p><a class="reference external" href="https://qiita.com/TsubasaSato/items/908d4f5c241091ecbf9b">https://qiita.com/TsubasaSato/items/908d4f5c241091ecbf9b</a></p>
+</dd>
+</dl>
+<p class="rubric">サンプル</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">uri_helper</span> <span class="o">=</span> <span class="n">UriHelper</span><span class="p">(</span><span class="s2">&quot;https://www.example.com/image.jpg&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">uri_helper</span><span class="o">.</span><span class="n">get_filename</span><span class="p">())</span>
+<span class="go">image</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">uri_helper</span><span class="o">.</span><span class="n">get_ext</span><span class="p">())</span>
+<span class="go">.jpg</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">data_uri</span> <span class="o">=</span> <span class="s2">&quot;data:image/jpeg;base64,/9j/4AAQSkZJRgABAQ...&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">uri_helper</span> <span class="o">=</span> <span class="n">UriHelper</span><span class="p">(</span><span class="n">data_uri</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">uri_helper</span><span class="o">.</span><span class="n">is_jpeg_data_uri</span><span class="p">())</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">uri_helper</span><span class="o">.</span><span class="n">save_data_uri</span><span class="p">(</span><span class="s2">&quot;image.jpg&quot;</span><span class="p">)</span>
+</pre></div>
 </div>
 <dl class="py class">
 <dt class="sig sig-object py" id="helper.uriHelper.UriHelper">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">helper.uriHelper.</span></span><span class="sig-name descname"><span class="pre">UriHelper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value_object</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#helper.uriHelper.UriHelperValue" title="helper.uriHelper.UriHelperValue"><span class="pre">UriHelperValue</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/uriHelper.html#UriHelper"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.uriHelper.UriHelper" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">helper.uriHelper.</span></span><span class="sig-name descname"><span class="pre">UriHelper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value_object</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#helper.uriHelper.UriHelperValue" title="helper.uriHelper.UriHelperValue"><span class="pre">UriHelperValue</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/uriHelper.html#UriHelper"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.uriHelper.UriHelper" title="Link to this definition"></a></dt>
 <dd><p>ベースクラス: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Uriのヘルパー</p>
+<p>URIを扱うためのヘルパークラス。</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="helper.uriHelper.UriHelper.get_data">
-<span class="sig-name descname"><span class="pre">get_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/uriHelper.html#UriHelper.get_data"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.uriHelper.UriHelper.get_data" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">get_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bytes</span></span></span><a class="reference internal" href="_modules/helper/uriHelper.html#UriHelper.get_data"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.uriHelper.UriHelper.get_data" title="Link to this definition"></a></dt>
+<dd><p>Data URIのデータを取得します。</p>
+<dl class="field-list simple">
+<dt class="field-odd">戻り値<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Data URIのデータ（バイト列）。</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="helper.uriHelper.UriHelper.get_data_uri">
-<span class="sig-name descname"><span class="pre">get_data_uri</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/uriHelper.html#UriHelper.get_data_uri"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.uriHelper.UriHelper.get_data_uri" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">get_data_uri</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataURI</span></span></span><a class="reference internal" href="_modules/helper/uriHelper.html#UriHelper.get_data_uri"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.uriHelper.UriHelper.get_data_uri" title="Link to this definition"></a></dt>
+<dd><p>DataURIオブジェクトを取得します。</p>
+<dl class="field-list simple">
+<dt class="field-odd">戻り値<span class="colon">:</span></dt>
+<dd class="field-odd"><p>DataURIオブジェクト。</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="helper.uriHelper.UriHelper.get_ext">
-<span class="sig-name descname"><span class="pre">get_ext</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/uriHelper.html#UriHelper.get_ext"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.uriHelper.UriHelper.get_ext" title="Link to this definition"></a></dt>
-<dd><p>拡張子を得る
-:return: str ファイルの拡張子(ドットを含む)</p>
+<span class="sig-name descname"><span class="pre">get_ext</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference internal" href="_modules/helper/uriHelper.html#UriHelper.get_ext"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.uriHelper.UriHelper.get_ext" title="Link to this definition"></a></dt>
+<dd><p>拡張子を取得します。</p>
+<dl class="simple">
+<dt>ドット(.)を含みます。Data URIの場合は、DataURIオブジェクトのextension属性を参照します。</dt><dd><p>拡張子が存在しない場合はNoneを返します。</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">戻り値<span class="colon">:</span></dt>
+<dd class="field-odd"><p>拡張子（ドットを含む）</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="helper.uriHelper.UriHelper.get_filename">
-<span class="sig-name descname"><span class="pre">get_filename</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/uriHelper.html#UriHelper.get_filename"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.uriHelper.UriHelper.get_filename" title="Link to this definition"></a></dt>
-<dd><p>ファイル名を得る
-:return: str ファイル名(拡張子除く)</p>
+<span class="sig-name descname"><span class="pre">get_filename</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference internal" href="_modules/helper/uriHelper.html#UriHelper.get_filename"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.uriHelper.UriHelper.get_filename" title="Link to this definition"></a></dt>
+<dd><p>ファイル名を取得します。</p>
+<p>拡張子は含まれません。Data URIの場合は、filenameパラメータから取得します。
+ファイル名が存在しない場合はNoneを返します。</p>
+<dl class="field-list simple">
+<dt class="field-odd">戻り値<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ファイル名（拡張子なし）。</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="helper.uriHelper.UriHelper.get_uri">
-<span class="sig-name descname"><span class="pre">get_uri</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/uriHelper.html#UriHelper.get_uri"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.uriHelper.UriHelper.get_uri" title="Link to this definition"></a></dt>
-<dd><p>URIを得る
-:return: str URI</p>
+<span class="sig-name descname"><span class="pre">get_uri</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/helper/uriHelper.html#UriHelper.get_uri"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.uriHelper.UriHelper.get_uri" title="Link to this definition"></a></dt>
+<dd><p>URIを取得します。</p>
+<dl class="field-list simple">
+<dt class="field-odd">戻り値<span class="colon">:</span></dt>
+<dd class="field-odd"><p>URI文字列。</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="helper.uriHelper.UriHelper.is_data_uri">
 <em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_data_uri</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="_modules/helper/uriHelper.html#UriHelper.is_data_uri"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.uriHelper.UriHelper.is_data_uri" title="Link to this definition"></a></dt>
-<dd><p>Data URIのjpeg画像かつbase64であればTrue
-:return: bool</p>
+<dd><p>指定されたURLがData URIかどうかを判定します。</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>url</strong> -- 判定対象のURL。</p>
+</dd>
+<dt class="field-even">戻り値<span class="colon">:</span></dt>
+<dd class="field-even"><p>Data URIの場合はTrue、そうでない場合はFalse。</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="helper.uriHelper.UriHelper.is_enable_filename">
-<span class="sig-name descname"><span class="pre">is_enable_filename</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/uriHelper.html#UriHelper.is_enable_filename"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.uriHelper.UriHelper.is_enable_filename" title="Link to this definition"></a></dt>
-<dd><p>ファイル名が使用可能ならTrue
-TODO: 改良の余地あり
-:return:</p>
+<span class="sig-name descname"><span class="pre">is_enable_filename</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="_modules/helper/uriHelper.html#UriHelper.is_enable_filename"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.uriHelper.UriHelper.is_enable_filename" title="Link to this definition"></a></dt>
+<dd><p>ファイル名を取得できるかどうかを判定します。</p>
+<dl class="field-list simple">
+<dt class="field-odd">戻り値<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ファイル名を取得できる場合はTrue、そうでない場合はFalse。</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="helper.uriHelper.UriHelper.is_jpeg_data_uri">
 <em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_jpeg_data_uri</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="_modules/helper/uriHelper.html#UriHelper.is_jpeg_data_uri"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.uriHelper.UriHelper.is_jpeg_data_uri" title="Link to this definition"></a></dt>
-<dd><p>Data URIのjpeg画像かつbase64であればTrue
-:return: bool</p>
+<dd><p>指定されたURLがJPEG形式のData URIかどうかを判定します。</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>url</strong> -- 判定対象のURL。</p>
+</dd>
+<dt class="field-even">戻り値<span class="colon">:</span></dt>
+<dd class="field-even"><p>JPEG形式のData URIの場合はTrue、そうでない場合はFalse。</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="helper.uriHelper.UriHelper.is_png_data_uri">
 <em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_png_data_uri</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="_modules/helper/uriHelper.html#UriHelper.is_png_data_uri"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.uriHelper.UriHelper.is_png_data_uri" title="Link to this definition"></a></dt>
-<dd><p>Data URIのpng画像かつbase64であればTrue
-:return: bool</p>
+<dd><p>指定されたURLがPNG形式のData URIかどうかを判定します。</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>url</strong> -- 判定対象のURL。</p>
+</dd>
+<dt class="field-even">戻り値<span class="colon">:</span></dt>
+<dd class="field-even"><p>PNG形式のData URIの場合はTrue、そうでない場合はFalse。</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="helper.uriHelper.UriHelper.save_data_uri">
-<span class="sig-name descname"><span class="pre">save_data_uri</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target_file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/uriHelper.html#UriHelper.save_data_uri"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.uriHelper.UriHelper.save_data_uri" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="helper.uriHelper.UriHelper.value_object">
-<span class="sig-name descname"><span class="pre">value_object</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#helper.uriHelper.UriHelperValue" title="helper.uriHelper.UriHelperValue"><span class="pre">UriHelperValue</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#helper.uriHelper.UriHelper.value_object" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">save_data_uri</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/uriHelper.html#UriHelper.save_data_uri"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.uriHelper.UriHelper.save_data_uri" title="Link to this definition"></a></dt>
+<dd><p>Data URIのデータをファイルに保存します。</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>target_file</strong> -- 保存先のファイルパス。</p>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="helper.uriHelper.UriHelperValue">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">helper.uriHelper.</span></span><span class="sig-name descname"><span class="pre">UriHelperValue</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">uri</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/uriHelper.html#UriHelperValue"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.uriHelper.UriHelperValue" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">helper.uriHelper.</span></span><span class="sig-name descname"><span class="pre">UriHelperValue</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">uri</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/uriHelper.html#UriHelperValue"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.uriHelper.UriHelperValue" title="Link to this definition"></a></dt>
 <dd><p>ベースクラス: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Uriヘルパー値オブジェクト</p>
+<p>URI文字列を保持する値オブジェクト。</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="helper.uriHelper.UriHelperValue.uri">
+<span class="sig-name descname"><span class="pre">uri</span></span><a class="headerlink" href="#helper.uriHelper.UriHelperValue.uri" title="Link to this definition"></a></dt>
+<dd><p>URI文字列</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="helper.uriHelper.UriHelperValue.is_uri_only">
 <em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_uri_only</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="_modules/helper/uriHelper.html#UriHelperValue.is_uri_only"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.uriHelper.UriHelperValue.is_uri_only" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>文字列がURIのみで構成されているかどうかを判定します。</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>string</strong> -- 判定対象の文字列</p>
+</dd>
+<dt class="field-even">戻り値<span class="colon">:</span></dt>
+<dd class="field-even"><p>URIのみで構成されている場合はTrue、そうでない場合はFalse</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="helper.uriHelper.UriHelperValue.uri">
-<span class="sig-name descname"><span class="pre">uri</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#helper.uriHelper.UriHelperValue.uri" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="id0">
+<span class="sig-name descname"><span class="pre">uri</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#id0" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
