@@ -1,14 +1,30 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""uriのヘルパー
-https://pypi.org/project/python-datauri/
-https://github.com/fcurella/python-datauri/tree/py3
+"""URIを扱うためのヘルパークラスを提供します。
 
-参考：
-https://qiita.com/TsubasaSato/items/908d4f5c241091ecbf9b
+このモジュールは、URI文字列を検証し、Data URIに関する情報を取得するための機能を提供します。
+UriHelperクラスは、URI文字列またはUriHelperValueオブジェクトからインスタンス化できます。
+Data URIのMIMEタイプ、データ、ファイル名、拡張子などを取得するメソッドが提供されています。
 
-Todo:
-    - docstringを整える
+python-datauriライブラリの説明とGitHub:
+    https://pypi.org/project/python-datauri/
+    https://github.com/fcurella/python-datauri/tree/py3
+
+参考:
+    https://qiita.com/TsubasaSato/items/908d4f5c241091ecbf9b
+
+Examples:
+    >>> uri_helper = UriHelper("https://www.example.com/image.jpg")
+    >>> print(uri_helper.get_filename())
+    image
+    >>> print(uri_helper.get_ext())
+    .jpg
+
+    >>> data_uri = "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQ..."
+    >>> uri_helper = UriHelper(data_uri)
+    >>> print(uri_helper.is_jpeg_data_uri())
+    True
+    >>> uri_helper.save_data_uri("image.jpg")
 """
 import copy
 import sys
@@ -17,145 +33,210 @@ import inspect
 # 3rd party packages
 from urllib.parse import *  # URLパーサー
 from dataclasses import dataclass
-from datauri import DataURI
+from datauri import DataURI, InvalidDataURI
 
 
 @dataclass(frozen=True)
 class UriHelperValue:
-    """Uriヘルパー値オブジェクト"""
-    uri: str = None
+    """URI文字列を保持する値オブジェクト。
 
-    def __init__(self,
-                 uri: str = uri,
-                 ):
-        """完全コンストラクタパターン"""
-        if not uri:
-            raise ValueError(f"{self.__class__.__name__}.{inspect.stack()[1].function}"
-                             f"引数エラー:uri=None")
-        if not self.is_uri_only(uri):
-            raise ValueError(f"{self.__class__.__name__}.{inspect.stack()[1].function}"
-                             f"引数エラー:uriがURIではない[{uri}]")
-        object.__setattr__(self, "uri", uri)
+    Attributes:
+        uri: URI文字列
+    """
+    uri: str
+
+    def __post_init__(self):
+        """インスタンス作成後のバリデーションを行います。"""
+        if not self.uri:
+            raise ValueError("uriは必須です。")
+        if not self.is_uri_only(self.uri):
+            raise ValueError(f"無効なURIです: {self.uri}")
 
     @staticmethod
     def is_uri_only(string: str) -> bool:
+        """文字列がURIのみで構成されているかどうかを判定します。
+
+        Args:
+            string: 判定対象の文字列
+
+        Returns:
+            URIのみで構成されている場合はTrue、そうでない場合はFalse
+        """
         return len(urlparse(string).scheme) > 0
 
 
 class UriHelper:
-    """Uriのヘルパー"""
-    value_object: UriHelperValue or str = None
+    """URIを扱うためのヘルパークラス。"""
+    def __init__(self, value_object: UriHelperValue | str):
+        """UriHelperオブジェクトを初期化します。
 
-    def __init__(self,
-                 value_object: UriHelperValue or str = value_object,
-                 ):
-        """値オブジェクトからの復元、
-        または、uriより、値オブジェクトを作成する
-        :param value_object: list 対象となるURI、または、値オブジェクト
+        Args:
+            value_object: URI文字列またはUriHelperValueオブジェクト。
+
+        Raises:
+            ValueError: value_objectが無効な値の場合。
         """
-        if value_object:
-            if isinstance(value_object, UriHelperValue):
-                value_object = copy.deepcopy(value_object)
-                self.value_object = value_object
-            elif isinstance(value_object, str):
-                uri = value_object
-                self.value_object = UriHelperValue(uri)
-            else:
-                raise ValueError(f"{self.__class__.__name__}.{inspect.stack()[1].function}"
-                                 f"引数エラー:value_objectの型")
+        if isinstance(value_object, UriHelperValue):
+            self.value_object = copy.deepcopy(value_object)
+        elif isinstance(value_object, str):
+            self.value_object = UriHelperValue(value_object)
         else:
-            raise ValueError(f"{self.__class__.__name__}.{inspect.stack()[1].function}"
-                             f"引数エラー:value_object=None")
+            raise ValueError(f"value_objectはUriHelperValueまたはstrでなければなりません: {type(value_object)}")
 
     @staticmethod
     def is_data_uri(url: str) -> bool:
-        """Data URIのjpeg画像かつbase64であればTrue
-        :return: bool
+        """指定されたURLがData URIかどうかを判定します。
+
+        Args:
+            url: 判定対象のURL。
+
+        Returns:
+            Data URIの場合はTrue、そうでない場合はFalse。
         """
-        if urlparse(url).scheme == 'data':
-            uri = DataURI(url)
-            if len(uri.mimetype) > 0:
-                return True
-        return False
+        try:
+            DataURI(url)
+            return True
+        except InvalidDataURI:
+            return False
 
     @staticmethod
     def is_jpeg_data_uri(url: str) -> bool:
-        """Data URIのjpeg画像かつbase64であればTrue
-        :return: bool
+        """指定されたURLがJPEG形式のData URIかどうかを判定します。
+
+        Args:
+            url: 判定対象のURL。
+
+        Returns:
+            JPEG形式のData URIの場合はTrue、そうでない場合はFalse。
         """
-        if urlparse(url).scheme == 'data':
-            uri = DataURI(url)
-            if uri.mimetype in ['image/jpeg']:
-                if uri.is_base64:
-                    return True
-        return False
+        try:
+            return urlparse(url).scheme == 'data' and DataURI(url).mimetype == 'image/jpeg' and DataURI(url).is_base64
+        except:
+            return False
 
     @staticmethod
     def is_png_data_uri(url: str) -> bool:
-        """Data URIのpng画像かつbase64であればTrue
-        :return: bool
-        """
-        if urlparse(url).scheme == 'data':
-            uri = DataURI(url)
-            if uri.mimetype in ['image/png']:
-                if uri.is_base64:
-                    return True
-        return False
+        """指定されたURLがPNG形式のData URIかどうかを判定します。
 
-    def get_uri(self):
-        """URIを得る
-        :return: str URI
+        Args:
+            url: 判定対象のURL。
+
+        Returns:
+            PNG形式のData URIの場合はTrue、そうでない場合はFalse。
+        """
+        try:
+            return urlparse(url).scheme == 'data' and DataURI(url).mimetype == 'image/png' and DataURI(url).is_base64
+        except:
+            return False
+
+    def get_uri(self) -> str:
+        """URIを取得します。
+
+        Returns:
+            URI文字列。
         """
         return copy.deepcopy(self.value_object.uri)
 
-    def get_data_uri(self):
+    def get_data_uri(self) -> DataURI:
+        """DataURIオブジェクトを取得します。
+
+        Returns:
+            DataURIオブジェクト。
+        """
         return DataURI(self.get_uri())
 
-    def get_data(self):
-        uri = self.get_data_uri()
-        return uri.data
+    def get_data(self) -> bytes:
+        """Data URIのデータを取得します。
 
-    def save_data_uri(self, target_file):
+        Returns:
+            Data URIのデータ（バイト列）。
+        """
+        return self.get_data_uri().data
+
+    def save_data_uri(self, target_file: str):
+        """Data URIのデータをファイルに保存します。
+
+        Args:
+            target_file: 保存先のファイルパス。
+        """
         with open(target_file, "wb") as image_file:
             image_file.write(self.get_data())
 
-    def is_enable_filename(self):
-        """ファイル名が使用可能ならTrue
-        TODO: 改良の余地あり
-        :return:
+    def is_enable_filename(self) -> bool:
+        """ファイル名を取得できるかどうかを判定します。
+
+        Returns:
+            ファイル名を取得できる場合はTrue、そうでない場合はFalse。
         """
         if self.is_data_uri(self.get_uri()):
-            return False
-        if not self.get_filename():
-            return False
-        if not self.get_ext():
-            return False
-        return True
-
-    def get_filename(self):
-        """ファイル名を得る
-        :return: str ファイル名(拡張子除く)
-        """
-        if self.is_jpeg_data_uri(self.get_uri()):
-            return None
+            return self.get_data_uri().name is not None
         else:
-            # TODO: URIにファイル名ない時もある
-            __parse = urlparse(self.get_uri())
-            __path_after_name = __parse.path[__parse.path.rfind('/') + 1:]
-            __base_name = __path_after_name[:__path_after_name.rfind('.')]
-            return copy.deepcopy(__base_name)
+            parsed_url = urlparse(self.get_uri())
+            return bool(parsed_url.path) and not parsed_url.path.endswith("/")
 
-    def get_ext(self):
-        """拡張子を得る
-        :return: str ファイルの拡張子(ドットを含む)
+    def get_filename(self) -> str | None:
+        """ファイル名を取得します。
+
+        拡張子は含まれません。Data URIの場合は、filenameパラメータから取得します。
+        ファイル名が存在しない場合はNoneを返します。
+
+        Returns:
+            ファイル名（拡張子なし）。
         """
-        if self.is_jpeg_data_uri(self.get_uri()):
-            return '.jpg'
-        if self.is_png_data_uri(self.get_uri()):
-            return '.png'
+        if self.is_data_uri(self.get_uri()):
+            uri = self.get_uri()
+            # filenameパラメータが存在する場合
+            if 'filename=' in uri:
+                filename = uri.split('filename=')[1]
+                # 最初の ; か , までをファイル名として抽出
+                if ';' in filename:
+                    filename = filename.split(';', 1)[0]
+                if ',' in filename :
+                    filename = filename.split(',', 1)[0]
+                return filename
+            else:
+              return self.get_data_uri().name #filenameがない場合は、従来のロジックを使用
         else:
-            # TODO: URIに拡張子ない時もある
-            __parse = urlparse(self.get_uri())
-            __path_after_name = __parse.path[__parse.path.rfind('/') + 1:]
-            __extend_name = __path_after_name[__path_after_name.rfind('.'):]
-            return copy.deepcopy(__extend_name)
+            parsed_url = urlparse(self.get_uri())
+            path = parsed_url.path
+            if not path or path.endswith("/"):
+                return None
+            filename = path.split("/")[-1]
+            if '=' in filename:
+                filename = filename.split('=', 1)[1] #修正
+            if ';' in filename:
+                filename = filename.split(';', 1)[0] #修正
+            if "." in filename:
+                return filename.rsplit(".", 1)[0]
+            else:
+                return filename
+
+    def get_ext(self) -> str | None:
+        """拡張子を取得します。
+
+        ドット(.)を含みます。Data URIの場合は、DataURIオブジェクトのextension属性を参照します。
+          拡張子が存在しない場合はNoneを返します。
+
+        Returns:
+           拡張子（ドットを含む）
+        """
+        if self.is_data_uri(self.get_uri()):
+            data_uri = self.get_data_uri()
+            try:
+                return data_uri.extension
+            except AttributeError: # extension属性がない場合の処理
+                mimetype = data_uri.mimetype
+                if mimetype == "image/jpeg":
+                    return ".jpg"
+                elif mimetype == "image/png":
+                    return ".png"
+                # 他のmimetypeにも対応する場合、ここに追加する
+                else:
+                    return None
+        else:
+            parsed_url = urlparse(self.get_uri())
+            path = parsed_url.path
+            if not path or path.endswith("/") or "." not in path :
+                return None
+            else:
+              return "." + path.rsplit(".", 1)[1]
