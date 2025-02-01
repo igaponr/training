@@ -17,10 +17,10 @@ import os
 import sys
 import copy
 import inspect
-import subprocess
 import json
 import datetime
 from dataclasses import dataclass
+from typing import Union, Optional
 from helper import chromeDriverHelper
 from helper import webFileListHelper
 from helper import webFileHelper
@@ -31,7 +31,20 @@ from helper.status import Status
 
 @dataclass(frozen=True)
 class CrawlingValue:
-    """Crawlingの値オブジェクトクラス"""
+    """Crawlingの値オブジェクトクラス
+
+    サイトURL、セレクタ、クローリングアイテム、クローリングファイルパスを保持します
+
+    Attributes:
+        site_url (str): サイトURL。
+        site_selectors (Dict[str, str]): サイトセレクタ。キーはアイテム名、値はCSSセレクタ
+        crawling_items (Dict[str, List[str]]): クローリングアイテム。キーはアイテムの種類（例：'page_urls'）、値はURLのリスト
+        crawling_file_path (str): クローリングファイルパス
+
+    Raises:
+        ValueError: 各属性が不正な値（None、空文字列、不正な型）の場合
+
+    """
     site_url: str = None
     site_selectors: dict = None
     crawling_items: dict = None
@@ -70,7 +83,10 @@ class CrawlingValue:
 
 
 class Crawling:
-    """クローリングクラス"""
+    """クローリングクラス
+
+    指定されたサイトをクローリングし、結果をファイルに保存します
+    """
     URLS_TARGET = "page_urls"
     URLS_EXCLUSION = "exclusion_urls"
     URLS_FAILURE = "failure_urls"
@@ -166,7 +182,6 @@ class Crawling:
     @staticmethod
     def download_chrome_driver(web_file_list):
         """selenium chromeDriverを用いて、画像をデフォルトダウンロードフォルダにダウンロードして、指定のフォルダに移動する
-        :return:
         """
         chromedriver = chromeDriverHelper.ChromeDriverHelper()
         for url, path in zip(web_file_list.get_url_list(), web_file_list.get_path_list()):
@@ -243,7 +258,6 @@ class Crawling:
         読み込みに失敗したらファイル名に日時分を付けてバックアップしてFalseを返す。
         crawling_file_pathで指定したファイルを読み込む
         crawling_itemsはマージする
-        :return: bool 成功/失敗=True/False
         """
         if not os.path.exists(crawling_file_path):
             return False
@@ -283,8 +297,6 @@ class Crawling:
 
     def is_url_included_exclusion_list(self, url):
         """除外リストに含まれるURLならTrueを返す
-        :param url:
-        :return:
         """
         crawling_items = self.get_crawling_items()
         if self.URLS_EXCLUSION in crawling_items:
@@ -294,8 +306,6 @@ class Crawling:
 
     def move_url_from_page_urls_to_exclusion_urls(self, url):
         """ターゲットリスト(page_urls)から除外リスト(exclusion_urls)にURLを移動する
-        :param url:
-        :return:
         """
         site_url = self.get_site_url()
         selectors = self.get_site_selectors()
@@ -314,8 +324,6 @@ class Crawling:
 
     def is_url_included_failure_list(self, url):
         """失敗リストに含まれるURLならTrueを返す
-        :param url:
-        :return:
         """
         crawling_items = self.get_crawling_items()
         if self.URLS_FAILURE in crawling_items:
@@ -325,8 +333,6 @@ class Crawling:
 
     def move_url_from_page_urls_to_failure_urls(self, url):
         """ターゲットリスト(page_urls)から失敗リスト(failure_urls)にURLを移動する
-        :param url:
-        :return:
         """
         site_url = self.get_site_url()
         selectors = self.get_site_selectors()
@@ -345,7 +351,6 @@ class Crawling:
 
     def marge_crawling_items(self):
         """crawling_itemsのpage_urlsにexclusion_urlsがあったら削除する
-        :return:
         """
         crawling_items = self.get_crawling_items()
         page_urls = []
@@ -367,10 +372,6 @@ class Crawling:
             # ダウンロードしない場合は、以降の処理をスキップする
             # 各page_urlをimage_selectorsでスクレイピングしてダウンロードする画像URLリストを作る。
             # 画像URLリストをirvineHelperでダウンロードして、zipファイルにする
-        :param page_selectors:
-        :param image_selectors:
-        :param notification_id:
-        :return:
         """
         crawling_items = self.get_crawling_items()
         page_urls = []
@@ -452,9 +453,6 @@ class Crawling:
             # ダウンロードしない場合は、以降の処理をスキップする
             # 各page_urlをimage_selectorsでスクレイピングしてダウンロードする画像URLリストを作る。
             # 画像URLリストをirvineHelperでダウンロードして、zipファイルにする
-        :param page_selectors:
-        :param image_selectors:
-        :return:
         """
         crawling_items = self.get_crawling_items()
         page_urls = []
@@ -502,15 +500,3 @@ class Crawling:
                 chromeDriverHelper.ChromeDriverHelper().save_source(target_file_name)
             # page_urlsからexclusion_urlsにURLを移して保存する
             self.move_url_from_page_urls_to_exclusion_urls(page_url)
-
-
-# 検証コード
-if __name__ == '__main__':  # インポート時には動かない
-    load_path = '../downloadlist.txt'
-    with open(load_path, 'r', encoding='utf-8') as work_file:
-        buff = work_file.readlines()
-        for line in buff:
-            target_url = line.rstrip('\n')
-            # subprocess.run(['python', 'imgdl.py', target_url])
-            # 画像が連番の場合、selenium
-            subprocess.run(['python', 'urlDeployment.py', target_url])
