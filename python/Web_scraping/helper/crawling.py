@@ -21,12 +21,12 @@ import json
 import datetime
 from dataclasses import dataclass
 from typing import Union, Optional
-from helper import chromeDriverHelper
-from helper import webFileListHelper
-from helper import webFileHelper
-from helper import line_message_api
-from helper import slack_message_api
-from helper.status import Status
+import helper.chromeDriverHelper
+import helper.webFileListHelper
+import helper.webFileHelper
+import helper.line_message_api
+import helper.slack_message_api
+import helper.status
 
 
 @dataclass(frozen=True)
@@ -138,7 +138,7 @@ class Crawling:
     def scraping(url, selectors):
         """ChromeDriverHelperを使ってスクレイピングする"""
         selectors = copy.deepcopy(selectors)
-        chrome_driver = chromeDriverHelper.ChromeDriverHelper(url, selectors)
+        chrome_driver = helper.chromeDriverHelper.ChromeDriverHelper(url, selectors)
         return chrome_driver.get_items()
 
     @staticmethod
@@ -177,13 +177,13 @@ class Crawling:
                 title = f'{now:%Y%m%d_%H%M%S}'
             else:
                 title = title_sub
-        return chromeDriverHelper.ChromeDriverHelper.fixed_file_name(title)
+        return helper.chromeDriverHelper.ChromeDriverHelper.fixed_file_name(title)
 
     @staticmethod
     def download_chrome_driver(web_file_list):
         """selenium chromeDriverを用いて、画像をデフォルトダウンロードフォルダにダウンロードして、指定のフォルダに移動する
         """
-        chromedriver = chromeDriverHelper.ChromeDriverHelper()
+        chromedriver = helper.chromeDriverHelper.ChromeDriverHelper()
         for url, path in zip(web_file_list.get_url_list(), web_file_list.get_path_list()):
             chromedriver.download_image(url, path)
 
@@ -379,7 +379,7 @@ class Crawling:
             page_urls = crawling_items[self.URLS_TARGET]
         total_pages = len(page_urls)
         for i, page_url in enumerate(page_urls):
-            status = Status()
+            status = helper.status.Status()
             if status is not None and not status.is_running():
                 print("stop status")
                 break
@@ -395,11 +395,11 @@ class Crawling:
             items = self.scraping(page_url, page_selectors)
             languages = self.take_out(items, 'languages')
             title = Crawling.validate_title(items, 'title_jp', 'title_en')
-            url_title = chromeDriverHelper.ChromeDriverHelper.fixed_file_name(page_url)
+            url_title = helper.chromeDriverHelper.ChromeDriverHelper.fixed_file_name(page_url)
 
             # フォルダがなかったらフォルダを作る
-            os.makedirs(webFileListHelper.WebFileListHelper.work_path, exist_ok=True)
-            target_file_name = os.path.join(webFileListHelper.WebFileListHelper.work_path, f'{title}：{url_title}.html')
+            os.makedirs(helper.webFileListHelper.WebFileListHelper.work_path, exist_ok=True)
+            target_file_name = os.path.join(helper.webFileListHelper.WebFileListHelper.work_path, f'{title}：{url_title}.html')
             print(title, languages)
             if languages and languages == 'japanese' and not os.path.exists(target_file_name):
                 # ダウンロードするときだけ通知する
@@ -407,7 +407,7 @@ class Crawling:
                 # _line_message_api.send_message(
                 #     notification_id,
                 #     f'crawling :現在{current_page}ページ目 / 全{total_pages}ページ中 (残り{remaining_pages}ページ)')
-                _slack_message_api = slack_message_api.SlackMessageAPI(access_token="")
+                _slack_message_api = helper.slack_message_api.SlackMessageAPI(access_token="")
                 _slack_message_api.send_message(
                     notification_id,
                     f'crawling :現在{current_page}ページ目 / 全{total_pages}ページ中 (残り{remaining_pages}ページ)')
@@ -417,14 +417,14 @@ class Crawling:
                 if not last_image_url:
                     raise ValueError(f"エラー:last_image_urlが不正[{last_image_url}]")
                 print(last_image_url, image_urls)
-                web_file_list = webFileListHelper.WebFileListHelper([last_image_url])
+                web_file_list = helper.webFileListHelper.WebFileListHelper([last_image_url])
                 # 末尾画像のナンバーから全ての画像URLを推測して展開する
                 web_file_list.update_value_object_by_deployment_url_list()
                 url_list = web_file_list.get_url_list()
                 print(url_list)
 
                 web_file_list.download_irvine()
-                for count in enumerate(webFileHelper.WebFileHelper.ext_list):
+                for count in enumerate(helper.webFileHelper.WebFileHelper.ext_list):
                     if web_file_list.is_exist():
                         break
                     # ダウンロードに失敗しているときは、失敗しているファイルの拡張子を変えてダウンロードしなおす
@@ -439,7 +439,7 @@ class Crawling:
                         sys.exit()
                 web_file_list.delete_local_files()
                 # 成功したらチェック用ファイルを残す
-                chromeDriverHelper.ChromeDriverHelper().save_source(target_file_name)
+                helper.chromeDriverHelper.ChromeDriverHelper().save_source(target_file_name)
                 # page_urlsからexclusion_urlsにURLを移して保存する
                 self.move_url_from_page_urls_to_exclusion_urls(page_url)
             else:
@@ -459,7 +459,7 @@ class Crawling:
         if self.URLS_TARGET in crawling_items:
             page_urls = crawling_items[self.URLS_TARGET]
         for page_url in page_urls:
-            status = Status()
+            status = helper.status.Status()
             if status is not None and not status.is_running():
                 print("stop status")
                 break
@@ -472,19 +472,19 @@ class Crawling:
                 continue
             items = self.scraping(page_url, page_selectors)
             title = Crawling.validate_title(items, 'title_jp', 'title_en')
-            url_title = chromeDriverHelper.ChromeDriverHelper.fixed_file_name(page_url)
+            url_title = helper.chromeDriverHelper.ChromeDriverHelper.fixed_file_name(page_url)
 
             # フォルダがなかったらフォルダを作る
-            os.makedirs(webFileListHelper.WebFileListHelper.work_path, exist_ok=True)
-            target_file_name = os.path.join(webFileListHelper.WebFileListHelper.work_path, f'{title}：{url_title}.html')
+            os.makedirs(helper.webFileListHelper.WebFileListHelper.work_path, exist_ok=True)
+            target_file_name = os.path.join(helper.webFileListHelper.WebFileListHelper.work_path, f'{title}：{url_title}.html')
             print(title)
             if not os.path.exists(target_file_name):
                 image_items = self.scraping(page_url, image_selectors)
                 image_urls = self.take_out(image_items, 'image_urls')
                 print(image_urls)
-                web_file_list = webFileListHelper.WebFileListHelper(image_urls)
+                web_file_list = helper.webFileListHelper.WebFileListHelper(image_urls)
                 web_file_list.download_irvine()
-                for count in enumerate(webFileHelper.WebFileHelper.ext_list):
+                for count in enumerate(helper.webFileHelper.WebFileHelper.ext_list):
                     if web_file_list.is_exist():
                         break
                     # ダウンロードに失敗しているときは、失敗しているファイルの拡張子を変えてダウンロードしなおす
@@ -497,6 +497,6 @@ class Crawling:
                         sys.exit()
                 web_file_list.delete_local_files()
                 # 成功したらチェック用ファイルを残す
-                chromeDriverHelper.ChromeDriverHelper().save_source(target_file_name)
+                helper.chromeDriverHelper.ChromeDriverHelper().save_source(target_file_name)
             # page_urlsからexclusion_urlsにURLを移して保存する
             self.move_url_from_page_urls_to_exclusion_urls(page_url)

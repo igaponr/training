@@ -60,9 +60,9 @@ from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
 
-from helper import uriHelper
-from helper import webFileListHelper
-from helper import webFileHelper
+import helper.uriHelper
+import helper.webFileListHelper
+import helper.webFileHelper
 
 
 @dataclass(frozen=True)
@@ -446,7 +446,7 @@ class ChromeDriverHelper:
         :param download_path:
         :return:
         """
-        uri = uriHelper.UriHelper(url)
+        uri = helper.uriHelper.UriHelper(url)
         if uri.is_data_uri(url):
             uri.save_data_uri(download_path)
         else:
@@ -519,7 +519,7 @@ class ChromeDriverHelper:
         """
         __image_url = self.__driver.current_url
         downloads_path = os.path.join(os.getenv("HOMEDRIVE"), os.getenv("HOMEPATH"), "downloads")
-        __web_file = webFileHelper.WebFileHelper(__image_url, download_file_name, download_ext, downloads_path)
+        __web_file = helper.webFileHelper.WebFileHelper(__image_url, download_file_name, download_ext, downloads_path)
         __filename = __web_file.get_filename() + __web_file.get_ext()
         script_str = """
         window.URL = window.URL || window.webkitURL;
