@@ -46,6 +46,7 @@ import socket
 import subprocess
 import time
 import inspect
+import typing as t
 
 import psutil
 from urllib.parse import urlparse
@@ -115,7 +116,7 @@ class ChromeDriverHelper:
     download_path: str = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                                       '../download').replace(os.sep, '/')
 
-    __driver = None
+    _driver = None
     __wait = None
     __source = None
     __start_window_handle = None
@@ -158,8 +159,7 @@ class ChromeDriverHelper:
                 if selectors:
                     selectors = copy.deepcopy(selectors)
                     self.open_current_tab(url)
-                    items = self.scraping(selectors)
-                    self.value_object = ChromeDriverHelperValue(url, selectors, items)
+                    self.scraping(selectors)
                 else:
                     raise ValueError(f"{self.__class__.__name__}.{inspect.stack()[1].function}"
                                      f"引数エラー:selectorsが不正[{selectors}]")
@@ -220,15 +220,18 @@ class ChromeDriverHelper:
 
     def scraping(self, selectors):
         """(画面依存)現在表示のURLにスクレイピングする"""
-        selectors = copy.deepcopy(selectors)
         items = {}
         for key, selector_list in selectors.items():
-            items[key] = self.__get_scraping_selector_list(selector_list)
+            if key == "title":
+                items[key] = [self._driver.title]
+            else:
+                items[key] = self.__get_scraping_selector_list(selector_list)
+        self.value_object = ChromeDriverHelperValue(self._driver.current_url, selectors, items)
         return items
 
     def scroll_element(self, element):
         """(画面遷移有)elementまでスクロールする"""
-        actions = ActionChains(self.__driver)
+        actions = ActionChains(self._driver)
         actions.move_to_element(element)
         actions.perform()
 
@@ -290,15 +293,15 @@ class ChromeDriverHelper:
             print(e, "Chromeに繋がらなかったので、起動して接続する。")
             self.__create()
             self.__connection()
-        self.__start_window_handle = self.__driver.current_window_handle
+        self.__start_window_handle = self._driver.current_window_handle
 
     def __connection(self):
         """起動しているchromeに接続
         :return:
         """
         chrome_service = Service(executable_path=ChromeDriverManager().install())
-        self.__driver = webdriver.Chrome(service=chrome_service, options=self.__options)
-        # self.__driver = Chrome(executable_path=ChromeDriverManager().install(), options=self.__options)
+        self._driver = webdriver.Chrome(service=chrome_service, options=self.__options)
+        # self._driver = Chrome(executable_path=ChromeDriverManager().install(), options=self.__options)
 
     def __create(self):
         """chromeを起動する
@@ -310,15 +313,15 @@ class ChromeDriverHelper:
         """chromeが開いていれば閉じる
         :return: なし
         """
-        if self.__driver is not None:
+        if self._driver is not None:
             for __window_handle in self.__window_handle_list:
                 self.close()
             if self.__start_window_handle:
-                self.__driver.switch_to.window(self.__start_window_handle)
-                self.__driver.close()
+                self._driver.switch_to.window(self.__start_window_handle)
+                self._driver.close()
                 self.__start_window_handle = None
-            self.__driver.quit()
-            self.__driver = None
+            self._driver.quit()
+            self._driver = None
 
     def __gen_scraping_selectors(self, selectors):
         """(画面依存)chromeで開いているサイトに対して、スクレイピング結果を返すジェネレータ
@@ -382,7 +385,7 @@ class ChromeDriverHelper:
             else:
                 count = 1
             for _ in range(count):
-                elements = self.__driver.find_elements(by=by, value=selector)
+                elements = self._driver.find_elements(by=by, value=selector)
                 for elem in elements:
                     self.scroll_element(elem)
                     text = action(elem)
@@ -397,7 +400,7 @@ class ChromeDriverHelper:
         """(画面依存)現在の画面(chromeで現在表示しているタブ)のソースコードを取得する
         :return: str ソースコード
         """
-        self.__source = self.__driver.page_source
+        self.__source = self._driver.page_source
         return copy.deepcopy(self.__source)
 
     def save_source(self, path='./title.html'):
@@ -413,13 +416,13 @@ class ChromeDriverHelper:
         """(画面遷移有)ブラウザの戻るボタン押下と同じ動作
         :return:
         """
-        self.__driver.back()
+        self._driver.back()
 
     def forward(self):
         """(画面遷移有)ブラウザの進むボタン押下と同じ動作
         :return:
         """
-        self.__driver.forward()
+        self._driver.forward()
 
     def next_tab(self):
         """(画面遷移有)openで作ったタブ(__window_handle_list)の内、一つ後のタブを表示する
@@ -436,9 +439,9 @@ class ChromeDriverHelper:
     def __shift_tab(self, step):
         index = 0
         count = len(self.__window_handle_list)
-        if self.__driver.current_window_handle in self.__window_handle_list:
-            index = self.__window_handle_list.index(self.__driver.current_window_handle)
-        self.__driver.switch_to.window(self.__window_handle_list[(index + step) % count])
+        if self._driver.current_window_handle in self.__window_handle_list:
+            index = self.__window_handle_list.index(self._driver.current_window_handle)
+        self._driver.switch_to.window(self.__window_handle_list[(index + step) % count])
 
     def download_image(self, url, download_path=None):
         """(画面遷移有)urlの画像を保存する(open_new_tab → save_image → closeする)
@@ -459,9 +462,9 @@ class ChromeDriverHelper:
         :param url: str chromeで開くURL
         :return: なし
         """
-        self.__driver.get(url)
+        self._driver.get(url)
         # ページが読み込まれるまで待機
-        self.__wait = WebDriverWait(self.__driver, 30)
+        self.__wait = WebDriverWait(self._driver, 30)
         self.__wait.until(EC.presence_of_all_elements_located)
 
     def open_new_tab(self, url):
@@ -469,9 +472,9 @@ class ChromeDriverHelper:
         :param url: str 開くURL
         :return: str 開いたタブのハンドル
         """
-        self.__driver.switch_to.new_window()
+        self._driver.switch_to.new_window()
         self.open_current_tab(url)
-        self.__window_handle_list.append(self.__driver.current_window_handle)
+        self.__window_handle_list.append(self._driver.current_window_handle)
         return self.__window_handle_list[-1]
 
     def open_new_tabs(self, url_list):
@@ -491,22 +494,22 @@ class ChromeDriverHelper:
         """
         try:
             if not window_handle:
-                window_handle = self.__driver.current_window_handle
+                window_handle = self._driver.current_window_handle
             else:
-                self.__driver.switch_to.window(window_handle)
+                self._driver.switch_to.window(window_handle)
             if window_handle == self.__start_window_handle:
                 return
-            if self.__driver.current_window_handle == self.__start_window_handle:
+            if self._driver.current_window_handle == self.__start_window_handle:
                 return
             index = self.__window_handle_list.index(window_handle)
-            self.__driver.close()
+            self._driver.close()
             del self.__window_handle_list[index]
             if len(self.__window_handle_list) == 0:
-                self.__driver.switch_to.window(self.__start_window_handle)
+                self._driver.switch_to.window(self.__start_window_handle)
             else:
                 if index:
                     index -= 1
-                self.__driver.switch_to.window(self.__window_handle_list[index])
+                self._driver.switch_to.window(self.__window_handle_list[index])
         except ValueError:
             print("ValueError 指定のwindow_handleがありません。")
             exit()
@@ -517,7 +520,7 @@ class ChromeDriverHelper:
         ダウンロード実行用スクリプトを生成＆実行する
         :return:
         """
-        __image_url = self.__driver.current_url
+        __image_url = self._driver.current_url
         downloads_path = os.path.join(os.getenv("HOMEDRIVE"), os.getenv("HOMEPATH"), "downloads")
         __web_file = helper.webFileHelper.WebFileHelper(__image_url, download_file_name, download_ext, downloads_path)
         __filename = __web_file.get_filename() + __web_file.get_ext()
@@ -537,21 +540,34 @@ class ChromeDriverHelper:
         };
         xhr.send();
         """
-        self.__driver.execute_script(script_str)
+        self._driver.execute_script(script_str)
         file_path = os.path.join(self.download_path, __filename)
-        # TODO: メソッド化する
-        # what = (lambda web_file, path: web_file.move(path))(__web_file, file_path)
-        # how = (lambda web_file: os.path.isfile(web_file.get_path()))(__web_file)
-        # self.wait_until(what, how)
+        what = (lambda web_file, path: web_file.move(path))(__web_file, file_path)
+        how = (lambda web_file: os.path.isfile(web_file.get_path()))(__web_file)
+        self.wait_until(what, how)
         start = time.time()
         while ((time.time() - start) < wait_time) and not (os.path.isfile(__web_file.get_path())):
             time.sleep(0.1)
         __web_file.move(file_path)
 
-    # @staticmethod
-    # def wait_until(what, how, wait_time=3):
-    #     """what(何)を実行するために、how(どのように)なるまで最大でwait_time秒間待つ"""
-    #     start = time.time()
-    #     while ((time.time() - start) < wait_time) and not (how):
-    #         time.sleep(0.1)
-    #     return what
+    @staticmethod
+    def wait_until(what: t.Callable, how: t.Callable, wait_time: int = 3) -> t.Any:
+        """指定の条件が満たされるまで待機する
+
+        Args:
+            what: 実行する関数
+            how: 条件を判定する関数。Trueを返せば待機終了
+            wait_time: 最大待機時間（秒）
+
+        Returns:
+            what関数の戻り値
+
+        Raises:
+            TimeoutError: wait_time秒以内に条件が満たされなかった場合
+        """
+        start = time.time()
+        while (time.time() - start) < wait_time:
+            if how():
+                return what()
+            time.sleep(0.1)
+        raise TimeoutError(f"{wait_time}秒以内に条件が満たされませんでした。")
