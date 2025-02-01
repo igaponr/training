@@ -21,10 +21,9 @@ import datetime
 from dataclasses import dataclass
 from urllib.parse import urlparse  # URLパーサー
 from urllib.parse import urlunparse
-import pyperclip  # クリップボード
-from helper import chromeDriverHelper
-from helper import webFileListHelper
-from helper import webFileHelper
+import helper.chromeDriverHelper
+import helper.webFileListHelper
+import helper.webFileHelper
 
 # local source
 from const import *
@@ -93,7 +92,7 @@ class UrlDeployment:
                 else:
                     __selectors = selectors_or_title
                     page_url = value_object
-                    __driver = chromeDriverHelper.ChromeDriverHelper(value_object, __selectors)
+                    __driver = helper.chromeDriverHelper.ChromeDriverHelper(value_object, __selectors)
                     items = __driver.get_items()
 
                     _title = None
@@ -184,51 +183,3 @@ class UrlDeployment:
         :return: list 画像リスト
         """
         return copy.deepcopy(self.value_object.image_urls)
-
-
-# 検証コード
-if __name__ == '__main__':  # インポート時には動かない
-    folder_path = OUTPUT_FOLDER_PATH
-    url_list: list = []
-    main_title = '[] a'
-    list_file_path = '../irvine_download_list.txt'
-    # 引数チェック
-    if 3 == len(sys.argv):
-        # Pythonに以下の3つ引数を渡す想定
-        # 0は固定でスクリプト名
-        # 1.対象のURL
-        # 2.対象のタイトル(後にファイル名にする)
-        paste_str = sys.argv[1]
-        main_title = sys.argv[2]
-    elif 2 == len(sys.argv):
-        # Pythonに以下の2つ引数を渡す想定
-        # 0は固定でスクリプト名
-        # 1.対象のURL
-        paste_str = sys.argv[1]
-    elif 1 == len(sys.argv):
-        # 引数がなければ、クリップボードからURLを得る
-        paste_str = pyperclip.paste()
-    else:
-        print('引数が不正です。')
-        sys.exit(1)
-
-    # スクレイピングして末尾画像のナンバーから全ての画像URLを推測して展開する
-    url_deployment = UrlDeployment(paste_str, SELECTORS)
-    title = url_deployment.get_title()
-    url_title = chromeDriverHelper.ChromeDriverHelper.fixed_file_name(paste_str)
-    url_list = url_deployment.get_image_urls()
-    print(url_list)
-    web_file_list = webFileListHelper.WebFileListHelper(url_list)
-    web_file_list.download_irvine()
-    for count in enumerate(webFileHelper.WebFileHelper.ext_list):
-        if web_file_list.is_exist():
-            break
-        # ダウンロードに失敗しているときは、失敗しているファイルの拡張子を変えてダウンロードしなおす
-        web_file_list.rename_url_ext_shift()
-        web_file_list.download_irvine()
-    if not web_file_list.make_zip_file():
-        sys.exit()
-    if not web_file_list.rename_zip_file(title):
-        if not web_file_list.rename_zip_file(f'{title}：{url_title}'):
-            sys.exit()
-    web_file_list.delete_local_files()
