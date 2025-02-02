@@ -55,6 +55,7 @@
 <li class="toctree-l3"><a class="reference internal" href="helper.scraping.html">helper.scraping module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="helper.slack_message_api.html">helper.slack_message_api module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="helper.spreadsheet.html">helper.spreadsheet module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="helper.status.html">helper.status module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="helper.tenki.html">helper.tenki module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="helper.uriHelper.html">helper.uriHelper module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="helper.urlDeployment.html">helper.urlDeployment module</a></li>
@@ -127,6 +128,7 @@
 <li class="toctree-l3"><a class="reference internal" href="helper.chromeDriverHelper.html#helper.chromeDriverHelper.ChromeDriverHelper.scraping"><code class="docutils literal notranslate"><span class="pre">ChromeDriverHelper.scraping()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="helper.chromeDriverHelper.html#helper.chromeDriverHelper.ChromeDriverHelper.scroll_element"><code class="docutils literal notranslate"><span class="pre">ChromeDriverHelper.scroll_element()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="helper.chromeDriverHelper.html#helper.chromeDriverHelper.ChromeDriverHelper.value_object"><code class="docutils literal notranslate"><span class="pre">ChromeDriverHelper.value_object</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="helper.chromeDriverHelper.html#helper.chromeDriverHelper.ChromeDriverHelper.wait_until"><code class="docutils literal notranslate"><span class="pre">ChromeDriverHelper.wait_until()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="helper.chromeDriverHelper.html#helper.chromeDriverHelper.ChromeDriverHelperValue"><code class="docutils literal notranslate"><span class="pre">ChromeDriverHelperValue</span></code></a><ul>
@@ -170,10 +172,14 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="helper.crawling.html#helper.crawling.CrawlingValue"><code class="docutils literal notranslate"><span class="pre">CrawlingValue</span></code></a><ul>
-<li class="toctree-l3"><a class="reference internal" href="helper.crawling.html#helper.crawling.CrawlingValue.crawling_file_path"><code class="docutils literal notranslate"><span class="pre">CrawlingValue.crawling_file_path</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="helper.crawling.html#helper.crawling.CrawlingValue.crawling_items"><code class="docutils literal notranslate"><span class="pre">CrawlingValue.crawling_items</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="helper.crawling.html#helper.crawling.CrawlingValue.site_selectors"><code class="docutils literal notranslate"><span class="pre">CrawlingValue.site_selectors</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="helper.crawling.html#helper.crawling.CrawlingValue.site_url"><code class="docutils literal notranslate"><span class="pre">CrawlingValue.site_url</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="helper.crawling.html#helper.crawling.CrawlingValue.site_selectors"><code class="docutils literal notranslate"><span class="pre">CrawlingValue.site_selectors</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="helper.crawling.html#helper.crawling.CrawlingValue.crawling_items"><code class="docutils literal notranslate"><span class="pre">CrawlingValue.crawling_items</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="helper.crawling.html#helper.crawling.CrawlingValue.crawling_file_path"><code class="docutils literal notranslate"><span class="pre">CrawlingValue.crawling_file_path</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="helper.crawling.html#id0"><code class="docutils literal notranslate"><span class="pre">CrawlingValue.crawling_file_path</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="helper.crawling.html#id2"><code class="docutils literal notranslate"><span class="pre">CrawlingValue.crawling_items</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="helper.crawling.html#id3"><code class="docutils literal notranslate"><span class="pre">CrawlingValue.site_selectors</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="helper.crawling.html#id4"><code class="docutils literal notranslate"><span class="pre">CrawlingValue.site_url</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -274,6 +280,31 @@
 <li class="toctree-l3"><a class="reference internal" href="helper.spreadsheet.html#helper.spreadsheet.SpreadsheetValue.json_keyfile_name"><code class="docutils literal notranslate"><span class="pre">SpreadsheetValue.json_keyfile_name</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="helper.spreadsheet.html#helper.spreadsheet.SpreadsheetValue.workbook_name"><code class="docutils literal notranslate"><span class="pre">SpreadsheetValue.workbook_name</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="helper.spreadsheet.html#helper.spreadsheet.SpreadsheetValue.worksheet_name"><code class="docutils literal notranslate"><span class="pre">SpreadsheetValue.worksheet_name</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="helper.status.html">helper.status module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="helper.status.html#helper.status.Status"><code class="docutils literal notranslate"><span class="pre">Status</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="helper.status.html#helper.status.Status.json_path"><code class="docutils literal notranslate"><span class="pre">Status.json_path</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="helper.status.html#helper.status.Status._status"><code class="docutils literal notranslate"><span class="pre">Status._status</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="helper.status.html#helper.status.Status.KEY_NAME"><code class="docutils literal notranslate"><span class="pre">Status.KEY_NAME</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="helper.status.html#helper.status.Status.is_running"><code class="docutils literal notranslate"><span class="pre">Status.is_running()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="helper.status.html#helper.status.Status.is_stop"><code class="docutils literal notranslate"><span class="pre">Status.is_stop()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="helper.status.html#id0"><code class="docutils literal notranslate"><span class="pre">Status.json_path</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="helper.status.html#helper.status.Status.save_to_json"><code class="docutils literal notranslate"><span class="pre">Status.save_to_json()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="helper.status.html#helper.status.StatusValue"><code class="docutils literal notranslate"><span class="pre">StatusValue</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="helper.status.html#helper.status.StatusValue.RUNNING"><code class="docutils literal notranslate"><span class="pre">StatusValue.RUNNING</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="helper.status.html#helper.status.StatusValue.STOP"><code class="docutils literal notranslate"><span class="pre">StatusValue.STOP</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="helper.status.html#helper.status.StatusValue.PENDING"><code class="docutils literal notranslate"><span class="pre">StatusValue.PENDING</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="helper.status.html#helper.status.StatusValue.ERROR"><code class="docutils literal notranslate"><span class="pre">StatusValue.ERROR</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="helper.status.html#id1"><code class="docutils literal notranslate"><span class="pre">StatusValue.ERROR</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="helper.status.html#id2"><code class="docutils literal notranslate"><span class="pre">StatusValue.PENDING</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="helper.status.html#id3"><code class="docutils literal notranslate"><span class="pre">StatusValue.RUNNING</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="helper.status.html#id4"><code class="docutils literal notranslate"><span class="pre">StatusValue.STOP</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="helper.status.html#helper.status.StatusValue.is_terminal"><code class="docutils literal notranslate"><span class="pre">StatusValue.is_terminal()</span></code></a></li>
 </ul>
 </li>
 </ul>

@@ -1,0 +1,248 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="ja" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>helper.status &mdash; Web_scraping 1.0.0 ドキュメント</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=144c8c96"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/translations.js?v=4755f45a"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="索引" href="../../genindex.html" />
+    <link rel="search" title="検索" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Web_scraping
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../helper.html">helper package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Web_scraping</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">モジュールコード</a></li>
+      <li class="breadcrumb-item active">helper.status</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>helper.status のソースコード</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python3</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;システムの状態を管理するための Status クラスを提供します</span>
+
+<span class="sd">- Status クラスは、状態を表す値オブジェクトであり、現在の状態を status.json ファイルに保存し、読み込めます</span>
+<span class="sd">- 状態は StatusValue 列挙型で定義され、RUNNING、STOP、PENDING、ERROR のいずれかの値を取ります</span>
+<span class="sd">- Status クラスは、状態の確認、設定、ファイルへの保存、ファイルからの読み込みを行うためのメソッドを提供します</span>
+<span class="sd">- さらに、終了状態かどうかを判断する is_terminal() メソッドを StatusValue に追加しました</span>
+<span class="sd">- Status クラスの is_stop() メソッドは is_terminal() を利用するため、ステータス値の追加や変更に柔軟に対応できます</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">pathlib</span>
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
+<span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
+
+
+<div class="viewcode-block" id="StatusValue">
+<a class="viewcode-back" href="../../helper.status.html#helper.status.StatusValue">[ドキュメント]</a>
+<span class="k">class</span> <span class="nc">StatusValue</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;システムのステータス値を表す列挙型</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        RUNNING: 実行中</span>
+<span class="sd">        STOP: 停止</span>
+<span class="sd">        PENDING: 保留中</span>
+<span class="sd">        ERROR: エラー</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">RUNNING</span> <span class="o">=</span> <span class="s2">&quot;running&quot;</span>
+    <span class="n">STOP</span> <span class="o">=</span> <span class="s2">&quot;stop&quot;</span>
+    <span class="n">PENDING</span> <span class="o">=</span> <span class="s2">&quot;pending&quot;</span>
+    <span class="n">ERROR</span> <span class="o">=</span> <span class="s2">&quot;error&quot;</span>
+
+<div class="viewcode-block" id="StatusValue.is_terminal">
+<a class="viewcode-back" href="../../helper.status.html#helper.status.StatusValue.is_terminal">[ドキュメント]</a>
+    <span class="k">def</span> <span class="nf">is_terminal</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;ステータスが終了状態かどうかを返す</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            True: 終了状態 (STOP または ERROR) の場合、False: それ以外の場合</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span> <span class="ow">in</span> <span class="p">(</span><span class="n">StatusValue</span><span class="o">.</span><span class="n">STOP</span><span class="p">,</span> <span class="n">StatusValue</span><span class="o">.</span><span class="n">ERROR</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="Status">
+<a class="viewcode-back" href="../../helper.status.html#helper.status.Status">[ドキュメント]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">Status</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;システムの状態を表すValue Object</span>
+
+<span class="sd">    status.jsonファイルからステータスを読み込み、保持する</span>
+<span class="sd">    ファイルが存在しない場合は、デフォルトでPENDING状態となる</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        json_path: ステータスを保存するJSONファイルのパス</span>
+<span class="sd">        _status: システムの現在のステータス</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: status.jsonファイルの形式が不正な場合</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">json_path</span><span class="p">:</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s2">&quot;json&quot;</span> <span class="o">/</span> <span class="s2">&quot;status.json&quot;</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;ステータスを保存するJSONファイルのパス  .. :noindex:&quot;</span><span class="p">}</span>
+    <span class="p">)</span>
+    <span class="n">_status</span><span class="p">:</span> <span class="n">StatusValue</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">StatusValue</span><span class="o">.</span><span class="n">PENDING</span><span class="p">)</span>
+    <span class="n">KEY_NAME</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;status&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;インスタンス初期化の処理。JSONファイルからステータスを読み込む&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">json_path</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">json_path</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_size</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_status&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_from_json</span><span class="p">())</span>
+            <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Status file not found: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">json_path</span><span class="si">}</span><span class="s2">. Using default &#39;pending&#39; status.&quot;</span><span class="p">)</span>
+            <span class="k">except</span> <span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">JSONDecodeError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid JSON format in </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">json_path</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Status.is_running">
+<a class="viewcode-back" href="../../helper.status.html#helper.status.Status.is_running">[ドキュメント]</a>
+    <span class="k">def</span> <span class="nf">is_running</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;システムが実行中かどうかを返す</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            True: 実行中の場合、False: それ以外の場合</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_status</span> <span class="o">==</span> <span class="n">StatusValue</span><span class="o">.</span><span class="n">RUNNING</span></div>
+
+
+<div class="viewcode-block" id="Status.is_stop">
+<a class="viewcode-back" href="../../helper.status.html#helper.status.Status.is_stop">[ドキュメント]</a>
+    <span class="k">def</span> <span class="nf">is_stop</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;システムが停止状態かどうかを返す</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            True: 停止状態の場合、False: それ以外の場合</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_status</span><span class="o">.</span><span class="n">is_terminal</span><span class="p">()</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_status</span> <span class="o">==</span> <span class="n">StatusValue</span><span class="o">.</span><span class="n">STOP</span></div>
+
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;ステータス値の文字列表現を返す</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            ステータス値の文字列</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_status</span><span class="o">.</span><span class="n">value</span>
+
+    <span class="k">def</span> <span class="nf">_load_from_json</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">StatusValue</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;status.jsonファイルからステータスを読み込む</span>
+
+<span class="sd">        jsonにKEY_NAMEが無ければ、PENDINGで読み込む</span>
+<span class="sd">        KEY_NAMEの値がStatusValueの値でなければ、PENDINGで読み込む</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            読み込んだステータス値</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: status.jsonファイルが不正なJSON形式の場合</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">json_path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+                <span class="n">l_status</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">KEY_NAME</span><span class="p">,</span> <span class="n">StatusValue</span><span class="o">.</span><span class="n">PENDING</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">l_status</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">StatusValue</span><span class="p">:</span>
+                    <span class="n">l_status</span> <span class="o">=</span> <span class="n">StatusValue</span><span class="o">.</span><span class="n">PENDING</span>
+                <span class="k">return</span> <span class="n">StatusValue</span><span class="p">(</span><span class="n">l_status</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">json</span><span class="o">.</span><span class="n">JSONDecodeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid JSON format in </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">json_path</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Status.save_to_json">
+<a class="viewcode-back" href="../../helper.status.html#helper.status.Status.save_to_json">[ドキュメント]</a>
+    <span class="k">def</span> <span class="nf">save_to_json</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;現在のステータスをstatus.jsonファイルに保存する</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            OSError: ファイルの保存に失敗した場合</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">json_path</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">json_path</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">({</span><span class="bp">self</span><span class="o">.</span><span class="n">KEY_NAME</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_status</span><span class="o">.</span><span class="n">value</span><span class="p">},</span> <span class="n">f</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">OSError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to save status to </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">json_path</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Ryosuke Igarashi.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

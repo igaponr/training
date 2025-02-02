@@ -15,6 +15,7 @@ Submodules
    helper.scraping
    helper.slack_message_api
    helper.spreadsheet
+   helper.status
    helper.tenki
    helper.uriHelper
    helper.urlDeployment

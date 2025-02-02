@@ -59,6 +59,7 @@
 <li class="toctree-l3"><a class="reference internal" href="helper.scraping.html">helper.scraping module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="helper.slack_message_api.html">helper.slack_message_api module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="helper.spreadsheet.html">helper.spreadsheet module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="helper.status.html">helper.status module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="helper.tenki.html">helper.tenki module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="helper.uriHelper.html">helper.uriHelper module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="helper.urlDeployment.html">helper.urlDeployment module</a></li>
@@ -121,6 +122,7 @@
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">helper.crawling.</span></span><span class="sig-name descname"><span class="pre">Crawling</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value_object</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">site_selectors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crawling_items</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crawling_file_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'D:/git/igaponr/training/python/Web_scraping/helper/../crawling_list.txt'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/crawling.html#Crawling"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.crawling.Crawling" title="Link to this definition"></a></dt>
 <dd><p>ベースクラス: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>クローリングクラス</p>
+<p>指定されたサイトをクローリングし、結果をファイルに保存します</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="helper.crawling.Crawling.URLS_EXCLUSION">
 <span class="sig-name descname"><span class="pre">URLS_EXCLUSION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'exclusion_urls'</span></em><a class="headerlink" href="#helper.crawling.Crawling.URLS_EXCLUSION" title="Link to this definition"></a></dt>
@@ -149,50 +151,23 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="helper.crawling.Crawling.crawling_url_deployment">
 <span class="sig-name descname"><span class="pre">crawling_url_deployment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">page_selectors</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_selectors</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">notification_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/crawling.html#Crawling.crawling_url_deployment"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.crawling.Crawling.crawling_url_deployment" title="Link to this definition"></a></dt>
-<dd><dl class="simple">
-<dt>各ページをスクレイピングして、末尾画像のナンバーから、URLを予測して、画像ファイルをダウンロード＆圧縮する</dt><dd><p># crawling_itemsに、page_urlsがあり、各page_urlをpage_selectorsでスクレイピングする
+<dd><p>各ページをスクレイピングして、末尾画像のナンバーから、URLを予測して、画像ファイルをダウンロード＆圧縮する
+# crawling_itemsに、page_urlsがあり、各page_urlをpage_selectorsでスクレイピングする
 # タイトルとURLでダウンロード除外または済みかをチェックして、
 # ダウンロードしない場合は、以降の処理をスキップする
 # 各page_urlをimage_selectorsでスクレイピングしてダウンロードする画像URLリストを作る。
 # 画像URLリストをirvineHelperでダウンロードして、zipファイルにする</p>
-</dd>
-</dl>
-<dl class="field-list simple">
-<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>page_selectors</strong></p></li>
-<li><p><strong>image_selectors</strong></p></li>
-<li><p><strong>notification_id</strong></p></li>
-</ul>
-</dd>
-<dt class="field-even">戻り値<span class="colon">:</span></dt>
-<dd class="field-even"><p></p>
-</dd>
-</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="helper.crawling.Crawling.crawling_urls">
 <span class="sig-name descname"><span class="pre">crawling_urls</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">page_selectors</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_selectors</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/crawling.html#Crawling.crawling_urls"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.crawling.Crawling.crawling_urls" title="Link to this definition"></a></dt>
-<dd><dl class="simple">
-<dt>各ページをスクレイピングして、画像ファイルをダウンロード＆圧縮する</dt><dd><p># crawling_itemsに、page_urlsがあり、各page_urlをpage_selectorsでスクレイピングする
+<dd><p>各ページをスクレイピングして、画像ファイルをダウンロード＆圧縮する
+# crawling_itemsに、page_urlsがあり、各page_urlをpage_selectorsでスクレイピングする
 # タイトルとURLでダウンロード除外または済みかをチェックして、
 # ダウンロードしない場合は、以降の処理をスキップする
 # 各page_urlをimage_selectorsでスクレイピングしてダウンロードする画像URLリストを作る。
 # 画像URLリストをirvineHelperでダウンロードして、zipファイルにする</p>
-</dd>
-</dl>
-<dl class="field-list simple">
-<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>page_selectors</strong></p></li>
-<li><p><strong>image_selectors</strong></p></li>
-</ul>
-</dd>
-<dt class="field-even">戻り値<span class="colon">:</span></dt>
-<dd class="field-even"><p></p>
-</dd>
-</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -223,8 +198,7 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="helper.crawling.Crawling.download_chrome_driver">
 <em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">download_chrome_driver</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">web_file_list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/crawling.html#Crawling.download_chrome_driver"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.crawling.Crawling.download_chrome_driver" title="Link to this definition"></a></dt>
-<dd><p>selenium chromeDriverを用いて、画像をデフォルトダウンロードフォルダにダウンロードして、指定のフォルダに移動する
-:return:</p>
+<dd><p>selenium chromeDriverを用いて、画像をデフォルトダウンロードフォルダにダウンロードして、指定のフォルダに移動する</p>
 </dd></dl>
 
 <dl class="py method">
@@ -260,17 +234,13 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="helper.crawling.Crawling.is_url_included_exclusion_list">
 <span class="sig-name descname"><span class="pre">is_url_included_exclusion_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/crawling.html#Crawling.is_url_included_exclusion_list"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.crawling.Crawling.is_url_included_exclusion_list" title="Link to this definition"></a></dt>
-<dd><p>除外リストに含まれるURLならTrueを返す
-:param url:
-:return:</p>
+<dd><p>除外リストに含まれるURLならTrueを返す</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="helper.crawling.Crawling.is_url_included_failure_list">
 <span class="sig-name descname"><span class="pre">is_url_included_failure_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/crawling.html#Crawling.is_url_included_failure_list"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.crawling.Crawling.is_url_included_failure_list" title="Link to this definition"></a></dt>
-<dd><p>失敗リストに含まれるURLならTrueを返す
-:param url:
-:return:</p>
+<dd><p>失敗リストに含まれるURLならTrueを返す</p>
 </dd></dl>
 
 <dl class="py method">
@@ -281,31 +251,25 @@
 ファイルがなかったり、ファイルが空だったらFalseを返す。
 読み込みに失敗したらファイル名に日時分を付けてバックアップしてFalseを返す。
 crawling_file_pathで指定したファイルを読み込む
-crawling_itemsはマージする
-:return: bool 成功/失敗=True/False</p>
+crawling_itemsはマージする</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="helper.crawling.Crawling.marge_crawling_items">
 <span class="sig-name descname"><span class="pre">marge_crawling_items</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/crawling.html#Crawling.marge_crawling_items"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.crawling.Crawling.marge_crawling_items" title="Link to this definition"></a></dt>
-<dd><p>crawling_itemsのpage_urlsにexclusion_urlsがあったら削除する
-:return:</p>
+<dd><p>crawling_itemsのpage_urlsにexclusion_urlsがあったら削除する</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="helper.crawling.Crawling.move_url_from_page_urls_to_exclusion_urls">
 <span class="sig-name descname"><span class="pre">move_url_from_page_urls_to_exclusion_urls</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/crawling.html#Crawling.move_url_from_page_urls_to_exclusion_urls"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.crawling.Crawling.move_url_from_page_urls_to_exclusion_urls" title="Link to this definition"></a></dt>
-<dd><p>ターゲットリスト(page_urls)から除外リスト(exclusion_urls)にURLを移動する
-:param url:
-:return:</p>
+<dd><p>ターゲットリスト(page_urls)から除外リスト(exclusion_urls)にURLを移動する</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="helper.crawling.Crawling.move_url_from_page_urls_to_failure_urls">
 <span class="sig-name descname"><span class="pre">move_url_from_page_urls_to_failure_urls</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/crawling.html#Crawling.move_url_from_page_urls_to_failure_urls"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.crawling.Crawling.move_url_from_page_urls_to_failure_urls" title="Link to this definition"></a></dt>
-<dd><p>ターゲットリスト(page_urls)から失敗リスト(failure_urls)にURLを移動する
-:param url:
-:return:</p>
+<dd><p>ターゲットリスト(page_urls)から失敗リスト(failure_urls)にURLを移動する</p>
 </dd></dl>
 
 <dl class="py method">
@@ -349,24 +313,74 @@ crawling_itemsはマージする
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">helper.crawling.</span></span><span class="sig-name descname"><span class="pre">CrawlingValue</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">site_url</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">site_selectors</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crawling_items</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crawling_file_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/crawling.html#CrawlingValue"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.crawling.CrawlingValue" title="Link to this definition"></a></dt>
 <dd><p>ベースクラス: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Crawlingの値オブジェクトクラス</p>
+<p>サイトURL、セレクタ、クローリングアイテム、クローリングファイルパスを保持します</p>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="helper.crawling.CrawlingValue.crawling_file_path">
-<span class="sig-name descname"><span class="pre">crawling_file_path</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#helper.crawling.CrawlingValue.crawling_file_path" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="helper.crawling.CrawlingValue.crawling_items">
-<span class="sig-name descname"><span class="pre">crawling_items</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#helper.crawling.CrawlingValue.crawling_items" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dt class="sig sig-object py" id="helper.crawling.CrawlingValue.site_url">
+<span class="sig-name descname"><span class="pre">site_url</span></span><a class="headerlink" href="#helper.crawling.CrawlingValue.site_url" title="Link to this definition"></a></dt>
+<dd><p>サイトURL。</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="helper.crawling.CrawlingValue.site_selectors">
-<span class="sig-name descname"><span class="pre">site_selectors</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#helper.crawling.CrawlingValue.site_selectors" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">site_selectors</span></span><a class="headerlink" href="#helper.crawling.CrawlingValue.site_selectors" title="Link to this definition"></a></dt>
+<dd><p>サイトセレクタ。キーはアイテム名、値はCSSセレクタ</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dict[str, str]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="helper.crawling.CrawlingValue.crawling_items">
+<span class="sig-name descname"><span class="pre">crawling_items</span></span><a class="headerlink" href="#helper.crawling.CrawlingValue.crawling_items" title="Link to this definition"></a></dt>
+<dd><p>クローリングアイテム。キーはアイテムの種類（例：'page_urls'）、値はURLのリスト</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dict[str, List[str]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="helper.crawling.CrawlingValue.crawling_file_path">
+<span class="sig-name descname"><span class="pre">crawling_file_path</span></span><a class="headerlink" href="#helper.crawling.CrawlingValue.crawling_file_path" title="Link to this definition"></a></dt>
+<dd><p>クローリングファイルパス</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="field-list simple">
+<dt class="field-odd">例外<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ValueError</strong> -- 各属性が不正な値（None、空文字列、不正な型）の場合</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id0">
+<span class="sig-name descname"><span class="pre">crawling_file_path</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#id0" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="helper.crawling.CrawlingValue.site_url">
-<span class="sig-name descname"><span class="pre">site_url</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#helper.crawling.CrawlingValue.site_url" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="id2">
+<span class="sig-name descname"><span class="pre">crawling_items</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#id2" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id3">
+<span class="sig-name descname"><span class="pre">site_selectors</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#id3" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id4">
+<span class="sig-name descname"><span class="pre">site_url</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#id4" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>

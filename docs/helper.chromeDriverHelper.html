@@ -59,6 +59,7 @@
 <li class="toctree-l3"><a class="reference internal" href="helper.scraping.html">helper.scraping module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="helper.slack_message_api.html">helper.slack_message_api module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="helper.spreadsheet.html">helper.spreadsheet module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="helper.status.html">helper.status module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="helper.tenki.html">helper.tenki module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="helper.uriHelper.html">helper.uriHelper module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="helper.urlDeployment.html">helper.urlDeployment module</a></li>
@@ -349,6 +350,27 @@ chromeのデフォルトダウンロードフォルダに保存された後に�
 <dt class="sig sig-object py" id="helper.chromeDriverHelper.ChromeDriverHelper.value_object">
 <span class="sig-name descname"><span class="pre">value_object</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#helper.chromeDriverHelper.ChromeDriverHelperValue" title="helper.chromeDriverHelper.ChromeDriverHelperValue"><span class="pre">ChromeDriverHelperValue</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#helper.chromeDriverHelper.ChromeDriverHelper.value_object" title="Link to this definition"></a></dt>
 <dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helper.chromeDriverHelper.ChromeDriverHelper.wait_until">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">wait_until</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">what</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">how</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Callable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wait_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="reference internal" href="_modules/helper/chromeDriverHelper.html#ChromeDriverHelper.wait_until"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.chromeDriverHelper.ChromeDriverHelper.wait_until" title="Link to this definition"></a></dt>
+<dd><p>指定の条件が満たされるまで待機する</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>what</strong> -- 実行する関数</p></li>
+<li><p><strong>how</strong> -- 条件を判定する関数。Trueを返せば待機終了</p></li>
+<li><p><strong>wait_time</strong> -- 最大待機時間（秒）</p></li>
+</ul>
+</dd>
+<dt class="field-even">戻り値<span class="colon">:</span></dt>
+<dd class="field-even"><p>what関数の戻り値</p>
+</dd>
+<dt class="field-odd">例外<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>TimeoutError</strong> -- wait_time秒以内に条件が満たされなかった場合</p>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 

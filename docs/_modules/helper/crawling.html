@@ -89,23 +89,36 @@
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">copy</span>
 <span class="kn">import</span> <span class="nn">inspect</span>
-<span class="kn">import</span> <span class="nn">subprocess</span>
 <span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">import</span> <span class="nn">datetime</span>
 <span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
-<span class="kn">from</span> <span class="nn">helper</span> <span class="kn">import</span> <span class="n">chromeDriverHelper</span>
-<span class="kn">from</span> <span class="nn">helper</span> <span class="kn">import</span> <span class="n">webFileListHelper</span>
-<span class="kn">from</span> <span class="nn">helper</span> <span class="kn">import</span> <span class="n">webFileHelper</span>
-<span class="kn">from</span> <span class="nn">helper</span> <span class="kn">import</span> <span class="n">line_message_api</span>
-<span class="kn">from</span> <span class="nn">helper</span> <span class="kn">import</span> <span class="n">slack_message_api</span>
-<span class="kn">from</span> <span class="nn">helper.status</span> <span class="kn">import</span> <span class="n">Status</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="kn">import</span> <span class="nn">helper.chromeDriverHelper</span>
+<span class="kn">import</span> <span class="nn">helper.webFileListHelper</span>
+<span class="kn">import</span> <span class="nn">helper.webFileHelper</span>
+<span class="kn">import</span> <span class="nn">helper.line_message_api</span>
+<span class="kn">import</span> <span class="nn">helper.slack_message_api</span>
+<span class="kn">import</span> <span class="nn">helper.status</span>
 
 
 <div class="viewcode-block" id="CrawlingValue">
 <a class="viewcode-back" href="../../helper.crawling.html#helper.crawling.CrawlingValue">[ドキュメント]</a>
 <span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="k">class</span> <span class="nc">CrawlingValue</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Crawlingの値オブジェクトクラス&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Crawlingの値オブジェクトクラス</span>
+
+<span class="sd">    サイトURL、セレクタ、クローリングアイテム、クローリングファイルパスを保持します</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        site_url (str): サイトURL。</span>
+<span class="sd">        site_selectors (Dict[str, str]): サイトセレクタ。キーはアイテム名、値はCSSセレクタ</span>
+<span class="sd">        crawling_items (Dict[str, List[str]]): クローリングアイテム。キーはアイテムの種類（例：&#39;page_urls&#39;）、値はURLのリスト</span>
+<span class="sd">        crawling_file_path (str): クローリングファイルパス</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: 各属性が不正な値（None、空文字列、不正な型）の場合</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">site_url</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">site_selectors</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">crawling_items</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="kc">None</span>
@@ -147,7 +160,10 @@
 <div class="viewcode-block" id="Crawling">
 <a class="viewcode-back" href="../../helper.crawling.html#helper.crawling.Crawling">[ドキュメント]</a>
 <span class="k">class</span> <span class="nc">Crawling</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;クローリングクラス&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;クローリングクラス</span>
+
+<span class="sd">    指定されたサイトをクローリングし、結果をファイルに保存します</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">URLS_TARGET</span> <span class="o">=</span> <span class="s2">&quot;page_urls&quot;</span>
     <span class="n">URLS_EXCLUSION</span> <span class="o">=</span> <span class="s2">&quot;exclusion_urls&quot;</span>
     <span class="n">URLS_FAILURE</span> <span class="o">=</span> <span class="s2">&quot;failure_urls&quot;</span>
@@ -201,7 +217,7 @@
     <span class="k">def</span> <span class="nf">scraping</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">selectors</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;ChromeDriverHelperを使ってスクレイピングする&quot;&quot;&quot;</span>
         <span class="n">selectors</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">selectors</span><span class="p">)</span>
-        <span class="n">chrome_driver</span> <span class="o">=</span> <span class="n">chromeDriverHelper</span><span class="o">.</span><span class="n">ChromeDriverHelper</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">selectors</span><span class="p">)</span>
+        <span class="n">chrome_driver</span> <span class="o">=</span> <span class="n">helper</span><span class="o">.</span><span class="n">chromeDriverHelper</span><span class="o">.</span><span class="n">ChromeDriverHelper</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">selectors</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">chrome_driver</span><span class="o">.</span><span class="n">get_items</span><span class="p">()</span></div>
 
 
@@ -249,7 +265,7 @@
                 <span class="n">title</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">now</span><span class="si">:</span><span class="s1">%Y%m%d_%H%M%S</span><span class="si">}</span><span class="s1">&#39;</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">title</span> <span class="o">=</span> <span class="n">title_sub</span>
-        <span class="k">return</span> <span class="n">chromeDriverHelper</span><span class="o">.</span><span class="n">ChromeDriverHelper</span><span class="o">.</span><span class="n">fixed_file_name</span><span class="p">(</span><span class="n">title</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">helper</span><span class="o">.</span><span class="n">chromeDriverHelper</span><span class="o">.</span><span class="n">ChromeDriverHelper</span><span class="o">.</span><span class="n">fixed_file_name</span><span class="p">(</span><span class="n">title</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Crawling.download_chrome_driver">
@@ -257,9 +273,8 @@
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">download_chrome_driver</span><span class="p">(</span><span class="n">web_file_list</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;selenium chromeDriverを用いて、画像をデフォルトダウンロードフォルダにダウンロードして、指定のフォルダに移動する</span>
-<span class="sd">        :return:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">chromedriver</span> <span class="o">=</span> <span class="n">chromeDriverHelper</span><span class="o">.</span><span class="n">ChromeDriverHelper</span><span class="p">()</span>
+        <span class="n">chromedriver</span> <span class="o">=</span> <span class="n">helper</span><span class="o">.</span><span class="n">chromeDriverHelper</span><span class="o">.</span><span class="n">ChromeDriverHelper</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">url</span><span class="p">,</span> <span class="n">path</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">web_file_list</span><span class="o">.</span><span class="n">get_url_list</span><span class="p">(),</span> <span class="n">web_file_list</span><span class="o">.</span><span class="n">get_path_list</span><span class="p">()):</span>
             <span class="n">chromedriver</span><span class="o">.</span><span class="n">download_image</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span></div>
 
@@ -358,7 +373,6 @@
 <span class="sd">        読み込みに失敗したらファイル名に日時分を付けてバックアップしてFalseを返す。</span>
 <span class="sd">        crawling_file_pathで指定したファイルを読み込む</span>
 <span class="sd">        crawling_itemsはマージする</span>
-<span class="sd">        :return: bool 成功/失敗=True/False</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">crawling_file_path</span><span class="p">):</span>
             <span class="k">return</span> <span class="kc">False</span>
@@ -401,8 +415,6 @@
 <a class="viewcode-back" href="../../helper.crawling.html#helper.crawling.Crawling.is_url_included_exclusion_list">[ドキュメント]</a>
     <span class="k">def</span> <span class="nf">is_url_included_exclusion_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;除外リストに含まれるURLならTrueを返す</span>
-<span class="sd">        :param url:</span>
-<span class="sd">        :return:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">crawling_items</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_crawling_items</span><span class="p">()</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">URLS_EXCLUSION</span> <span class="ow">in</span> <span class="n">crawling_items</span><span class="p">:</span>
@@ -415,8 +427,6 @@
 <a class="viewcode-back" href="../../helper.crawling.html#helper.crawling.Crawling.move_url_from_page_urls_to_exclusion_urls">[ドキュメント]</a>
     <span class="k">def</span> <span class="nf">move_url_from_page_urls_to_exclusion_urls</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;ターゲットリスト(page_urls)から除外リスト(exclusion_urls)にURLを移動する</span>
-<span class="sd">        :param url:</span>
-<span class="sd">        :return:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">site_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_site_url</span><span class="p">()</span>
         <span class="n">selectors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_site_selectors</span><span class="p">()</span>
@@ -438,8 +448,6 @@
 <a class="viewcode-back" href="../../helper.crawling.html#helper.crawling.Crawling.is_url_included_failure_list">[ドキュメント]</a>
     <span class="k">def</span> <span class="nf">is_url_included_failure_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;失敗リストに含まれるURLならTrueを返す</span>
-<span class="sd">        :param url:</span>
-<span class="sd">        :return:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">crawling_items</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_crawling_items</span><span class="p">()</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">URLS_FAILURE</span> <span class="ow">in</span> <span class="n">crawling_items</span><span class="p">:</span>
@@ -452,8 +460,6 @@
 <a class="viewcode-back" href="../../helper.crawling.html#helper.crawling.Crawling.move_url_from_page_urls_to_failure_urls">[ドキュメント]</a>
     <span class="k">def</span> <span class="nf">move_url_from_page_urls_to_failure_urls</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;ターゲットリスト(page_urls)から失敗リスト(failure_urls)にURLを移動する</span>
-<span class="sd">        :param url:</span>
-<span class="sd">        :return:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">site_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_site_url</span><span class="p">()</span>
         <span class="n">selectors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_site_selectors</span><span class="p">()</span>
@@ -475,7 +481,6 @@
 <a class="viewcode-back" href="../../helper.crawling.html#helper.crawling.Crawling.marge_crawling_items">[ドキュメント]</a>
     <span class="k">def</span> <span class="nf">marge_crawling_items</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;crawling_itemsのpage_urlsにexclusion_urlsがあったら削除する</span>
-<span class="sd">        :return:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">crawling_items</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_crawling_items</span><span class="p">()</span>
         <span class="n">page_urls</span> <span class="o">=</span> <span class="p">[]</span>
@@ -500,10 +505,6 @@
 <span class="sd">            # ダウンロードしない場合は、以降の処理をスキップする</span>
 <span class="sd">            # 各page_urlをimage_selectorsでスクレイピングしてダウンロードする画像URLリストを作る。</span>
 <span class="sd">            # 画像URLリストをirvineHelperでダウンロードして、zipファイルにする</span>
-<span class="sd">        :param page_selectors:</span>
-<span class="sd">        :param image_selectors:</span>
-<span class="sd">        :param notification_id:</span>
-<span class="sd">        :return:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">crawling_items</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_crawling_items</span><span class="p">()</span>
         <span class="n">page_urls</span> <span class="o">=</span> <span class="p">[]</span>
@@ -511,7 +512,7 @@
             <span class="n">page_urls</span> <span class="o">=</span> <span class="n">crawling_items</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">URLS_TARGET</span><span class="p">]</span>
         <span class="n">total_pages</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">page_urls</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">page_url</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">page_urls</span><span class="p">):</span>
-            <span class="n">status</span> <span class="o">=</span> <span class="n">Status</span><span class="p">()</span>
+            <span class="n">status</span> <span class="o">=</span> <span class="n">helper</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">Status</span><span class="p">()</span>
             <span class="k">if</span> <span class="n">status</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">status</span><span class="o">.</span><span class="n">is_running</span><span class="p">():</span>
                 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;stop status&quot;</span><span class="p">)</span>
                 <span class="k">break</span>
@@ -527,11 +528,11 @@
             <span class="n">items</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scraping</span><span class="p">(</span><span class="n">page_url</span><span class="p">,</span> <span class="n">page_selectors</span><span class="p">)</span>
             <span class="n">languages</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">take_out</span><span class="p">(</span><span class="n">items</span><span class="p">,</span> <span class="s1">&#39;languages&#39;</span><span class="p">)</span>
             <span class="n">title</span> <span class="o">=</span> <span class="n">Crawling</span><span class="o">.</span><span class="n">validate_title</span><span class="p">(</span><span class="n">items</span><span class="p">,</span> <span class="s1">&#39;title_jp&#39;</span><span class="p">,</span> <span class="s1">&#39;title_en&#39;</span><span class="p">)</span>
-            <span class="n">url_title</span> <span class="o">=</span> <span class="n">chromeDriverHelper</span><span class="o">.</span><span class="n">ChromeDriverHelper</span><span class="o">.</span><span class="n">fixed_file_name</span><span class="p">(</span><span class="n">page_url</span><span class="p">)</span>
+            <span class="n">url_title</span> <span class="o">=</span> <span class="n">helper</span><span class="o">.</span><span class="n">chromeDriverHelper</span><span class="o">.</span><span class="n">ChromeDriverHelper</span><span class="o">.</span><span class="n">fixed_file_name</span><span class="p">(</span><span class="n">page_url</span><span class="p">)</span>
 
             <span class="c1"># フォルダがなかったらフォルダを作る</span>
-            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">webFileListHelper</span><span class="o">.</span><span class="n">WebFileListHelper</span><span class="o">.</span><span class="n">work_path</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-            <span class="n">target_file_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">webFileListHelper</span><span class="o">.</span><span class="n">WebFileListHelper</span><span class="o">.</span><span class="n">work_path</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s1">：</span><span class="si">{</span><span class="n">url_title</span><span class="si">}</span><span class="s1">.html&#39;</span><span class="p">)</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">helper</span><span class="o">.</span><span class="n">webFileListHelper</span><span class="o">.</span><span class="n">WebFileListHelper</span><span class="o">.</span><span class="n">work_path</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">target_file_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">helper</span><span class="o">.</span><span class="n">webFileListHelper</span><span class="o">.</span><span class="n">WebFileListHelper</span><span class="o">.</span><span class="n">work_path</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s1">：</span><span class="si">{</span><span class="n">url_title</span><span class="si">}</span><span class="s1">.html&#39;</span><span class="p">)</span>
             <span class="nb">print</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">languages</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">languages</span> <span class="ow">and</span> <span class="n">languages</span> <span class="o">==</span> <span class="s1">&#39;japanese&#39;</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">target_file_name</span><span class="p">):</span>
                 <span class="c1"># ダウンロードするときだけ通知する</span>
@@ -539,7 +540,7 @@
                 <span class="c1"># _line_message_api.send_message(</span>
                 <span class="c1">#     notification_id,</span>
                 <span class="c1">#     f&#39;crawling :現在{current_page}ページ目 / 全{total_pages}ページ中 (残り{remaining_pages}ページ)&#39;)</span>
-                <span class="n">_slack_message_api</span> <span class="o">=</span> <span class="n">slack_message_api</span><span class="o">.</span><span class="n">SlackMessageAPI</span><span class="p">(</span><span class="n">access_token</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+                <span class="n">_slack_message_api</span> <span class="o">=</span> <span class="n">helper</span><span class="o">.</span><span class="n">slack_message_api</span><span class="o">.</span><span class="n">SlackMessageAPI</span><span class="p">(</span><span class="n">access_token</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
                 <span class="n">_slack_message_api</span><span class="o">.</span><span class="n">send_message</span><span class="p">(</span>
                     <span class="n">notification_id</span><span class="p">,</span>
                     <span class="sa">f</span><span class="s1">&#39;crawling :現在</span><span class="si">{</span><span class="n">current_page</span><span class="si">}</span><span class="s1">ページ目 / 全</span><span class="si">{</span><span class="n">total_pages</span><span class="si">}</span><span class="s1">ページ中 (残り</span><span class="si">{</span><span class="n">remaining_pages</span><span class="si">}</span><span class="s1">ページ)&#39;</span><span class="p">)</span>
@@ -549,14 +550,14 @@
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">last_image_url</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;エラー:last_image_urlが不正[</span><span class="si">{</span><span class="n">last_image_url</span><span class="si">}</span><span class="s2">]&quot;</span><span class="p">)</span>
                 <span class="nb">print</span><span class="p">(</span><span class="n">last_image_url</span><span class="p">,</span> <span class="n">image_urls</span><span class="p">)</span>
-                <span class="n">web_file_list</span> <span class="o">=</span> <span class="n">webFileListHelper</span><span class="o">.</span><span class="n">WebFileListHelper</span><span class="p">([</span><span class="n">last_image_url</span><span class="p">])</span>
+                <span class="n">web_file_list</span> <span class="o">=</span> <span class="n">helper</span><span class="o">.</span><span class="n">webFileListHelper</span><span class="o">.</span><span class="n">WebFileListHelper</span><span class="p">([</span><span class="n">last_image_url</span><span class="p">])</span>
                 <span class="c1"># 末尾画像のナンバーから全ての画像URLを推測して展開する</span>
                 <span class="n">web_file_list</span><span class="o">.</span><span class="n">update_value_object_by_deployment_url_list</span><span class="p">()</span>
                 <span class="n">url_list</span> <span class="o">=</span> <span class="n">web_file_list</span><span class="o">.</span><span class="n">get_url_list</span><span class="p">()</span>
                 <span class="nb">print</span><span class="p">(</span><span class="n">url_list</span><span class="p">)</span>
 
                 <span class="n">web_file_list</span><span class="o">.</span><span class="n">download_irvine</span><span class="p">()</span>
-                <span class="k">for</span> <span class="n">count</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">webFileHelper</span><span class="o">.</span><span class="n">WebFileHelper</span><span class="o">.</span><span class="n">ext_list</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">count</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">helper</span><span class="o">.</span><span class="n">webFileHelper</span><span class="o">.</span><span class="n">WebFileHelper</span><span class="o">.</span><span class="n">ext_list</span><span class="p">):</span>
                     <span class="k">if</span> <span class="n">web_file_list</span><span class="o">.</span><span class="n">is_exist</span><span class="p">():</span>
                         <span class="k">break</span>
                     <span class="c1"># ダウンロードに失敗しているときは、失敗しているファイルの拡張子を変えてダウンロードしなおす</span>
@@ -571,7 +572,7 @@
                         <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
                 <span class="n">web_file_list</span><span class="o">.</span><span class="n">delete_local_files</span><span class="p">()</span>
                 <span class="c1"># 成功したらチェック用ファイルを残す</span>
-                <span class="n">chromeDriverHelper</span><span class="o">.</span><span class="n">ChromeDriverHelper</span><span class="p">()</span><span class="o">.</span><span class="n">save_source</span><span class="p">(</span><span class="n">target_file_name</span><span class="p">)</span>
+                <span class="n">helper</span><span class="o">.</span><span class="n">chromeDriverHelper</span><span class="o">.</span><span class="n">ChromeDriverHelper</span><span class="p">()</span><span class="o">.</span><span class="n">save_source</span><span class="p">(</span><span class="n">target_file_name</span><span class="p">)</span>
                 <span class="c1"># page_urlsからexclusion_urlsにURLを移して保存する</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">move_url_from_page_urls_to_exclusion_urls</span><span class="p">(</span><span class="n">page_url</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
@@ -588,16 +589,13 @@
 <span class="sd">            # ダウンロードしない場合は、以降の処理をスキップする</span>
 <span class="sd">            # 各page_urlをimage_selectorsでスクレイピングしてダウンロードする画像URLリストを作る。</span>
 <span class="sd">            # 画像URLリストをirvineHelperでダウンロードして、zipファイルにする</span>
-<span class="sd">        :param page_selectors:</span>
-<span class="sd">        :param image_selectors:</span>
-<span class="sd">        :return:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">crawling_items</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_crawling_items</span><span class="p">()</span>
         <span class="n">page_urls</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">URLS_TARGET</span> <span class="ow">in</span> <span class="n">crawling_items</span><span class="p">:</span>
             <span class="n">page_urls</span> <span class="o">=</span> <span class="n">crawling_items</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">URLS_TARGET</span><span class="p">]</span>
         <span class="k">for</span> <span class="n">page_url</span> <span class="ow">in</span> <span class="n">page_urls</span><span class="p">:</span>
-            <span class="n">status</span> <span class="o">=</span> <span class="n">Status</span><span class="p">()</span>
+            <span class="n">status</span> <span class="o">=</span> <span class="n">helper</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">Status</span><span class="p">()</span>
             <span class="k">if</span> <span class="n">status</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">status</span><span class="o">.</span><span class="n">is_running</span><span class="p">():</span>
                 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;stop status&quot;</span><span class="p">)</span>
                 <span class="k">break</span>
@@ -610,19 +608,19 @@
                 <span class="k">continue</span>
             <span class="n">items</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scraping</span><span class="p">(</span><span class="n">page_url</span><span class="p">,</span> <span class="n">page_selectors</span><span class="p">)</span>
             <span class="n">title</span> <span class="o">=</span> <span class="n">Crawling</span><span class="o">.</span><span class="n">validate_title</span><span class="p">(</span><span class="n">items</span><span class="p">,</span> <span class="s1">&#39;title_jp&#39;</span><span class="p">,</span> <span class="s1">&#39;title_en&#39;</span><span class="p">)</span>
-            <span class="n">url_title</span> <span class="o">=</span> <span class="n">chromeDriverHelper</span><span class="o">.</span><span class="n">ChromeDriverHelper</span><span class="o">.</span><span class="n">fixed_file_name</span><span class="p">(</span><span class="n">page_url</span><span class="p">)</span>
+            <span class="n">url_title</span> <span class="o">=</span> <span class="n">helper</span><span class="o">.</span><span class="n">chromeDriverHelper</span><span class="o">.</span><span class="n">ChromeDriverHelper</span><span class="o">.</span><span class="n">fixed_file_name</span><span class="p">(</span><span class="n">page_url</span><span class="p">)</span>
 
             <span class="c1"># フォルダがなかったらフォルダを作る</span>
-            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">webFileListHelper</span><span class="o">.</span><span class="n">WebFileListHelper</span><span class="o">.</span><span class="n">work_path</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-            <span class="n">target_file_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">webFileListHelper</span><span class="o">.</span><span class="n">WebFileListHelper</span><span class="o">.</span><span class="n">work_path</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s1">：</span><span class="si">{</span><span class="n">url_title</span><span class="si">}</span><span class="s1">.html&#39;</span><span class="p">)</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">helper</span><span class="o">.</span><span class="n">webFileListHelper</span><span class="o">.</span><span class="n">WebFileListHelper</span><span class="o">.</span><span class="n">work_path</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">target_file_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">helper</span><span class="o">.</span><span class="n">webFileListHelper</span><span class="o">.</span><span class="n">WebFileListHelper</span><span class="o">.</span><span class="n">work_path</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s1">：</span><span class="si">{</span><span class="n">url_title</span><span class="si">}</span><span class="s1">.html&#39;</span><span class="p">)</span>
             <span class="nb">print</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">target_file_name</span><span class="p">):</span>
                 <span class="n">image_items</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scraping</span><span class="p">(</span><span class="n">page_url</span><span class="p">,</span> <span class="n">image_selectors</span><span class="p">)</span>
                 <span class="n">image_urls</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">take_out</span><span class="p">(</span><span class="n">image_items</span><span class="p">,</span> <span class="s1">&#39;image_urls&#39;</span><span class="p">)</span>
                 <span class="nb">print</span><span class="p">(</span><span class="n">image_urls</span><span class="p">)</span>
-                <span class="n">web_file_list</span> <span class="o">=</span> <span class="n">webFileListHelper</span><span class="o">.</span><span class="n">WebFileListHelper</span><span class="p">(</span><span class="n">image_urls</span><span class="p">)</span>
+                <span class="n">web_file_list</span> <span class="o">=</span> <span class="n">helper</span><span class="o">.</span><span class="n">webFileListHelper</span><span class="o">.</span><span class="n">WebFileListHelper</span><span class="p">(</span><span class="n">image_urls</span><span class="p">)</span>
                 <span class="n">web_file_list</span><span class="o">.</span><span class="n">download_irvine</span><span class="p">()</span>
-                <span class="k">for</span> <span class="n">count</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">webFileHelper</span><span class="o">.</span><span class="n">WebFileHelper</span><span class="o">.</span><span class="n">ext_list</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">count</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">helper</span><span class="o">.</span><span class="n">webFileHelper</span><span class="o">.</span><span class="n">WebFileHelper</span><span class="o">.</span><span class="n">ext_list</span><span class="p">):</span>
                     <span class="k">if</span> <span class="n">web_file_list</span><span class="o">.</span><span class="n">is_exist</span><span class="p">():</span>
                         <span class="k">break</span>
                     <span class="c1"># ダウンロードに失敗しているときは、失敗しているファイルの拡張子を変えてダウンロードしなおす</span>
@@ -635,23 +633,11 @@
                         <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
                 <span class="n">web_file_list</span><span class="o">.</span><span class="n">delete_local_files</span><span class="p">()</span>
                 <span class="c1"># 成功したらチェック用ファイルを残す</span>
-                <span class="n">chromeDriverHelper</span><span class="o">.</span><span class="n">ChromeDriverHelper</span><span class="p">()</span><span class="o">.</span><span class="n">save_source</span><span class="p">(</span><span class="n">target_file_name</span><span class="p">)</span>
+                <span class="n">helper</span><span class="o">.</span><span class="n">chromeDriverHelper</span><span class="o">.</span><span class="n">ChromeDriverHelper</span><span class="p">()</span><span class="o">.</span><span class="n">save_source</span><span class="p">(</span><span class="n">target_file_name</span><span class="p">)</span>
             <span class="c1"># page_urlsからexclusion_urlsにURLを移して保存する</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">move_url_from_page_urls_to_exclusion_urls</span><span class="p">(</span><span class="n">page_url</span><span class="p">)</span></div>
 </div>
 
-
-
-<span class="c1"># 検証コード</span>
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>  <span class="c1"># インポート時には動かない</span>
-    <span class="n">load_path</span> <span class="o">=</span> <span class="s1">&#39;../downloadlist.txt&#39;</span>
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">load_path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">work_file</span><span class="p">:</span>
-        <span class="n">buff</span> <span class="o">=</span> <span class="n">work_file</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">buff</span><span class="p">:</span>
-            <span class="n">target_url</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
-            <span class="c1"># subprocess.run([&#39;python&#39;, &#39;imgdl.py&#39;, target_url])</span>
-            <span class="c1"># 画像が連番の場合、selenium</span>
-            <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="s1">&#39;python&#39;</span><span class="p">,</span> <span class="s1">&#39;urlDeployment.py&#39;</span><span class="p">,</span> <span class="n">target_url</span><span class="p">])</span>
 </pre></div>
 
            </div>

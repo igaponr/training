@@ -93,10 +93,9 @@
 <span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
 <span class="kn">from</span> <span class="nn">urllib.parse</span> <span class="kn">import</span> <span class="n">urlparse</span>  <span class="c1"># URLパーサー</span>
 <span class="kn">from</span> <span class="nn">urllib.parse</span> <span class="kn">import</span> <span class="n">urlunparse</span>
-<span class="kn">import</span> <span class="nn">pyperclip</span>  <span class="c1"># クリップボード</span>
-<span class="kn">from</span> <span class="nn">helper</span> <span class="kn">import</span> <span class="n">chromeDriverHelper</span>
-<span class="kn">from</span> <span class="nn">helper</span> <span class="kn">import</span> <span class="n">webFileListHelper</span>
-<span class="kn">from</span> <span class="nn">helper</span> <span class="kn">import</span> <span class="n">webFileHelper</span>
+<span class="kn">import</span> <span class="nn">helper.chromeDriverHelper</span>
+<span class="kn">import</span> <span class="nn">helper.webFileListHelper</span>
+<span class="kn">import</span> <span class="nn">helper.webFileHelper</span>
 
 <span class="c1"># local source</span>
 <span class="kn">from</span> <span class="nn">const</span> <span class="kn">import</span> <span class="o">*</span>
@@ -173,7 +172,7 @@
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">__selectors</span> <span class="o">=</span> <span class="n">selectors_or_title</span>
                     <span class="n">page_url</span> <span class="o">=</span> <span class="n">value_object</span>
-                    <span class="n">__driver</span> <span class="o">=</span> <span class="n">chromeDriverHelper</span><span class="o">.</span><span class="n">ChromeDriverHelper</span><span class="p">(</span><span class="n">value_object</span><span class="p">,</span> <span class="n">__selectors</span><span class="p">)</span>
+                    <span class="n">__driver</span> <span class="o">=</span> <span class="n">helper</span><span class="o">.</span><span class="n">chromeDriverHelper</span><span class="o">.</span><span class="n">ChromeDriverHelper</span><span class="p">(</span><span class="n">value_object</span><span class="p">,</span> <span class="n">__selectors</span><span class="p">)</span>
                     <span class="n">items</span> <span class="o">=</span> <span class="n">__driver</span><span class="o">.</span><span class="n">get_items</span><span class="p">()</span>
 
                     <span class="n">_title</span> <span class="o">=</span> <span class="kc">None</span>
@@ -271,54 +270,6 @@
         <span class="k">return</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value_object</span><span class="o">.</span><span class="n">image_urls</span><span class="p">)</span></div>
 </div>
 
-
-
-<span class="c1"># 検証コード</span>
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>  <span class="c1"># インポート時には動かない</span>
-    <span class="n">folder_path</span> <span class="o">=</span> <span class="n">OUTPUT_FOLDER_PATH</span>
-    <span class="n">url_list</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="n">main_title</span> <span class="o">=</span> <span class="s1">&#39;[] a&#39;</span>
-    <span class="n">list_file_path</span> <span class="o">=</span> <span class="s1">&#39;../irvine_download_list.txt&#39;</span>
-    <span class="c1"># 引数チェック</span>
-    <span class="k">if</span> <span class="mi">3</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">):</span>
-        <span class="c1"># Pythonに以下の3つ引数を渡す想定</span>
-        <span class="c1"># 0は固定でスクリプト名</span>
-        <span class="c1"># 1.対象のURL</span>
-        <span class="c1"># 2.対象のタイトル(後にファイル名にする)</span>
-        <span class="n">paste_str</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-        <span class="n">main_title</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
-    <span class="k">elif</span> <span class="mi">2</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">):</span>
-        <span class="c1"># Pythonに以下の2つ引数を渡す想定</span>
-        <span class="c1"># 0は固定でスクリプト名</span>
-        <span class="c1"># 1.対象のURL</span>
-        <span class="n">paste_str</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-    <span class="k">elif</span> <span class="mi">1</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">):</span>
-        <span class="c1"># 引数がなければ、クリップボードからURLを得る</span>
-        <span class="n">paste_str</span> <span class="o">=</span> <span class="n">pyperclip</span><span class="o">.</span><span class="n">paste</span><span class="p">()</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;引数が不正です。&#39;</span><span class="p">)</span>
-        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-
-    <span class="c1"># スクレイピングして末尾画像のナンバーから全ての画像URLを推測して展開する</span>
-    <span class="n">url_deployment</span> <span class="o">=</span> <span class="n">UrlDeployment</span><span class="p">(</span><span class="n">paste_str</span><span class="p">,</span> <span class="n">SELECTORS</span><span class="p">)</span>
-    <span class="n">title</span> <span class="o">=</span> <span class="n">url_deployment</span><span class="o">.</span><span class="n">get_title</span><span class="p">()</span>
-    <span class="n">url_title</span> <span class="o">=</span> <span class="n">chromeDriverHelper</span><span class="o">.</span><span class="n">ChromeDriverHelper</span><span class="o">.</span><span class="n">fixed_file_name</span><span class="p">(</span><span class="n">paste_str</span><span class="p">)</span>
-    <span class="n">url_list</span> <span class="o">=</span> <span class="n">url_deployment</span><span class="o">.</span><span class="n">get_image_urls</span><span class="p">()</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">url_list</span><span class="p">)</span>
-    <span class="n">web_file_list</span> <span class="o">=</span> <span class="n">webFileListHelper</span><span class="o">.</span><span class="n">WebFileListHelper</span><span class="p">(</span><span class="n">url_list</span><span class="p">)</span>
-    <span class="n">web_file_list</span><span class="o">.</span><span class="n">download_irvine</span><span class="p">()</span>
-    <span class="k">for</span> <span class="n">count</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">webFileHelper</span><span class="o">.</span><span class="n">WebFileHelper</span><span class="o">.</span><span class="n">ext_list</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">web_file_list</span><span class="o">.</span><span class="n">is_exist</span><span class="p">():</span>
-            <span class="k">break</span>
-        <span class="c1"># ダウンロードに失敗しているときは、失敗しているファイルの拡張子を変えてダウンロードしなおす</span>
-        <span class="n">web_file_list</span><span class="o">.</span><span class="n">rename_url_ext_shift</span><span class="p">()</span>
-        <span class="n">web_file_list</span><span class="o">.</span><span class="n">download_irvine</span><span class="p">()</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">web_file_list</span><span class="o">.</span><span class="n">make_zip_file</span><span class="p">():</span>
-        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">web_file_list</span><span class="o">.</span><span class="n">rename_zip_file</span><span class="p">(</span><span class="n">title</span><span class="p">):</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">web_file_list</span><span class="o">.</span><span class="n">rename_zip_file</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s1">：</span><span class="si">{</span><span class="n">url_title</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">):</span>
-            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
-    <span class="n">web_file_list</span><span class="o">.</span><span class="n">delete_local_files</span><span class="p">()</span>
 </pre></div>
 
            </div>
