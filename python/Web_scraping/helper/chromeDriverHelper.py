@@ -2,28 +2,7 @@
 # -*- coding: utf-8 -*-
 """Selenium Chromeドライバのヘルパー
 
-- コンストラクタで引数を指定するとスクレイピングまで実施されてget_value_objectが有効になる
-    - fixed_path (staticmethod)フォルダ名の禁止文字を全角文字に置き換える
-    - fixed_file_name (staticmethod)ファイル名の禁止文字を全角文字に置き換える
-    - scraping (staticmethod、画面依存)現在表示のURLにスクレイピングする
-    - scroll_element (画面遷移有)指定のelementまでスクロールする
-    - get_value_object 値オブジェクトを取得する
-    - get_url URLを取得する
-    - get_selectors セレクタを取得する
-    - get_items スクレイピング結果を取得する
-    - destroy Chromeを閉じる
-    - get_source Chromeで表示しているタブのsourceを取得する
-    - save_source Chromeで表示しているタブのsourceをファイルに保存する
-    - back (画面遷移有)ブラウザの戻るボタン押下と同じ動作
-    - forward (画面遷移有)ブラウザの進むボタン押下と同じ動作
-    - next_tab (画面遷移有)openで作ったタブ(__window_handle_list)の内、一つ後のタブを表示する
-    - previous_tab (画面遷移有)openで作ったタブ(__window_handle_list)の内、一つ前のタブを表示する
-    - download_image (画面遷移有)urlの画像を保存する(open_new_tab → save_image → closeする)
-    - open_current_tab (画面依存)現在表示されているタブでurlを開く
-    - open_new_tab (画面遷移有)新しいタブでurlを開く
-    - open_new_tabs (画面遷移有)新しいタブでurlリストを開く
-    - close (画面遷移有)指定の画面か、現在の画面を閉じる
-    - save_image (画面依存)表示されている画像を保存する(Chromeデフォルトダウンロードフォルダに保存)
+- selenium chromeでスクレイピングを実施する
 - 参考記事
     - https://note.nkmk.me/python/
     - https://maku77.github.io/python/
@@ -36,9 +15,6 @@
     - https://www.seleniumqref.com/api/webdriver_gyaku.html
     - https://www.selenium.dev/ja/documentation/webdriver/getting_started/
     - https://kurozumi.github.io/selenium-python/index.html
-
-Todo:
-    - docstringを整える
 """
 import os
 import copy
@@ -47,6 +23,7 @@ import subprocess
 import time
 import inspect
 import typing as t
+from typing import Any
 
 import psutil
 from urllib.parse import urlparse
@@ -59,6 +36,8 @@ from selenium.webdriver import ChromeOptions
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.remote.webelement import WebElement
+from selenium.webdriver.common.by import By
 from webdriver_manager.chrome import ChromeDriverManager
 
 import helper.uriHelper
@@ -73,11 +52,13 @@ class ChromeDriverHelperValue:
     selectors: dict = None
     items: dict = None
 
-    def __init__(self, url, selectors, items):
+    def __init__(self, url: str, selectors, items):
         """完全コンストラクタパターン
-        :param url: str 処理対象サイトURL
-        :param selectors: dict スクレイピングする際のセレクタリスト
-        :param items: dict スクレイピングして取得した値の辞書
+
+        Attributes:
+            url: str 処理対象サイトURL
+            selectors: dict スクレイピングする際のセレクタリスト
+            items: dict スクレイピングして取得した値の辞書
         """
         if not url:
             raise ValueError(f"{self.__class__.__name__}.{inspect.stack()[1].function}"
@@ -111,6 +92,16 @@ class ChromeDriverHelperValue:
 
 class ChromeDriverHelper:
     """chromeドライバを操作する
+
+    Attributes:
+        value_object: ChromeDriverHelperValue インスタンス。スクレイピング結果などを保持する
+        download_path: ダウンロードファイルの保存先パス
+
+    Example:
+        >>> helper = ChromeDriverHelper(url="https://www.google.com", selectors={"title": [(By.TAG_NAME, "title", lambda elem: elem.text)]})
+        >>> print(helper.get_items())
+        {'title': ['Google']}
+        >>> helper.destroy()
     """
     value_object: ChromeDriverHelperValue = None
     download_path: str = os.path.join(os.path.dirname(os.path.abspath(__file__)),
@@ -120,7 +111,6 @@ class ChromeDriverHelper:
     __wait = None
     __source = None
     __start_window_handle = None
-    __window_handle_list = []
     root_path = os.path.dirname(os.path.abspath(__file__))
     driver_path = os.path.join(root_path, r'driver\chromedriver.exe')
     chrome_path = r'"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe"'
@@ -139,14 +129,23 @@ class ChromeDriverHelper:
             f' -remote-debugging-port={__port}' \
             f' --user-data-dir="{profile_path}"'
 
-    def __init__(self, value_object=None, selectors=None, download_path=download_path):
+    def __init__(self,
+                 value_object: t.Union[ChromeDriverHelperValue, str] = None,
+                 selectors: dict = None,
+                 download_path: str = download_path):
         """コンストラクタ
-        値オブジェクトからの復元、
-        または、urlとselectorsより、値オブジェクトを作成する
-        :param value_object: list 対象となるサイトURL、または、値オブジェクト
-        :param selectors: dict スクレイピングする際のセレクタリスト
-        :param download_path: str ダウンロードフォルダのパス
+
+        値オブジェクトからの復元、または、urlとselectorsより、値オブジェクトを作成する
+
+        Args:
+            value_object (ChromeDriverHelperValue | str | None): 対象となるサイトURL、または、値オブジェクト。デフォルトは None
+            selectors (dict, optional): スクレイピングする際のセレクタリスト。デフォルトは None
+            download_path (str, optional): ダウンロードフォルダのパス。デフォルトは download_path
+
+        Raises:
+            ValueError: value_object が ChromeDriverHelperValue または str ではない場合、または selectors が不正な場合
         """
+        self._window_handle_list = []
         self.__start()
         if download_path:
             self.download_path = download_path
@@ -168,11 +167,12 @@ class ChromeDriverHelper:
                                  f"引数エラー:value_objectが不正[{value_object}]")
 
     @staticmethod
-    def is_chrome_running_in_debug_mode():
-        """chrome.exeが起動していて、9222ポートに応答することを確認する
-        :return: bool 全ての条件を満たす場合True、そうでない場合False
+    def is_chrome_running_in_debug_mode() -> bool:
+        """Chrome がデバッグモードで実行されているか確認する
+
+        Returns:
+            True: Chrome が起動し、9222 ポートに応答する場合. False: それ以外
         """
-        # chrome.exeが起動しているか確認
         chrome_running = False
         for proc in psutil.process_iter():
             try:
@@ -184,7 +184,6 @@ class ChromeDriverHelper:
         if not chrome_running:
             print("chrome見つからず。")
             return False
-        # 9222ポートに応答しているか確認
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             try:
                 s.connect(('127.0.0.1', int(ChromeDriverHelper.__port)))
@@ -194,10 +193,14 @@ class ChromeDriverHelper:
                 return False
 
     @staticmethod
-    def fixed_path(file_path):
+    def fixed_path(file_path: str) -> str:
         """フォルダ名の禁止文字を全角文字に置き換える
-        :param file_path: str 置き換えたいフォルダパス
-        :return: str 置き換え後のフォルダパス
+
+        Args:
+            file_path: 置き換えたいフォルダパス
+
+        Returns:
+            置き換え後のフォルダパス
         """
         file_path = file_path.replace(':', '：')
         file_path = file_path.replace('*', '＊')
@@ -209,17 +212,30 @@ class ChromeDriverHelper:
         return file_path
 
     @staticmethod
-    def fixed_file_name(file_name):
+    def fixed_file_name(file_name: str) -> str:
         """ファイル名の禁止文字を全角文字に置き換える
-        :param file_name: str 置き換えたいファイル名
-        :return: str 置き換え後のファイル名
+
+        Args:
+            file_name: 置き換えたいファイル名
+
+        Returns:
+            置き換え後のファイル名
         """
         file_name = file_name.replace(os.sep, '￥')
         file_name = file_name.replace('/', '／')
         return ChromeDriverHelper.fixed_path(file_name)
 
-    def scraping(self, selectors):
-        """(画面依存)現在表示のURLにスクレイピングする"""
+    def scraping(self, selectors: dict[str, list[tuple[By, str, t.Callable[[WebElement], str]]]]) -> dict[str, list[str]]:
+        """現在表示の URL に対してスクレイピングを実行する
+
+        Args:
+            selectors: スクレイピングする際のセレクタリスト
+                      key: スクレイピング結果のキー
+                      value: [(By, セレクタ, WebElementに対するアクション)...] のリスト
+
+        Returns:
+            スクレイピング結果の辞書
+        """
         items = {}
         for key, selector_list in selectors.items():
             if key == "title":
@@ -229,54 +245,90 @@ class ChromeDriverHelper:
         self.value_object = ChromeDriverHelperValue(self._driver.current_url, selectors, items)
         return items
 
-    def scroll_element(self, element):
-        """(画面遷移有)elementまでスクロールする"""
+    def scroll_element(self, element: WebElement) -> None:
+        """指定された要素までスクロールする
+
+        Args:
+            element: スクロール先の要素
+        """
         actions = ActionChains(self._driver)
         actions.move_to_element(element)
         actions.perform()
 
-    def get_value_object(self):
-        """値オブジェクトを取得する"""
+    def get_value_object(self) -> ChromeDriverHelperValue:
+        """値オブジェクトを取得する
+
+        Returns:
+            値オブジェクト
+
+        Raises:
+            ValueError: value_object が存在しない場合
+        """
         if self.value_object:
             return copy.deepcopy(self.value_object)
         raise ValueError(f"{self.__class__.__name__}.{inspect.stack()[1].function}"
                          f"オブジェクトエラー:value_object")
 
-    def get_url(self):
-        """URLを取得する"""
+    def get_url(self) -> str:
+        """URL を取得する
+
+        Returns:
+            URL
+
+        Raises:
+            ValueError: URL が存在しない場合
+        """
         if self.get_value_object():
             return copy.deepcopy(self.get_value_object().url)
         raise ValueError(f"{self.__class__.__name__}.{inspect.stack()[1].function}"
                          f"オブジェクトエラー:url")
 
-    def get_selectors(self):
-        """セレクタを取得する"""
+    def get_selectors(self) -> dict[str, list[tuple[By, str, t.Callable[[WebElement], str]]]]:
+        """セレクタを取得する
+
+        Returns:
+             セレクタ
+
+        Raises:
+            ValueError: セレクタが存在しない場合
+        """
         if self.get_value_object():
             return copy.deepcopy(self.get_value_object().selectors)
         raise ValueError(f"{self.__class__.__name__}.{inspect.stack()[1].function}"
                          f"オブジェクトエラー:selectors")
 
-    def get_items(self):
-        """スクレイピング結果を取得する"""
+    def get_items(self) -> dict[str, list[str]]:
+        """スクレイピング結果を取得する
+
+        Returns:
+            スクレイピング結果
+
+        Raises:
+            ValueError: スクレイピング結果が存在しない場合
+        """
         if self.get_value_object():
             return copy.deepcopy(self.get_value_object().items)
         raise ValueError(f"{self.__class__.__name__}.{inspect.stack()[1].function}"
                          f"オブジェクトエラー:items")
 
-    def __add_options(self, *args):
-        """オプション追加
-        :param args: tuple(str, str) 追加するキーと値
-        :return:
+    def __add_options(self, *args: tuple[str, Any]) -> None:
+        """Chrome オプションを追加する
+
+        Args:
+            *args: 追加するオプションのタプル
         """
         self.__options.add_experimental_option(*args)
 
-    def __add_argument(self, args):
+    def __add_argument(self, args: str) -> None:
+        """Chrome 引数を追加する
+
+        Args:
+            args: 追加する引数
+        """
         self.__options.add_argument(args)
 
-    def __start(self):
-        """Chromeへの接続を完了する。起動していなければ起動する。既に開いているtabは、とりあえず気にしない
-        :return:
-        """
+    def __start(self) -> None:
+        """Chromeへの接続を完了する。起動していなければ起動する。既に開いているtabは、とりあえず気にしない"""
         # TODO: __add_argumentが効いてない、使い方を調べる
         #        for arg in self.__chrome_add_argument:
         #            self.__add_argument(arg)
@@ -295,38 +347,39 @@ class ChromeDriverHelper:
             self.__connection()
         self.__start_window_handle = self._driver.current_window_handle
 
-    def __connection(self):
-        """起動しているchromeに接続
-        :return:
-        """
+    def __connection(self) -> None:
+        """起動しているchromeに接続"""
         chrome_service = Service(executable_path=ChromeDriverManager().install())
         self._driver = webdriver.Chrome(service=chrome_service, options=self.__options)
         # self._driver = Chrome(executable_path=ChromeDriverManager().install(), options=self.__options)
 
-    def __create(self):
-        """chromeを起動する
-        :return:
-        """
+    def __create(self) -> None:
+        """chromeを起動する"""
         subprocess.Popen(self.__cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
-    def destroy(self):
-        """chromeが開いていれば閉じる
-        :return: なし
-        """
+    def destroy(self) -> None:
+        """chromeが開いていれば閉じる"""
         if self._driver is not None:
-            for __window_handle in self.__window_handle_list:
-                self.close()
-            if self.__start_window_handle:
+            for __window_handle in self._window_handle_list:
+                self.close(__window_handle)
+            if self.__start_window_handle : # None でない場合のみclose()を呼ぶ
                 self._driver.switch_to.window(self.__start_window_handle)
                 self._driver.close()
                 self.__start_window_handle = None
             self._driver.quit()
             self._driver = None
 
-    def __gen_scraping_selectors(self, selectors):
+    def __gen_scraping_selectors(self, selectors: dict) -> t.Generator[list[str], None, None]:
         """(画面依存)chromeで開いているサイトに対して、スクレイピング結果を返すジェネレータ
-        :param selectors: dict{key, list[tuple(by, selector, action)]}] スクレイピングの規則
-        :return: list[str] スクレイピング結果をlistに入れて返す
+
+        Args:
+            selectors (dict): {key, list[tuple(by, selector, action)]}] スクレイピングの規則
+
+        Yields:
+            list[str]: スクレイピング結果をlistに入れて返す
+
+        Raises:
+            ValueError: URLが不正な場合
         """
         for key, selector_list in selectors.items():
             while selector_list:
@@ -342,14 +395,21 @@ class ChromeDriverHelper:
                             raise ValueError(f"{self.__class__.__name__}.{inspect.stack()[1].function}"
                                              f"引数エラー:urlが不正[{url}]")
                 else:
-                    for _ in self.__window_handle_list:
+                    for _ in self._window_handle_list:
                         self.close()
                     yield ret_list
 
-    def __get_scraping_selector_list(self, selector_list):
+    def __get_scraping_selector_list(self, selector_list: list) -> list:
         """(画面依存)chromeで開いているサイトに対して、スクレイピング結果を返す
-        :param selector_list: list[tuple(by, selector, action)] スクレイピングの規則
-        :return: list[str] スクレイピング結果をlistに入れて返す
+
+        Args:
+            selector_list: list[tuple(by, selector, action)]: スクレイピングの規則
+
+        Returns:
+            list[str]: スクレイピング結果をlistに入れて返す
+
+        Raises:
+          ValueError: URLが不正な場合
         """
         selector_list = copy.deepcopy(selector_list)
         while selector_list:
@@ -365,21 +425,28 @@ class ChromeDriverHelper:
                         raise ValueError(f"{self.__class__.__name__}.{inspect.stack()[1].function}"
                                          f"引数エラー:urlが不正[{url}]")
             else:
-                for _ in self.__window_handle_list:
+                for _ in self._window_handle_list:
                     self.close()
                 return ret_list
 
-    def __get_scraping_selector(self, by, selector, action):
-        """(画面遷移有)現在の画面(self._window_handle_listがあればそれ、無ければself.__start_window_handle)について、
-        スクレイピングして、画面を閉じて、結果を返す
-        :param by:
-        :param selector:
-        :param action:
-        :return:
+    def __get_scraping_selector(self, by: By, selector: str, action: t.Callable[[WebElement], str]) -> t.List[str]:
+        """(画面遷移有)現在の画面について、スクレイピングして、結果を返す
+
+        Args:
+            by: セレクタの種類 (e.g., By.ID, By.XPATH)
+            selector: セレクタ文字列
+            action: WebElementに対して実行する関数 (e.g., lambda elem: elem.text)
+
+        Returns:
+            スクレイピング結果のリスト
+
+        Raises:
+            NoSuchElementException: 指定されたセレクタを持つ要素が見つからない場合
+            その他の例外: actionの実行中に例外が発生した場合
         """
         try:
             ret_list = []
-            __temp_window_handle_list = copy.deepcopy(self.__window_handle_list)
+            __temp_window_handle_list = copy.deepcopy(self._window_handle_list)
             if __temp_window_handle_list:
                 count = len(__temp_window_handle_list)
             else:
@@ -390,64 +457,77 @@ class ChromeDriverHelper:
                     self.scroll_element(elem)
                     text = action(elem)
                     ret_list.append(text)
-                self.close()
-        except NoSuchElementException:
+                if count != 1:
+                    self.close()
+            return ret_list
+        except NoSuchElementException as e:
             # find_elementsでelementが見つからなかったとき
-            ret_list = [""]
-        return ret_list
+            print(f"NoSuchElementException: {e}")
+            return []
+        except Exception as e:
+            print(f"An unexpected error occurred: {e}")
+            return []
 
-    def get_source(self):
+    def get_source(self) -> str:
         """(画面依存)現在の画面(chromeで現在表示しているタブ)のソースコードを取得する
-        :return: str ソースコード
+
+        Returns:
+            str: ソースコード
         """
         self.__source = self._driver.page_source
         return copy.deepcopy(self.__source)
 
-    def save_source(self, path='./title.html'):
+    def save_source(self, path: str = './title.html') -> None:
         """(画面依存)現在の画面のソースコードをファイルに保存する
-        :param path: str 保存するファイルパス(URLかタイトルを指定するとよさそう)
-        :return:
+
+        Args:
+            path (str, optional): 保存するファイルパス(URLかタイトルを指定するとよさそう)。 デフォルトは './title.html'
         """
         html = self.get_source()
         with open(path, 'w', encoding='utf-8') as f:
             f.write(html)
 
-    def back(self):
-        """(画面遷移有)ブラウザの戻るボタン押下と同じ動作
-        :return:
-        """
+    def back(self) -> None:
+        """(画面遷移有)ブラウザの戻るボタン押下と同じ動作"""
         self._driver.back()
 
-    def forward(self):
-        """(画面遷移有)ブラウザの進むボタン押下と同じ動作
-        :return:
-        """
+    def forward(self) -> None:
+        """(画面遷移有)ブラウザの進むボタン押下と同じ動作"""
         self._driver.forward()
 
-    def next_tab(self):
-        """(画面遷移有)openで作ったタブ(__window_handle_list)の内、一つ後のタブを表示する
-        :return:
-        """
+    def next_tab(self) -> None:
+        """(画面遷移有)openで作ったタブ(__window_handle_list)の内、一つ後のタブを表示する"""
         self.__shift_tab(1)
 
-    def previous_tab(self):
-        """(画面遷移有)openで作ったタブ(__window_handle_list)の内、一つ前のタブを表示する
-        :return:
-        """
+    def previous_tab(self) -> None:
+        """(画面遷移有)openで作ったタブ(__window_handle_list)の内、一つ前のタブを表示する"""
         self.__shift_tab(-1)
 
-    def __shift_tab(self, step):
-        index = 0
-        count = len(self.__window_handle_list)
-        if self._driver.current_window_handle in self.__window_handle_list:
-            index = self.__window_handle_list.index(self._driver.current_window_handle)
-        self._driver.switch_to.window(self.__window_handle_list[(index + step) % count])
+    def __shift_tab(self, step: int) -> None:
+        """(画面遷移有)openで作ったタブ(__window_handle_list)の内、指定されたステップ数だけタブを切り替える
 
-    def download_image(self, url, download_path=None):
+        Args:
+          step (int): 切り替えるタブのステップ数。正の値は次へ、負の値は前へ
+        """
+        if not self._window_handle_list:
+            self._driver.switch_to.window(self.__start_window_handle)
+            return
+        # switch_to.window の呼び出し履歴から、現在のウィンドウハンドルを特定する
+        if self._driver.switch_to.window.call_args_list:
+            current_handle = self._driver.switch_to.window.call_args_list[-1].args[0]
+        else:  # まだ一度も switch_to.window が呼ばれていない場合は、最初のハンドルを設定する
+          current_handle = self._window_handle_list[0]
+        index = self._window_handle_list.index(current_handle)
+        next_index = (index + step) % len(self._window_handle_list)
+        next_handle = self._window_handle_list[next_index]
+        self._driver.switch_to.window(next_handle)
+
+    def download_image(self, url: str, download_path: str = None) -> None:
         """(画面遷移有)urlの画像を保存する(open_new_tab → save_image → closeする)
-        :param url: 画像のurl
-        :param download_path:
-        :return:
+
+        Args:
+            url (str): 画像のurl
+            download_path (str, optional): ダウンロード先のパス。指定しない場合は、インスタンスの download_path を使用する
         """
         uri = helper.uriHelper.UriHelper(url)
         if uri.is_data_uri(url):
@@ -457,30 +537,42 @@ class ChromeDriverHelper:
             self.save_image(uri.get_filename(), uri.get_ext())
             self.close(__handle)
 
-    def open_current_tab(self, url):
+    def open_current_tab(self, url: str) -> None:
         """(画面依存)現在表示されているタブでurlを開く
-        :param url: str chromeで開くURL
-        :return: なし
+
+        Args:
+            url (str): chromeで開くURL
         """
         self._driver.get(url)
         # ページが読み込まれるまで待機
         self.__wait = WebDriverWait(self._driver, 30)
         self.__wait.until(EC.presence_of_all_elements_located)
 
-    def open_new_tab(self, url):
+    def open_new_tab(self, url: str) -> str:
         """(画面遷移有)新しいタブでurlを開く
-        :param url: str 開くURL
-        :return: str 開いたタブのハンドル
+
+        Args:
+            url (str): 開くURL
+
+        Returns:
+            str: 開いたタブのハンドル
+
+        Raises:
+            Exception: 新しいタブを開けなかった場合
         """
         self._driver.switch_to.new_window()
         self.open_current_tab(url)
-        self.__window_handle_list.append(self._driver.current_window_handle)
-        return self.__window_handle_list[-1]
+        self._window_handle_list.append(self._driver.current_window_handle)
+        return self._window_handle_list[-1]
 
-    def open_new_tabs(self, url_list):
+    def open_new_tabs(self, url_list: list) -> list:
         """(画面遷移有)新しいタブでurlリストを開く
-        :param url_list:  list[str] 開くURLのリスト
-        :return: list[str] 開いたタブのハンドルリスト
+
+        Args:
+            url_list (list[str]): 開くURLのリスト
+
+        Returns:
+            list[str]: 開いたタブのハンドルリスト
         """
         window_handle_list = []
         for url in url_list:
@@ -488,37 +580,47 @@ class ChromeDriverHelper:
         return window_handle_list
 
     def close(self, window_handle=None):
-        """(画面遷移有)openで開いた画面の内、指定の画面か、現在の画面を閉じる
-        :param window_handle: str 閉じる画面のハンドル
-        :return: None
+        """openで開いた画面の内、指定の画面か、現在の画面を閉じる
+
+        Args:
+            window_handle: 閉じる画面のハンドル
+
+        Raises:
+            ValueError: 指定のwindow_handleがリストに存在しない場合
         """
         try:
             if not window_handle:
                 window_handle = self._driver.current_window_handle
-            else:
-                self._driver.switch_to.window(window_handle)
             if window_handle == self.__start_window_handle:
-                return
-            if self._driver.current_window_handle == self.__start_window_handle:
-                return
-            index = self.__window_handle_list.index(window_handle)
+                raise ValueError("開始時のタブは閉じられません。")
+            if window_handle not in self._window_handle_list:
+                raise ValueError(f"指定されたウィンドウハンドル '{window_handle}' が存在しません。")
+            index = self._window_handle_list.index(window_handle)
             self._driver.close()
-            del self.__window_handle_list[index]
-            if len(self.__window_handle_list) == 0:
+            del self._window_handle_list[index]
+            if len(self._window_handle_list) == 0:
                 self._driver.switch_to.window(self.__start_window_handle)
             else:
                 if index:
                     index -= 1
-                self._driver.switch_to.window(self.__window_handle_list[index])
-        except ValueError:
-            print("ValueError 指定のwindow_handleがありません。")
-            exit()
+                self._driver.switch_to.window(self._window_handle_list[index])
+        except ValueError as e:
+            print(f"ValueError: {e}")
+            raise
 
     def save_image(self, download_file_name, download_ext='.jpg', wait_time=3):
-        """(画面依存)表示されている画像を保存する
+        """表示されている画像を保存する
+
         chromeのデフォルトダウンロードフォルダに保存された後に、指定のフォルダに移動する
         ダウンロード実行用スクリプトを生成＆実行する
-        :return:
+
+        Args:
+            download_file_name: ダウンロードするファイル名
+            download_ext: ダウンロードするファイルの拡張子。デフォルトは '.jpg'
+            wait_time: ファイルのダウンロード完了を待つ時間（秒）。デフォルトは 3 秒
+
+        Raises:
+            TimeoutError: wait_time秒以内にダウンロードが完了しなかった場合
         """
         __image_url = self._driver.current_url
         downloads_path = os.path.join(os.getenv("HOMEDRIVE"), os.getenv("HOMEPATH"), "downloads")
