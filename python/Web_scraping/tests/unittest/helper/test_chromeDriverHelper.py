@@ -2,11 +2,10 @@ import os
 import sys
 import pytest
 from unittest.mock import patch, MagicMock, call
-
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..')))
-import helper.chromeDriverHelper
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..')))
+import helper.chromeDriverHelper
 
 
 # テスト用のダミーURLとセレクタ
