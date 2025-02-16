@@ -11,25 +11,26 @@ import inspect
 from dataclasses import dataclass
 from urllib.parse import urlparse
 from urllib.parse import urlunparse
+from datauri import DataURI
 
 # 3rd party packages
 import requests  # HTTP通信
 import shutil
-from helper import uriHelper
-from datauri import DataURI
+
+import helper.uriHelper
 
 
 @dataclass(frozen=True)
 class WebFileHelperValue:
     """webファイルヘルパー値オブジェクト"""
-    url: uriHelper.UriHelper = None
+    url: helper.uriHelper.UriHelper = None
     download_file_name: str = None
     start_ext: str = '.jpg'
     download_path: str = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                                       '../download').replace(os.sep, '/')
 
     def __init__(self,
-                 url: uriHelper.UriHelper = url,
+                 url: helper.uriHelper.UriHelper = url,
                  download_file_name: str = download_file_name,
                  start_ext: str = start_ext,
                  download_path: str = download_path,
@@ -55,7 +56,7 @@ class WebFileHelperValue:
 
 class WebFileHelper:
     """webファイルのヘルパー"""
-    value_object: WebFileHelperValue or uriHelper.UriHelper or str = None
+    value_object: WebFileHelperValue or helper.uriHelper.UriHelper or str = None
     download_file_name: str = None
     start_ext: str = WebFileHelperValue.start_ext
     download_path: str = WebFileHelperValue.download_path
@@ -69,7 +70,7 @@ class WebFileHelper:
                       }
 
     def __init__(self,
-                 value_object: WebFileHelperValue or uriHelper.UriHelper or str = value_object,
+                 value_object: WebFileHelperValue or helper.uriHelper.UriHelper or str = value_object,
                  download_file_name: str = download_file_name,
                  start_ext: str = start_ext,
                  download_path: str = download_path,
@@ -81,7 +82,7 @@ class WebFileHelper:
             if isinstance(value_object, WebFileHelperValue):
                 value_object = copy.deepcopy(value_object)
                 self.value_object = value_object
-            elif isinstance(value_object, uriHelper.UriHelper):
+            elif isinstance(value_object, helper.uriHelper.UriHelper):
                 uri = copy.deepcopy(value_object)
                 if not download_file_name:
                     if uri.is_enable_filename():
@@ -101,7 +102,7 @@ class WebFileHelper:
                 self.value_object = WebFileHelperValue(uri, download_file_name, start_ext, download_path)
             elif isinstance(value_object, str):
                 url = value_object
-                uri = uriHelper.UriHelper(url)
+                uri = helper.uriHelper.UriHelper(url)
                 if not download_file_name:
                     if uri.is_enable_filename():
                         download_file_name = uri.get_filename()
@@ -256,7 +257,7 @@ class WebFileHelper:
             __ext = self.ext_dict[self.get_start_ext()][__index]
             # [::-1] 配列を逆順にする
             __url = self.get_url()[::-1].replace(self.get_ext()[::-1], __ext[::-1])[::-1]
-            self.value_object = WebFileHelperValue(uriHelper.UriHelper(__url),
+            self.value_object = WebFileHelperValue(helper.uriHelper.UriHelper(__url),
                                                    self.get_filename(),
                                                    self.get_start_ext(),
                                                    self.get_download_path(),
@@ -316,7 +317,7 @@ class WebFileHelper:
                 return False
             os.rename(self.get_path(), dst_path)
             self.download_file_name = new_file_name
-            self.value_object = WebFileHelperValue(uriHelper.UriHelper(self.get_url()),
+            self.value_object = WebFileHelperValue(helper.uriHelper.UriHelper(self.get_url()),
                                                    self.get_filename(),
                                                    self.get_start_ext(),
                                                    self.get_download_path(),

@@ -608,7 +608,7 @@ class ChromeDriverHelper:
             print(f"ValueError: {e}")
             raise
 
-    def save_image(self, download_file_name, download_ext='.jpg', wait_time=3):
+    def save_image(self, download_file_name, download_ext='.jpg', wait_time=10):
         """表示されている画像を保存する
 
         chromeのデフォルトダウンロードフォルダに保存された後に、指定のフォルダに移動する
@@ -643,14 +643,11 @@ class ChromeDriverHelper:
         xhr.send();
         """
         self._driver.execute_script(script_str)
-        file_path = os.path.join(self.download_path, __filename)
-        what = (lambda web_file, path: web_file.move(path))(__web_file, file_path)
-        how = (lambda web_file: os.path.isfile(web_file.get_path()))(__web_file)
-        self.wait_until(what, how)
-        start = time.time()
-        while ((time.time() - start) < wait_time) and not (os.path.isfile(__web_file.get_path())):
-            time.sleep(0.1)
-        __web_file.move(file_path)
+        file_path_to = os.path.join(self.download_path, __filename)
+        file_path_from = __web_file.get_path()
+        what = lambda: __web_file.move(file_path_to)
+        how = lambda: os.path.isfile(file_path_from)
+        self.wait_until(what, how, wait_time)
 
     @staticmethod
     def wait_until(what: t.Callable, how: t.Callable, wait_time: int = 3) -> t.Any:

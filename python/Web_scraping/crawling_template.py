@@ -41,6 +41,8 @@ Todo:
     * 例外処理を詳細化
     * ログ出力機能を追加
     * SlackとLINE通知の切り替え機能を実装
+    * 人間チェックが表示されるときがある
+        * site_check = '//*[@id="uHkM6"]/div/label/input'
 """
 from selenium.webdriver.common.by import By
 from helper.crawling import *
