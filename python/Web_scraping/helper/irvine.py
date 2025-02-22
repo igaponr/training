@@ -52,18 +52,12 @@ irvine.ExecuteAction('actFileClose');
 - [Irvine Uploader](https://u1.getuploader.com/irvn/)
 - [Irvine Part36スレ](https://mevius.5ch.net/test/read.cgi/win/1545612410)
 """
-# standard library
-import sys  # 終了時のエラー有無
-import os  # ファイルパス分解
+import sys
+import os
 import subprocess
 from itertools import zip_longest
-
-# 3rd party packages
 from dataclasses import dataclass, field
 from typing import List, Optional
-
-# local source
-
 # 最大再起回数を1万回にする
 sys.setrecursionlimit(10000)
 
@@ -72,14 +66,14 @@ sys.setrecursionlimit(10000)
 class IrvineValue:
     """Irvineの値オブジェクトクラス
 
-        Args:
-            url_list (list): URLのリスト
-            exe_path (str): (省略可)Irvine.exeのパス
-            list_path (str): (省略可)Irvineでダウンロードするファイルリストのファイルパス
-        Returns:
-            IrvineValue: インスタンス
-        Raises:
-            ValueError: exe_pathとlist_pathのパスが存在しなければ例外を出す
+    Args:
+        url_list (list): URLのリスト
+        exe_path (str): (省略可)Irvine.exeのパス
+        list_path (str): (省略可)Irvineでダウンロードするファイルリストのファイルパス
+    Returns:
+        IrvineValue: インスタンス
+    Raises:
+        ValueError: exe_pathとlist_pathのパスが存在しなければ例外を出す
     """
     url_list: List[str]
     exe_path: str = r'c:\Program1\irvine1_3_0\irvine.exe'.replace(os.sep, '/')
@@ -102,15 +96,15 @@ class IrvineValue:
 class Irvine:
     """Irvineのヘルパー
 
-        Args:
-            value_object (IrvineValue or list or str):
-             IrvineHelperValueは値オブジェクト、listはIrvineでダウンロードするURLリスト、strはIrvineでダウンロードするURL
-            download_path (str): (省略可)ダウンロードするフォルダパス
-            download_file_name_list (list): (省略可)保存するファイル名リスト
-        Returns:
-            value_object
-        Raises:
-            ValueError: value_objectが指定されないか、exe_pathとlist_pathのパスが存在しなければ、例外を出す
+    Args:
+        value_object (IrvineValue or list or str):
+         IrvineHelperValueは値オブジェクト、listはIrvineでダウンロードするURLリスト、strはIrvineでダウンロードするURL
+        download_path (str): (省略可)ダウンロードするフォルダパス
+        download_file_name_list (list): (省略可)保存するファイル名リスト
+    Returns:
+        value_object
+    Raises:
+        ValueError: value_objectが指定されないか、exe_pathとlist_pathのパスが存在しなければ、例外を出す
     """
     value_object: IrvineValue or List[str] or str = None
     download_path: Optional[str] = None
@@ -128,19 +122,17 @@ class Irvine:
         """
         if self.value_object:
             if isinstance(self.value_object, str):
-                self.value_object = IrvineValue(url_list=[self.value_object])
-                self.create_download_file()
-            elif isinstance(self.value_object, List):
+                self.value_object = [self.value_object]
+            if isinstance(self.value_object, List):
                 self.value_object = IrvineValue(url_list=self.value_object)
-                self.create_download_file()
-            elif isinstance(self.value_object, IrvineValue):
+            if isinstance(self.value_object, IrvineValue):
                 self.create_download_file()
             else:
                 raise ValueError("Either value_object or url_list must be provided.")
+            if not os.path.isfile(self.value_object.list_path):
+                raise FileNotFoundError(f"Download list file not found: {self.value_object.list_path}")
         else:
             raise ValueError("Either value_object or url_list must be provided.")
-        if not os.path.isfile(self.value_object.list_path):
-            raise FileNotFoundError(f"Download list file not found: {self.value_object.list_path}")
 
     def create_download_file(self) -> None:
       """ダウンロードリストファイルを作成する
