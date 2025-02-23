@@ -57,7 +57,7 @@ import os
 import subprocess
 from itertools import zip_longest
 from dataclasses import dataclass, field
-from typing import List, Optional
+from typing import List, Optional, Union
 # 最大再起回数を1万回にする
 sys.setrecursionlimit(10000)
 
@@ -76,9 +76,9 @@ class IrvineValue:
         ValueError: exe_pathとlist_pathのパスが存在しなければ例外を出す
     """
     url_list: List[str]
-    exe_path: str = r'c:\Program1\irvine1_3_0\irvine.exe'.replace(os.sep, '/')
-    list_path: str = field(default_factory=lambda: os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                                                                '../irvine_download_list.txt').replace(os.sep, '/'))
+    exe_path: str = field(default=r'c:\Program1\irvine1_3_0\irvine.exe'.replace(os.sep, '/'))
+    list_path: str = field(default=os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                                '../irvine_download_list.txt').replace(os.sep, '/'))
 
     def __post_init__(self):
         """初期化後の処理
@@ -106,7 +106,7 @@ class Irvine:
     Raises:
         ValueError: value_objectが指定されないか、exe_pathとlist_pathのパスが存在しなければ、例外を出す
     """
-    value_object: IrvineValue or List[str] or str = None
+    value_object: Optional[Union[IrvineValue, List[str], str]] = None
     download_path: Optional[str] = None
     download_file_name_list: List[str] = field(default_factory=lambda: [''])
 
@@ -120,19 +120,17 @@ class Irvine:
             ValueError: `value_object` と `url_list` の両方が指定されていない場合
             FileNotFoundError: `value_object` で指定されたダウンロードリストファイルが存在しない場合
         """
-        if self.value_object:
-            if isinstance(self.value_object, str):
-                self.value_object = [self.value_object]
-            if isinstance(self.value_object, List):
-                self.value_object = IrvineValue(url_list=self.value_object)
-            if isinstance(self.value_object, IrvineValue):
-                self.create_download_file()
-            else:
-                raise ValueError("Either value_object or url_list must be provided.")
-            if not os.path.isfile(self.value_object.list_path):
-                raise FileNotFoundError(f"Download list file not found: {self.value_object.list_path}")
-        else:
+        if not self.value_object:
             raise ValueError("Either value_object or url_list must be provided.")
+        if isinstance(self.value_object, str):
+            self.value_object = [self.value_object]
+        if isinstance(self.value_object, List):
+            self.value_object = IrvineValue(url_list=self.value_object)
+        if not isinstance(self.value_object, IrvineValue):
+            raise ValueError("Either value_object or url_list must be provided.")
+        self.create_download_file()
+        if not os.path.isfile(self.value_object.list_path):
+            raise FileNotFoundError(f"Download list file not found: {self.value_object.list_path}")
 
     def create_download_file(self) -> None:
       """ダウンロードリストファイルを作成する
@@ -149,10 +147,8 @@ class Irvine:
               for url, file_name in zip_longest(self.value_object.url_list, self.download_file_name_list):
                   line = f"{url}\t{self.download_path or ''}\t{file_name or ''}\t" + "\t" * 17 + "\n"
                   work_file.write(line)
-      except OSError as e:
-          raise OSError(f"Failed to create download list file: {e}") from e
-      except Exception as e:
-            raise Exception(f"An unexpected error occurred: {e}") from e
+      except IOError as e:
+          raise IOError(f"Failed to create download list file: {e}") from e
 
     def download(self) -> None:
         """Irvineを実行してファイルダウンロードを行う

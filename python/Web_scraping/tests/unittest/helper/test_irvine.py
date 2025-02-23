@@ -87,9 +87,9 @@ def test_init_with_url_list(irvine_value, temp_download_list_file):
     assert lines[0] == f"{TEST_URLS[0]}\t\t\t" + "\t" * 17 + "\n"
     assert lines[1] == f"{TEST_URLS[1]}\t\t\t" + "\t" * 17 + "\n"
 
-def test_init_with_url_srt(irvine_value, temp_download_list_file):
-    """url_listで初期化できることをテストする。"""
-    irvine = helper.irvine.Irvine(value_object=[TEST_URLS[0]])
+def test_init_with_url_str(irvine_value, temp_download_list_file):
+    """url_listで初期化できることをテストする"""
+    irvine = helper.irvine.Irvine(value_object=TEST_URLS[0])
     assert irvine.value_object is not None
     assert os.path.isfile(irvine.value_object.list_path)
     with open(irvine_value.list_path, "r", encoding="utf-8") as work_file:
