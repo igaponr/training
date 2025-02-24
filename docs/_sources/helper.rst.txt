@@ -17,10 +17,10 @@ Submodules
    helper.spreadsheet
    helper.status
    helper.tenki
-   helper.uriHelper
+   helper.uri
    helper.urlDeployment
-   helper.webFileHelper
-   helper.webFileListHelper
+   helper.webFile
+   helper.webFileList
 
 Module contents
 ---------------

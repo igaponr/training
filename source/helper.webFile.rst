@@ -1,7 +1,7 @@
-helper.webFileHelper module
+helper.webFile module
 ===========================
 
-.. automodule:: helper.webFileHelper
+.. automodule:: helper.webFile
    :members:
    :undoc-members:
    :show-inheritance:

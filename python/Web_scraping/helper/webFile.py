@@ -18,7 +18,7 @@ import helper.uri
 
 
 @dataclass(frozen=True)
-class WebFileHelperValue:
+class WebFileValue:
     """webファイルヘルパー値オブジェクト"""
     url: helper.uri.Uri = None
     download_file_name: str = None
@@ -51,15 +51,15 @@ class WebFileHelperValue:
         object.__setattr__(self, "download_path", download_path.replace(os.sep, '/'))
 
 
-class WebFileHelper:
+class WebFile:
     """webファイルのヘルパー"""
-    value_object: WebFileHelperValue or helper.uri.Uri or str = None
+    value_object: WebFileValue or helper.uri.Uri or str = None
     download_file_name: str = None
-    start_ext: str = WebFileHelperValue.start_ext
-    download_path: str = WebFileHelperValue.download_path
+    start_ext: str = WebFileValue.start_ext
+    download_path: str = WebFileValue.download_path
 
     # ext_list: list = ['.jpg', '.png', '.jpeg', '.webp', '.svg', '.svgz', '.gif', '.tif', '.tiff', '.psd', '.bmp']
-    ext_list: list = [WebFileHelperValue.start_ext, '.png', '.gif', '.webp']  # これを画像とする
+    ext_list: list = [WebFileValue.start_ext, '.png', '.gif', '.webp']  # これを画像とする
     ext_dict: dict = {ext_list[0]: ext_list,
                       ext_list[1]: [ext_list[1], ext_list[0], ext_list[2], ext_list[3]],
                       ext_list[2]: [ext_list[2], ext_list[0], ext_list[1], ext_list[3]],
@@ -67,7 +67,7 @@ class WebFileHelper:
                       }
 
     def __init__(self,
-                 value_object: WebFileHelperValue or helper.uri.Uri or str = value_object,
+                 value_object: WebFileValue or helper.uri.Uri or str = value_object,
                  download_file_name: str = download_file_name,
                  start_ext: str = start_ext,
                  download_path: str = download_path,
@@ -76,7 +76,7 @@ class WebFileHelper:
         または、urlとfolder_pathより、値オブジェクトを作成する
         """
         if value_object:
-            if isinstance(value_object, WebFileHelperValue):
+            if isinstance(value_object, WebFileValue):
                 value_object = copy.deepcopy(value_object)
                 self.value_object = value_object
             elif isinstance(value_object, helper.uri.Uri):
@@ -96,7 +96,7 @@ class WebFileHelper:
                 if not download_path:
                     raise ValueError(f"{self.__class__.__name__}.{inspect.stack()[1].function}"
                                      f"引数エラー:download_path=None")
-                self.value_object = WebFileHelperValue(uri, download_file_name, start_ext, download_path)
+                self.value_object = WebFileValue(uri, download_file_name, start_ext, download_path)
             elif isinstance(value_object, str):
                 url = value_object
                 uri = helper.uri.Uri(url)
@@ -115,7 +115,7 @@ class WebFileHelper:
                 if not download_path:
                     raise ValueError(f"{self.__class__.__name__}.{inspect.stack()[1].function}"
                                      f"引数エラー:download_path=None")
-                self.value_object = WebFileHelperValue(uri, download_file_name, start_ext, download_path)
+                self.value_object = WebFileValue(uri, download_file_name, start_ext, download_path)
             else:
                 raise ValueError(f"{self.__class__.__name__}.{inspect.stack()[1].function}"
                                  f"引数エラー:value_objectの型")
@@ -148,7 +148,7 @@ class WebFileHelper:
         __file_name = copy.deepcopy(file_name)
         __file_name = __file_name.replace(os.sep, '￥')
         __file_name = __file_name.replace('/', '／')
-        return WebFileHelper.fixed_path(__file_name)
+        return WebFile.fixed_path(__file_name)
 
     @staticmethod
     def is_jpeg_data_uri(url):
@@ -254,11 +254,11 @@ class WebFileHelper:
             __ext = self.ext_dict[self.get_start_ext()][__index]
             # [::-1] 配列を逆順にする
             __url = self.get_url()[::-1].replace(self.get_ext()[::-1], __ext[::-1])[::-1]
-            self.value_object = WebFileHelperValue(helper.uri.Uri(__url),
-                                                   self.get_filename(),
-                                                   self.get_start_ext(),
-                                                   self.get_download_path(),
-                                                   )
+            self.value_object = WebFileValue(helper.uri.Uri(__url),
+                                             self.get_filename(),
+                                             self.get_start_ext(),
+                                             self.get_download_path(),
+                                             )
 
     def download_requests(self):
         """requestsを用いて、ファイルをダウンロードする
@@ -314,11 +314,11 @@ class WebFileHelper:
                 return False
             os.rename(self.get_path(), dst_path)
             self.download_file_name = new_file_name
-            self.value_object = WebFileHelperValue(helper.uri.Uri(self.get_url()),
-                                                   self.get_filename(),
-                                                   self.get_start_ext(),
-                                                   self.get_download_path(),
-                                                   )
+            self.value_object = WebFileValue(helper.uri.Uri(self.get_url()),
+                                             self.get_filename(),
+                                             self.get_start_ext(),
+                                             self.get_download_path(),
+                                             )
         return True
 
     def delete_local_file(self):

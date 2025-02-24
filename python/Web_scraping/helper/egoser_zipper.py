@@ -11,7 +11,7 @@ import pyperclip  # クリップボード
 from selenium.webdriver.common.by import By
 from helper import crawling
 from helper import chromeDriverHelper
-from helper import webFileListHelper
+from helper import webFileList
 
 
 if __name__ == '__main__':  # インポート時には動かない
@@ -70,13 +70,13 @@ if __name__ == '__main__':  # インポート時には動かない
         title = crawling.Crawling.validate_title(items, 'title_jp', 'title_en')
         url_title = chromeDriverHelper.ChromeDriverHelper.fixed_file_name(page_url)
         # フォルダがなかったらフォルダを作る
-        os.makedirs(webFileListHelper.WebFileListHelper.work_path, exist_ok=True)
-        target_file_name = os.path.join(webFileListHelper.WebFileListHelper.work_path, f'{title}：{url_title}.html')
+        os.makedirs(webFileList.WebFileList.work_path, exist_ok=True)
+        target_file_name = os.path.join(webFileList.WebFileList.work_path, f'{title}：{url_title}.html')
         print(title)
         if not os.path.exists(target_file_name):
             if image_urls:
                 print(image_urls)
-                web_file_list = webFileListHelper.WebFileListHelper(image_urls)
+                web_file_list = webFileList.WebFileList(image_urls)
                 crawling.download_chrome_driver(web_file_list)
                 if not web_file_list.make_zip_file():
                     sys.exit()

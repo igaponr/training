@@ -41,8 +41,8 @@ from selenium.webdriver.common.by import By
 from webdriver_manager.chrome import ChromeDriverManager
 
 import helper.uri
-import helper.webFileHelper
-import helper.webFileListHelper
+import helper.webFile
+import helper.webFileList
 
 
 @dataclass(frozen=True)
@@ -624,7 +624,7 @@ class ChromeDriverHelper:
         """
         __image_url = self._driver.current_url
         downloads_path = os.path.join(os.getenv("HOMEDRIVE"), os.getenv("HOMEPATH"), "downloads")
-        __web_file = helper.webFileHelper.WebFileHelper(__image_url, download_file_name, download_ext, downloads_path)
+        __web_file = helper.webFile.WebFile(__image_url, download_file_name, download_ext, downloads_path)
         __filename = __web_file.get_filename() + __web_file.get_ext()
         script_str = """
         window.URL = window.URL || window.webkitURL;

@@ -112,9 +112,9 @@
 <span class="kn">from</span> <span class="nn">selenium.webdriver.common.by</span> <span class="kn">import</span> <span class="n">By</span>
 <span class="kn">from</span> <span class="nn">webdriver_manager.chrome</span> <span class="kn">import</span> <span class="n">ChromeDriverManager</span>
 
-<span class="kn">import</span> <span class="nn">helper.uriHelper</span>
-<span class="kn">import</span> <span class="nn">helper.webFileListHelper</span>
-<span class="kn">import</span> <span class="nn">helper.webFileHelper</span>
+<span class="kn">import</span> <span class="nn">helper.uri</span>
+<span class="kn">import</span> <span class="nn">helper.webFile</span>
+<span class="kn">import</span> <span class="nn">helper.webFileList</span>
 
 
 <div class="viewcode-block" id="ChromeDriverHelperValue">
@@ -659,7 +659,7 @@
 <span class="sd">            url (str): 画像のurl</span>
 <span class="sd">            download_path (str, optional): ダウンロード先のパス。指定しない場合は、インスタンスの download_path を使用する</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">uri</span> <span class="o">=</span> <span class="n">helper</span><span class="o">.</span><span class="n">uriHelper</span><span class="o">.</span><span class="n">UriHelper</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="n">uri</span> <span class="o">=</span> <span class="n">helper</span><span class="o">.</span><span class="n">uri</span><span class="o">.</span><span class="n">Uri</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">uri</span><span class="o">.</span><span class="n">is_data_uri</span><span class="p">(</span><span class="n">url</span><span class="p">):</span>
             <span class="n">uri</span><span class="o">.</span><span class="n">save_data_uri</span><span class="p">(</span><span class="n">download_path</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
@@ -769,7 +769,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">__image_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_driver</span><span class="o">.</span><span class="n">current_url</span>
         <span class="n">downloads_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;HOMEDRIVE&quot;</span><span class="p">),</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;HOMEPATH&quot;</span><span class="p">),</span> <span class="s2">&quot;downloads&quot;</span><span class="p">)</span>
-        <span class="n">__web_file</span> <span class="o">=</span> <span class="n">helper</span><span class="o">.</span><span class="n">webFileHelper</span><span class="o">.</span><span class="n">WebFileHelper</span><span class="p">(</span><span class="n">__image_url</span><span class="p">,</span> <span class="n">download_file_name</span><span class="p">,</span> <span class="n">download_ext</span><span class="p">,</span> <span class="n">downloads_path</span><span class="p">)</span>
+        <span class="n">__web_file</span> <span class="o">=</span> <span class="n">helper</span><span class="o">.</span><span class="n">webFile</span><span class="o">.</span><span class="n">WebFile</span><span class="p">(</span><span class="n">__image_url</span><span class="p">,</span> <span class="n">download_file_name</span><span class="p">,</span> <span class="n">download_ext</span><span class="p">,</span> <span class="n">downloads_path</span><span class="p">)</span>
         <span class="n">__filename</span> <span class="o">=</span> <span class="n">__web_file</span><span class="o">.</span><span class="n">get_filename</span><span class="p">()</span> <span class="o">+</span> <span class="n">__web_file</span><span class="o">.</span><span class="n">get_ext</span><span class="p">()</span>
         <span class="n">script_str</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
 <span class="s2">        window.URL = window.URL || window.webkitURL;</span>

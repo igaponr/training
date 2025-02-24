@@ -61,10 +61,10 @@ class UriValue:
 class Uri:
     """URIを扱うためのヘルパークラス。"""
     def __init__(self, value_object: UriValue | str):
-        """UriHelperオブジェクトを初期化します
+        """Uriオブジェクトを初期化します
 
         Args:
-            value_object: URI文字列またはUriHelperValueオブジェクト
+            value_object: URI文字列またはUriValueオブジェクト
 
         Raises:
             ValueError: value_objectが無効な値の場合
@@ -74,7 +74,7 @@ class Uri:
         elif isinstance(value_object, str):
             self.value_object = UriValue(value_object)
         else:
-            raise ValueError(f"value_objectはUriHelperValueまたはstrでなければなりません: {type(value_object)}")
+            raise ValueError(f"value_objectはUriValueまたはstrでなければなりません: {type(value_object)}")
 
     @staticmethod
     def is_data_uri(url: str) -> bool:

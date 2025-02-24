@@ -16,12 +16,12 @@ import datetime
 
 import helper.uri
 import helper.chromeDriverHelper
-import helper.webFileHelper
+import helper.webFile
 import helper.irvine
 
 
 @dataclass(frozen=True)
-class WebFileListHelperValue:
+class WebFileListValue:
     """値オブジェクト"""
     web_file_list: list = None
     work_path: str = os.path.join(os.path.dirname(os.path.abspath(__file__)),
@@ -39,36 +39,36 @@ class WebFileListHelperValue:
             raise ValueError(f"{self.__class__.__name__}.{inspect.stack()[1].function}"
                              f"引数エラー:web_file_list=None")
         for count, item in enumerate(web_file_list):
-            if not isinstance(item, helper.webFileHelper.WebFileHelper):
+            if not isinstance(item, helper.webFile.WebFile):
                 raise ValueError(f"{self.__class__.__name__}.{inspect.stack()[1].function}"
-                                 f"引数エラー:web_file_listの{count}個目がWebFileHelperで無い")
+                                 f"引数エラー:web_file_listの{count}個目がWebFileで無い")
         object.__setattr__(self, "web_file_list", web_file_list)
         object.__setattr__(self, "work_path", work_path)
         object.__setattr__(self, "archive_path", archive_path)
 
 
-class WebFileListHelper:
+class WebFileList:
     """webファイルリスト"""
-    value_object: WebFileListHelperValue or list = None
-    start_ext: str = helper.webFileHelper.WebFileHelper.start_ext
+    value_object: WebFileListValue or list = None
+    start_ext: str = helper.webFile.WebFile.start_ext
     download_path: str = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                                       '../download').replace(os.sep, '/')
-    work_path: str = WebFileListHelperValue.work_path
-    archive_path: str = WebFileListHelperValue.archive_path
+    work_path: str = WebFileListValue.work_path
+    archive_path: str = WebFileListValue.archive_path
 
     def __init__(self,
-                 value_object: WebFileListHelperValue or list = value_object,
+                 value_object: WebFileListValue or list = value_object,
                  start_ext: str = start_ext,
                  download_path: str = download_path,
                  work_path: str = work_path,
                  archive_path: str = archive_path,
                  ):
         """値オブジェクトからの復元、
-        または、Webファイルのヘルパー: list[WebFileHelper]と、ファイル名、拡張子名、各種pathより、値オブジェクトを作成する
+        または、Webファイルのヘルパー: list[WebFile]と、ファイル名、拡張子名、各種pathより、値オブジェクトを作成する
         または、url: list[str]と、ファイル名、拡張子名、各種pathより、値オブジェクトを作成する
         """
         if value_object:
-            if isinstance(value_object, WebFileListHelperValue):
+            if isinstance(value_object, WebFileListValue):
                 value_object = copy.deepcopy(value_object)
                 self.value_object = value_object
             elif isinstance(value_object, list):
@@ -83,12 +83,12 @@ class WebFileListHelper:
                                      f"引数エラー:archive_path=None")
                 value_object = copy.deepcopy(value_object)
                 web_file_list = []
-                isinstance_list = [isinstance(val, helper.webFileHelper.WebFileHelper) for val in value_object]
+                isinstance_list = [isinstance(val, helper.webFile.WebFile) for val in value_object]
                 isinstance_str = [isinstance(val, str) for val in value_object]
                 if sum(isinstance_list):
                     if sum(isinstance_list) != len(isinstance_list):
                         raise ValueError(f"{self.__class__.__name__}.{inspect.stack()[1].function}"
-                                         f"引数エラー:value_objectの型list[WebFileHelper]ではない")
+                                         f"引数エラー:value_objectの型list[WebFile]ではない")
                     else:
                         web_file_list = value_object
                 elif sum(isinstance_str):
@@ -103,14 +103,14 @@ class WebFileListHelper:
                             __start_ext = start_ext
                             if not __start_ext:
                                 __start_ext = uri.get_ext()
-                            web_file = helper.webFileHelper.WebFileHelper(uri, download_file_name, __start_ext, download_path)
+                            web_file = helper.webFile.WebFile(uri, download_file_name, __start_ext, download_path)
                             web_file_list.append(web_file)
                 else:
                     raise ValueError(f"{self.__class__.__name__}.{inspect.stack()[1].function}"
                                      f"引数エラー:value_objectの型")
-                self.value_object = WebFileListHelperValue(web_file_list,
-                                                           work_path,
-                                                           archive_path)
+                self.value_object = WebFileListValue(web_file_list,
+                                                     work_path,
+                                                     archive_path)
             else:
                 raise ValueError(f"{self.__class__.__name__}.{inspect.stack()[1].function}"
                                  f"引数エラー:value_objectの型")
@@ -144,7 +144,7 @@ class WebFileListHelper:
 
     def get_web_file_list(self):
         """webファイルリストを得る
-        :return: list[WebFileHelper]
+        :return: list[WebFile]
         """
         return copy.deepcopy(self.value_object.web_file_list)
 
@@ -284,7 +284,7 @@ class WebFileListHelper:
         archive_path = pathlib.Path(self.archive_path)
         zip_path = pathlib.Path(os.path.join(archive_path, zip_file_name))
         if zip_path.is_file():
-            new_zip_filename = helper.webFileHelper.WebFileHelper.fixed_file_name(zip_filename)
+            new_zip_filename = helper.webFile.WebFile.fixed_file_name(zip_filename)
             new_zip_path = zip_path.with_name(f'{new_zip_filename}.zip')
             if os.path.isfile(new_zip_path):
                 print(f'圧縮リネームファイル{new_zip_filename}.zipが既に存在しています')
@@ -339,10 +339,10 @@ class WebFileListHelper:
             __start_ext = self.start_ext
             if not __start_ext:
                 __start_ext = uri.get_ext()
-            web_file = helper.webFileHelper.WebFileHelper(uri, download_file_name, __start_ext, download_path)
+            web_file = helper.webFile.WebFile(uri, download_file_name, __start_ext, download_path)
             __web_file_list.append(web_file)
-        self.value_object = WebFileListHelperValue(__web_file_list,
-                                                   self.value_object.work_path,
-                                                   self.value_object.archive_path)
+        self.value_object = WebFileListValue(__web_file_list,
+                                             self.value_object.work_path,
+                                             self.value_object.archive_path)
         return True
 

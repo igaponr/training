@@ -10,8 +10,8 @@ sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 import helper.urlDeployment
 import helper.crawling
 import helper.chromeDriverHelper
-import helper.webFileListHelper
-import helper.webFileHelper
+import helper.webFileList
+import helper.webFile
 
 # local source
 from const import *
@@ -33,14 +33,14 @@ if __name__ == '__main__':  # インポート時には動かない
             if not last_image_url:
                 raise ValueError(f"エラー:last_image_urlが不正[{last_image_url}]")
             print(last_image_url, image_urls)
-            web_file_list = helper.webFileListHelper.WebFileListHelper([last_image_url])
+            web_file_list = helper.webFileList.WebFileList([last_image_url])
             # 末尾画像のナンバーから全ての画像URLを推測して展開する
             web_file_list.update_value_object_by_deployment_url_list()
             url_list = web_file_list.get_url_list()
             print(url_list)
-            web_file_list = helper.webFileListHelper.WebFileListHelper(url_list)
+            web_file_list = helper.webFileList.WebFileList(url_list)
             web_file_list.download_irvine()
-            for count in enumerate(helper.webFileHelper.WebFileHelper.ext_list):
+            for count in enumerate(helper.webFile.WebFile.ext_list):
                 if web_file_list.is_exist():
                     break
                 # ダウンロードに失敗しているときは、失敗しているファイルの拡張子を変えてダウンロードしなおす

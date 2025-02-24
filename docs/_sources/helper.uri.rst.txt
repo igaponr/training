@@ -1,7 +1,7 @@
-helper.uriHelper module
+helper.uri module
 =======================
 
-.. automodule:: helper.uriHelper
+.. automodule:: helper.uri
    :members:
    :undoc-members:
    :show-inheritance:

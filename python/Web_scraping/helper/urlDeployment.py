@@ -22,8 +22,8 @@ from dataclasses import dataclass
 from urllib.parse import urlparse  # URLパーサー
 from urllib.parse import urlunparse
 import helper.chromeDriverHelper
-import helper.webFileListHelper
-import helper.webFileHelper
+import helper.webFile
+import helper.webFileList
 
 # local source
 from const import *

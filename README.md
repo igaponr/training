@@ -202,12 +202,12 @@ webクローリング関連の処理を行う。
   - web巡回して、スクレイピングして、ファイルダウンロードして、zipファイルにまとめる
 - egoser_zipper: google 画像検索して、先頭20サムネイル画像をzipにまとめる
 - irvineHelper: Irvineを操作するヘルパークラス
-- uriHelper: URLのヘルパークラス
+- uri: URLのヘルパークラス
   - URLのパス、ファイル名、拡張子、DataURIのデータ、ファイルの存在確認など
-- webFileHelper: webファイルのヘルパークラス
+- webFile: webファイルのヘルパークラス
   - URLから、ダウンロードしたり、ファイル名変更したり、存在確認したり、削除したりする
-- webFileListHelper: webファイルリストのヘルパークラス
-  - URLリストから、webFileHelperのリストを作って、操作する。まとめてだウンロードしたり、zipファイルにする
+- webFileList: webファイルリストのヘルパークラス
+  - URLリストから、webFileのリストを作って、操作する。まとめてだウンロードしたり、zipファイルにする
 
 以下は「古い」
 

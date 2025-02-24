@@ -3,7 +3,7 @@ import os
 import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..')))
 import helper.irvine
-import helper.webFileListHelper
+import helper.webFileList
 
 # テストデータ
 TEST_URLS = ["https://www.example.com/test1.txt", "https://www.example.com/test2.txt"]

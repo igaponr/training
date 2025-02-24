@@ -22,8 +22,8 @@ import datetime
 from dataclasses import dataclass
 from typing import Union, Optional
 import helper.chromeDriverHelper
-import helper.webFileListHelper
-import helper.webFileHelper
+import helper.webFile
+import helper.webFileList
 import helper.line_message_api
 import helper.slack_message_api
 import helper.status
@@ -398,8 +398,8 @@ class Crawling:
             url_title = helper.chromeDriverHelper.ChromeDriverHelper.fixed_file_name(page_url)
 
             # フォルダがなかったらフォルダを作る
-            os.makedirs(helper.webFileListHelper.WebFileListHelper.work_path, exist_ok=True)
-            target_file_name = os.path.join(helper.webFileListHelper.WebFileListHelper.work_path, f'{title}：{url_title}.html')
+            os.makedirs(helper.webFileList.WebFileList.work_path, exist_ok=True)
+            target_file_name = os.path.join(helper.webFileList.WebFileList.work_path, f'{title}：{url_title}.html')
             print(title, languages)
             if languages and languages == 'japanese' and not os.path.exists(target_file_name):
                 # ダウンロードするときだけ通知する
@@ -417,14 +417,14 @@ class Crawling:
                 if not last_image_url:
                     raise ValueError(f"エラー:last_image_urlが不正[{last_image_url}]")
                 print(last_image_url, image_urls)
-                web_file_list = helper.webFileListHelper.WebFileListHelper([last_image_url])
+                web_file_list = helper.webFileList.WebFileList([last_image_url])
                 # 末尾画像のナンバーから全ての画像URLを推測して展開する
                 web_file_list.update_value_object_by_deployment_url_list()
                 url_list = web_file_list.get_url_list()
                 print(url_list)
 
                 web_file_list.download_irvine()
-                for count in enumerate(helper.webFileHelper.WebFileHelper.ext_list):
+                for count in enumerate(helper.webFile.WebFile.ext_list):
                     if web_file_list.is_exist():
                         break
                     # ダウンロードに失敗しているときは、失敗しているファイルの拡張子を変えてダウンロードしなおす
@@ -475,16 +475,16 @@ class Crawling:
             url_title = helper.chromeDriverHelper.ChromeDriverHelper.fixed_file_name(page_url)
 
             # フォルダがなかったらフォルダを作る
-            os.makedirs(helper.webFileListHelper.WebFileListHelper.work_path, exist_ok=True)
-            target_file_name = os.path.join(helper.webFileListHelper.WebFileListHelper.work_path, f'{title}：{url_title}.html')
+            os.makedirs(helper.webFileList.WebFileList.work_path, exist_ok=True)
+            target_file_name = os.path.join(helper.webFileList.WebFileList.work_path, f'{title}：{url_title}.html')
             print(title)
             if not os.path.exists(target_file_name):
                 image_items = self.scraping(page_url, image_selectors)
                 image_urls = self.take_out(image_items, 'image_urls')
                 print(image_urls)
-                web_file_list = helper.webFileListHelper.WebFileListHelper(image_urls)
+                web_file_list = helper.webFileList.WebFileList(image_urls)
                 web_file_list.download_irvine()
-                for count in enumerate(helper.webFileHelper.WebFileHelper.ext_list):
+                for count in enumerate(helper.webFile.WebFile.ext_list):
                     if web_file_list.is_exist():
                         break
                     # ダウンロードに失敗しているときは、失敗しているファイルの拡張子を変えてダウンロードしなおす
