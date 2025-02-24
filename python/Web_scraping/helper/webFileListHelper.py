@@ -14,7 +14,7 @@ import zipfile  # zipファイル
 import pathlib
 import datetime
 
-import helper.uriHelper
+import helper.uri
 import helper.chromeDriverHelper
 import helper.webFileHelper
 import helper.irvine
@@ -98,7 +98,7 @@ class WebFileListHelper:
                     else:
                         # TODO: urlには、DataURIやURLが混ざってくる。URLには、ファイル名がない場合もある
                         for index, url in enumerate(value_object):
-                            uri = helper.uriHelper.UriHelper(url)
+                            uri = helper.uri.Uri(url)
                             download_file_name = '{:04d}'.format(index)
                             __start_ext = start_ext
                             if not __start_ext:
@@ -334,7 +334,7 @@ class WebFileListHelper:
         download_path = self.get_download_path_from_1st_element()
         __web_file_list = []
         for index, url in enumerate(url_list):
-            uri = helper.uriHelper.UriHelper(url)
+            uri = helper.uri.Uri(url)
             download_file_name = '{:04d}'.format(index)
             __start_ext = self.start_ext
             if not __start_ext:

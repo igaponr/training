@@ -211,7 +211,7 @@ class TestChromeDriverHelper:
         (TEST_IMAGE_URL, False)
     ])
     def test_download_image(self, chromedriver_helper, tmp_path, url, expected):
-        with patch("helper.uriHelper.UriHelper.save_data_uri") as mock_save_data_uri, \
+        with patch("helper.uri.Uri.save_data_uri") as mock_save_data_uri, \
             patch.object(chromedriver_helper, 'save_image') as mock_save_image:
             chromedriver_helper.download_image(url, download_path=str(tmp_path))
             if expected :

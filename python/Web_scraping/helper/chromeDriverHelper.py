@@ -40,9 +40,9 @@ from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.common.by import By
 from webdriver_manager.chrome import ChromeDriverManager
 
-import helper.uriHelper
-import helper.webFileListHelper
+import helper.uri
 import helper.webFileHelper
+import helper.webFileListHelper
 
 
 @dataclass(frozen=True)
@@ -529,7 +529,7 @@ class ChromeDriverHelper:
             url (str): 画像のurl
             download_path (str, optional): ダウンロード先のパス。指定しない場合は、インスタンスの download_path を使用する
         """
-        uri = helper.uriHelper.UriHelper(url)
+        uri = helper.uri.Uri(url)
         if uri.is_data_uri(url):
             uri.save_data_uri(download_path)
         else:

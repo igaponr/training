@@ -2,10 +2,10 @@ import pytest
 import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..')))
-import helper.uriHelper
+import helper.uri
 
 
-class TestUriHelperValue:
+class TestUriValue:
     @pytest.mark.parametrize(
         "uri, expected",
         [
@@ -18,9 +18,9 @@ class TestUriHelperValue:
         ],
     )
     def test_is_uri_only(self, uri, expected):
-        assert helper.uriHelper.UriHelperValue.is_uri_only(uri) == expected
+        assert helper.uri.UriValue.is_uri_only(uri) == expected
 
-class TestUriHelper:
+class TestUri:
 
     @pytest.mark.parametrize(
         "uri, expected",
@@ -35,7 +35,7 @@ class TestUriHelper:
         ],
     )
     def test_is_enable_filename(self, uri, expected):
-      uri_helper = helper.uriHelper.UriHelper(uri)
+      uri_helper = helper.uri.Uri(uri)
       assert uri_helper.is_enable_filename() == expected
 
     @pytest.mark.parametrize(
@@ -54,7 +54,7 @@ class TestUriHelper:
         ],
     )
     def test_get_filename(self, uri, expected):
-        uri_helper = helper.uriHelper.UriHelper(uri)
+        uri_helper = helper.uri.Uri(uri)
         assert uri_helper.get_filename() == expected
 
     @pytest.mark.parametrize(
@@ -72,22 +72,22 @@ class TestUriHelper:
         ],
     )
     def test_get_ext(self, uri, expected):
-        uri_helper = helper.uriHelper.UriHelper(uri)
+        uri_helper = helper.uri.Uri(uri)
         assert uri_helper.get_ext() == expected
 
-    def test_uri_helper_value_valid(self):
+    def test_uri_value_valid(self):
         uri = "https://www.example.com"
-        value_object = helper.uriHelper.UriHelperValue(uri)
+        value_object = helper.uri.UriValue(uri)
         assert value_object.uri == uri
 
-    def test_uri_helper_value_invalid(self):
+    def test_uri_value_invalid(self):
         with pytest.raises(ValueError):
-            helper.uriHelper.UriHelperValue("invalid uri")
+            helper.uri.UriValue("invalid uri")
 
-    def test_uri_helper_value_none(self):
+    def test_uri_value_none(self):
         with pytest.raises(ValueError):
-            helper.uriHelper.UriHelperValue(None)
+            helper.uri.UriValue(None)
 
-    def test_uri_helper_invalid_type(self):
+    def test_uri_invalid_type(self):
         with pytest.raises(ValueError):
-            helper.uriHelper.UriHelper(123)
+            helper.uri.Uri(123)

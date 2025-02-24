@@ -3,10 +3,12 @@
 """
 検証コード
 """
-import os
-import copy
 import unittest
-from helper import spreadsheet
+import os
+import sys
+import copy
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..')))
+import helper.spreadsheet
 
 RESULT_FILE_PATH = './result.txt'  # タイトルと、ダウンロードするファイルのURLの列挙を書き込むファイル
 
@@ -21,10 +23,10 @@ class TestSpreadsheet(unittest.TestCase):
                                               '../../../json/tenki-347610-1bc0fec79f90.json').replace(os.sep, '/')
         self.workbook_name = '天気予報'
         self.worksheet_name = '七尾市和倉町data'
-        self.spreadsheet = spreadsheet.Spreadsheet(self.json_keyfile_name,
-                                                   self.workbook_name,
-                                                   self.worksheet_name,
-                                                   )
+        self.spreadsheet = helper.spreadsheet.Spreadsheet(self.json_keyfile_name,
+                                                          self.workbook_name,
+                                                          self.worksheet_name,
+                                                          )
 
     def tearDown(self):
         print("tearDown")
@@ -45,7 +47,7 @@ class TestSpreadsheet(unittest.TestCase):
         :return:
         """
         value_objects = self.spreadsheet.get_value_objects()
-        spreadsheet2 = spreadsheet.Spreadsheet(value_objects)
+        spreadsheet2 = helper.spreadsheet.Spreadsheet(value_objects)
         self.assertEqual(self.spreadsheet, spreadsheet2)
 
     def test_spreadsheet03(self):
@@ -53,7 +55,7 @@ class TestSpreadsheet(unittest.TestCase):
 
         :return:
         """
-        spreadsheet3 = spreadsheet.Spreadsheet()
+        spreadsheet3 = helper.spreadsheet.Spreadsheet()
         spreadsheet3.load_text(RESULT_FILE_PATH + '1.txt')
         spreadsheet3.write_list_columns([100, 200, 300, 50], (1, 1))
         spreadsheet3.write_list_columns([99, 98, 97, 96], (1, 3))
