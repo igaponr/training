@@ -1,0 +1,274 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="ja" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>helper.irvine &mdash; Web_scraping 1.0.0 ドキュメント</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=144c8c96"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/translations.js?v=4755f45a"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="索引" href="../../genindex.html" />
+    <link rel="search" title="検索" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Web_scraping
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../helper.html">helper package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Web_scraping</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">モジュールコード</a></li>
+      <li class="breadcrumb-item active">helper.irvine</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>helper.irvine のソースコード</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python3</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;Irvineのヘルパー</span>
+
+<span class="sd">- 記事[Irvineを使ってurlリストのファイルをダウンロードする](https://qiita.com/igapon1/items/4d92950259083ae6ba41)で紹介した</span>
+<span class="sd">- 事前にIrvineの設定を行っておく必要がある</span>
+<span class="sd">- urlやurlリストから、IrvineValueインスタンスを作る</span>
+<span class="sd">- IrvineValueインスタンスから、list_pathにIrvineのダウンロードファイルを作る</span>
+<span class="sd">    - Irvineのダウンロードファイルのフォーマット(タブ区切りcsv)</span>
+<span class="sd">        - URL</span>
+<span class="sd">        - 保存フォルダ</span>
+<span class="sd">        - 別名で保存</span>
+<span class="sd">        - 以降不明(17フィールド)</span>
+<span class="sd">- downloadメソッドでIrvineを使ってList_pathのファイルをダウンロードする</span>
+<span class="sd">    - 以下のIrvineの設定を行っておくこと</span>
+<span class="sd">        - キューフォルダにフォーカスを当ててIrvineを終了しておく。Irvine起動時にフォーカスの当たっているキューフォルダにurlリストが追加される</span>
+<span class="sd">        - ダウンロードが終わったらIrvineを終了する</span>
+<span class="sd">            - [オプション設定]-[イベント]-[OnDeactivateQueue]に新規作成で後述のスクリプトを書き込む</span>
+<span class="sd">            - [全て終了時にIrvineを終了]をチェックする</span>
+<span class="sd">- Irvineに設定するスクリプト</span>
+<span class="sd">    doneclose.dms:</span>
+<span class="sd">    ```</span>
+<span class="sd">    /*</span>
+<span class="sd">    スクリプト初期化データ</span>
+<span class="sd">    guid={3FD7CA4D-BB58-4E4E-B1EF-E66AA72E9685}</span>
+<span class="sd">    caption=全て終了時にIrvineを終了</span>
+<span class="sd">    version=0</span>
+<span class="sd">    hint=</span>
+<span class="sd">    event=OnDeactivateQueue</span>
+<span class="sd">    match=</span>
+<span class="sd">    author=</span>
+<span class="sd">    synchronize=0</span>
+<span class="sd">    */</span>
+<span class="sd">    function OnDeactivateQueue(irvine){</span>
+<span class="sd">    //すべてのダウンロード終了イベント</span>
+<span class="sd">    irvine.ExecuteAction(&#39;actFileClose&#39;);</span>
+<span class="sd">    }</span>
+<span class="sd">    ```</span>
+<span class="sd">- 参考</span>
+<span class="sd">    - [Irvine公式](http://hp.vector.co.jp/authors/VA024591/)</span>
+<span class="sd">    - [Irvineマニュアル](http://hp.vector.co.jp/authors/VA024591/doc/manual.html)</span>
+<span class="sd">    - [IrvineまとめWiki](https://w.atwiki.jp/irvinewiki/)</span>
+<span class="sd">    - [Irvineの設定](https://w.atwiki.jp/irvinewiki/pages/32.html)</span>
+<span class="sd">    - [Irvine Uploader](https://u1.getuploader.com/irvn/)</span>
+<span class="sd">    - [Irvine Part36スレ](https://mevius.5ch.net/test/read.cgi/win/1545612410)</span>
+
+<span class="sd">Example:</span>
+<span class="sd">    &gt;&gt;&gt; urls = [&quot;http://example.com/file1.txt&quot;, &quot;http://example.com/file2.txt&quot;]</span>
+<span class="sd">    &gt;&gt;&gt; irvine = Irvine(urls, download_path=&quot;C:/downloads&quot;, download_file_name_list=[&quot;file1_renamed.txt&quot;, &quot;file2_renamed.txt&quot;])</span>
+<span class="sd">    &gt;&gt;&gt; irvine.download()</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">zip_longest</span>
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+
+
+<div class="viewcode-block" id="IrvineValue">
+<a class="viewcode-back" href="../../helper.irvine.html#helper.irvine.IrvineValue">[ドキュメント]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">IrvineValue</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Irvineの値オブジェクトクラス</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        url_list (list): ダウンロードするURLのリスト</span>
+<span class="sd">        exe_path (str): Irvine.exeのパス。デフォルトは &quot;c:\Program1\irvine1_3_0\irvine.exe&quot;</span>
+<span class="sd">        list_path (str): Irvineでダウンロードするファイルリストのファイルパス。デフォルトは &quot;../irvine_download_list.txt&quot;</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        FileNotFoundError: exe_pathで指定されたファイルが存在しない場合</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">url_list</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="n">exe_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="sa">r</span><span class="s1">&#39;c:\Program1\irvine1_3_0\irvine.exe&#39;</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">,</span> <span class="s1">&#39;/&#39;</span><span class="p">))</span>
+    <span class="n">list_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)),</span>
+                                                <span class="s1">&#39;../irvine_download_list.txt&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">,</span> <span class="s1">&#39;/&#39;</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;初期化後の処理</span>
+
+<span class="sd">        Irvine実行ファイルの存在を確認する</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            FileNotFoundError: Irvineの実行ファイルが存在しない場合</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">exe_path</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Irvine executable not found: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">exe_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="Irvine">
+<a class="viewcode-back" href="../../helper.irvine.html#helper.irvine.Irvine">[ドキュメント]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">Irvine</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Irvineのヘルパー</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        value_object (Optional[Union[IrvineValue, List[str], str]]): IrvineValueオブジェクト、URLリスト、またはURL文字列。</span>
+<span class="sd">        download_path (Optional[str]): ダウンロード先のフォルダパス。指定しない場合は、Irvineのデフォルト設定が使用される。</span>
+<span class="sd">        download_file_name_list (List[str]): ダウンロードするファイルのファイル名リスト。指定しない場合は、元のファイル名が使用される。</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        value_object</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: value_objectが指定されないか、exe_pathとlist_pathのパスが存在しなければ、例外を出す</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">value_object</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">IrvineValue</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">download_path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">download_file_name_list</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;&#39;</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;初期化後の処理</span>
+
+<span class="sd">        `value_object` でバリューオブジェクトを指定するか、URLのリストか、URLを指定する</span>
+<span class="sd">        ダウンロードリストファイルの存在を確認する</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: `value_object`が指定されていない場合</span>
+<span class="sd">            FileNotFoundError: ダウンロードリストファイルが存在しない場合</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">value_object</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Either value_object or url_list must be provided.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value_object</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">value_object</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">value_object</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value_object</span><span class="p">,</span> <span class="n">List</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">value_object</span> <span class="o">=</span> <span class="n">IrvineValue</span><span class="p">(</span><span class="n">url_list</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">value_object</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value_object</span><span class="p">,</span> <span class="n">IrvineValue</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Either value_object or url_list must be provided.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">create_download_file</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value_object</span><span class="o">.</span><span class="n">list_path</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Download list file not found: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">value_object</span><span class="o">.</span><span class="n">list_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Irvine.create_download_file">
+<a class="viewcode-back" href="../../helper.irvine.html#helper.irvine.Irvine.create_download_file">[ドキュメント]</a>
+    <span class="k">def</span> <span class="nf">create_download_file</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">      </span><span class="sd">&quot;&quot;&quot;Irvine用のダウンロードリストファイルを作成する</span>
+
+<span class="sd">      ファイルフォーマットは、URL、保存フォルダ、別名で保存、タブ区切り（17フィールド）となる</span>
+
+<span class="sd">      Raises:</span>
+<span class="sd">          OSError: ファイルの作成に失敗した場合</span>
+<span class="sd">      &quot;&quot;&quot;</span>
+      <span class="k">try</span><span class="p">:</span>
+          <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value_object</span><span class="o">.</span><span class="n">list_path</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">work_file</span><span class="p">:</span>
+              <span class="k">for</span> <span class="n">url</span><span class="p">,</span> <span class="n">file_name</span> <span class="ow">in</span> <span class="n">zip_longest</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value_object</span><span class="o">.</span><span class="n">url_list</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">download_file_name_list</span><span class="p">):</span>
+                  <span class="n">line</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="se">\t</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">download_path</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="s1">&#39;&#39;</span><span class="si">}</span><span class="se">\t</span><span class="si">{</span><span class="n">file_name</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="s1">&#39;&#39;</span><span class="si">}</span><span class="se">\t</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span> <span class="o">*</span> <span class="mi">17</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+                  <span class="n">work_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+      <span class="k">except</span> <span class="ne">IOError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+          <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to create download list file: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span></div>
+
+
+<div class="viewcode-block" id="Irvine.download">
+<a class="viewcode-back" href="../../helper.irvine.html#helper.irvine.Irvine.download">[ドキュメント]</a>
+    <span class="k">def</span> <span class="nf">download</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Irvineを実行してダウンロードを行う</span>
+
+<span class="sd">        Irvineを実行し、ダウンロードリストファイルに基づいてファイルのダウンロードを行い、Irvineの実行が完了するまで待機する</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            RuntimeError: Irvineの実行に失敗した場合</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">value_object</span><span class="o">.</span><span class="n">exe_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">value_object</span><span class="o">.</span><span class="n">list_path</span><span class="p">]</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">check</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">capture_output</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">CalledProcessError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Irvine execution failed with code </span><span class="si">{</span><span class="n">e</span><span class="o">.</span><span class="n">returncode</span><span class="si">}</span><span class="s2">.</span><span class="se">\n</span><span class="s2">&quot;</span>
+                             <span class="sa">f</span><span class="s2">&quot;Stdout: </span><span class="si">{</span><span class="n">e</span><span class="o">.</span><span class="n">stdout</span><span class="si">}</span><span class="se">\n</span><span class="s2">Stderr: </span><span class="si">{</span><span class="n">e</span><span class="o">.</span><span class="n">stderr</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to download files: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Ryosuke Igarashi.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

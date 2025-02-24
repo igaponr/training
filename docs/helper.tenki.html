@@ -100,40 +100,99 @@
              
   <section id="module-helper.tenki">
 <span id="helper-tenki-module"></span><h1>helper.tenki module<a class="headerlink" href="#module-helper.tenki" title="Link to this heading"></a></h1>
-<p>requests-htmlでスクレイピング
-requestsでスクレイピングできないページのスクレイピング</p>
-<p>参考資料
-<a class="reference external" href="https://gammasoft.jp/blog/how-to-download-web-page-created-javascript/">https://gammasoft.jp/blog/how-to-download-web-page-created-javascript/</a>
-<a class="reference external" href="https://docs.python-requests.org/projects/requests-html/en/latest/">https://docs.python-requests.org/projects/requests-html/en/latest/</a>
-<a class="reference external" href="https://commte.net/7628">https://commte.net/7628</a>
-<a class="reference external" href="https://qiita.com/uitspitss/items/f131ea79dffd58bc01ae">https://qiita.com/uitspitss/items/f131ea79dffd58bc01ae</a>
-<a class="reference external" href="https://computer.masas-record-storage-container.com/2021/03/01/requestshtml/">https://computer.masas-record-storage-container.com/2021/03/01/requestshtml/</a></p>
-<p>Documents
-<a class="reference external" href="https://requests.readthedocs.io/projects/requests-html/en/latest/">https://requests.readthedocs.io/projects/requests-html/en/latest/</a></p>
-<p>requests-htmlのGitHub
-<a class="reference external" href="https://github.com/kennethreitz/requests-html">https://github.com/kennethreitz/requests-html</a></p>
-<div class="admonition-todo admonition" id="id1">
-<p class="admonition-title">課題</p>
+<p>requests-htmlでスクレイピング</p>
+<p>requestsでスクレイピングできないページのスクレイピング</p>
 <ul class="simple">
-<li><p>docstringを整える</p></li>
-</ul>
-</div>
-<dl class="py class">
-<dt class="sig sig-object py" id="helper.tenki.Tenki">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">helper.tenki.</span></span><span class="sig-name descname"><span class="pre">Tenki</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">css_root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">css_selectors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attrs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/tenki.html#Tenki"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.tenki.Tenki" title="Link to this definition"></a></dt>
-<dd><p>ベースクラス: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<dl class="simple">
-<dt>クローリングのユーティリティ</dt><dd><ul class="simple">
-<li><p>指定のサイトを読み込む</p></li>
-<li><p>指定のCSSセレクタ(css_selectors)と属性でクローリング(attrs)する</p></li>
-<li><p>クローリング結果でTenkiValueを生成する</p></li>
-<li><p>TenkiValueをファイルに保存したり読み込んだりできる</p></li>
+<li><dl class="simple">
+<dt>参考資料</dt><dd><ul>
+<li><p><a class="reference external" href="https://gammasoft.jp/blog/how-to-download-web-page-created-javascript/">https://gammasoft.jp/blog/how-to-download-web-page-created-javascript/</a></p></li>
+<li><p><a class="reference external" href="https://docs.python-requests.org/projects/requests-html/en/latest/">https://docs.python-requests.org/projects/requests-html/en/latest/</a></p></li>
+<li><p><a class="reference external" href="https://commte.net/7628">https://commte.net/7628</a></p></li>
+<li><p><a class="reference external" href="https://qiita.com/uitspitss/items/f131ea79dffd58bc01ae">https://qiita.com/uitspitss/items/f131ea79dffd58bc01ae</a></p></li>
+<li><p><a class="reference external" href="https://computer.masas-record-storage-container.com/2021/03/01/requestshtml/">https://computer.masas-record-storage-container.com/2021/03/01/requestshtml/</a></p></li>
 </ul>
 </dd>
 </dl>
+</li>
+<li><dl class="simple">
+<dt>Documents</dt><dd><ul>
+<li><p><a class="reference external" href="https://requests.readthedocs.io/projects/requests-html/en/latest/">https://requests.readthedocs.io/projects/requests-html/en/latest/</a></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>requests-htmlのGitHub</dt><dd><ul>
+<li><p><a class="reference external" href="https://github.com/kennethreitz/requests-html">https://github.com/kennethreitz/requests-html</a></p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<dl class="py class">
+<dt class="sig sig-object py" id="helper.tenki.Tenki">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">helper.tenki.</span></span><span class="sig-name descname"><span class="pre">Tenki</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target_value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#helper.tenki.TenkiValue" title="helper.tenki.TenkiValue"><span class="pre">TenkiValue</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">css_root</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">css_selectors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attrs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/tenki.html#Tenki"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.tenki.Tenki" title="Link to this definition"></a></dt>
+<dd><p>ベースクラス: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>クローリングユーティリティ</p>
+<p>指定のサイトを読み込み、指定のCSSセレクタ(css_selectors)と属性でクローリング(attrs)し、クローリング結果でTenkiValueを生成する</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="helper.tenki.Tenki.tenki_value">
+<span class="sig-name descname"><span class="pre">tenki_value</span></span><a class="headerlink" href="#helper.tenki.Tenki.tenki_value" title="Link to this definition"></a></dt>
+<dd><p>TenkiValueオブジェクト</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#helper.tenki.TenkiValue" title="helper.tenki.TenkiValue">helper.tenki.TenkiValue</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="helper.tenki.Tenki.target_url">
+<span class="sig-name descname"><span class="pre">target_url</span></span><a class="headerlink" href="#helper.tenki.Tenki.target_url" title="Link to this definition"></a></dt>
+<dd><p>対象サイトのURL</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="helper.tenki.Tenki.css_root">
+<span class="sig-name descname"><span class="pre">css_root</span></span><a class="headerlink" href="#helper.tenki.Tenki.css_root" title="Link to this definition"></a></dt>
+<dd><p>スクレイピングルートCSSセレクタ</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="helper.tenki.Tenki.css_selectors">
+<span class="sig-name descname"><span class="pre">css_selectors</span></span><a class="headerlink" href="#helper.tenki.Tenki.css_selectors" title="Link to this definition"></a></dt>
+<dd><p>スクレイピングCSSセレクタ辞書</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py attribute">
 <dt class="sig sig-object py" id="helper.tenki.Tenki.attrs">
-<span class="sig-name descname"><span class="pre">attrs</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#helper.tenki.Tenki.attrs" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">attrs</span></span><a class="headerlink" href="#helper.tenki.Tenki.attrs" title="Link to this definition"></a></dt>
+<dd><p>スクレイピング属性辞書</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id0">
+<span class="sig-name descname"><span class="pre">attrs</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#id0" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -142,7 +201,10 @@ requestsでスクレイピングできないページのスクレイピング</p
 <dd><p>クローリング結果をクリップボードにコピーする</p>
 <dl class="field-list simple">
 <dt class="field-odd">戻り値<span class="colon">:</span></dt>
-<dd class="field-odd"><p>bool 成功/失敗=True/False</p>
+<dd class="field-odd"><p>成功/失敗=True/False</p>
+</dd>
+<dt class="field-even">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-even"><p>bool</p>
 </dd>
 </dl>
 </dd></dl>
@@ -152,8 +214,11 @@ requestsでスクレイピングできないページのスクレイピング</p
 <span class="sig-name descname"><span class="pre">create_LINE_BOT_TOBA_format</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/tenki.html#Tenki.create_LINE_BOT_TOBA_format"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.tenki.Tenki.create_LINE_BOT_TOBA_format" title="Link to this definition"></a></dt>
 <dd><p>時間毎の天気予報配列を作る</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return data<span class="colon">:</span></dt>
-<dd class="field-odd"><p>dict 天気予報配列</p>
+<dt class="field-odd">戻り値<span class="colon">:</span></dt>
+<dd class="field-odd"><p>天気予報配列</p>
+</dd>
+<dt class="field-even">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict</p>
 </dd>
 </dl>
 </dd></dl>
@@ -164,19 +229,22 @@ requestsでスクレイピングできないページのスクレイピング</p
 <dd><p>保存用文字列の作成</p>
 <dl class="field-list simple">
 <dt class="field-odd">戻り値<span class="colon">:</span></dt>
-<dd class="field-odd"><p>str 保存用文字列の作成</p>
+<dd class="field-odd"><p>保存用文字列の作成</p>
+</dd>
+<dt class="field-even">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="helper.tenki.Tenki.css_root">
-<span class="sig-name descname"><span class="pre">css_root</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#helper.tenki.Tenki.css_root" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="id1">
+<span class="sig-name descname"><span class="pre">css_root</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#id1" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="helper.tenki.Tenki.css_selectors">
-<span class="sig-name descname"><span class="pre">css_selectors</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#helper.tenki.Tenki.css_selectors" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="id2">
+<span class="sig-name descname"><span class="pre">css_selectors</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#id2" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -185,7 +253,10 @@ requestsでスクレイピングできないページのスクレイピング</p
 <dd><p>クローリング結果を取得する</p>
 <dl class="field-list simple">
 <dt class="field-odd">戻り値<span class="colon">:</span></dt>
-<dd class="field-odd"><p>dict クローリング結果</p>
+<dd class="field-odd"><p>クローリング結果</p>
+</dd>
+<dt class="field-even">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict</p>
 </dd>
 </dl>
 </dd></dl>
@@ -196,7 +267,10 @@ requestsでスクレイピングできないページのスクレイピング</p
 <dd><p>クローリング結果を取得する</p>
 <dl class="field-list simple">
 <dt class="field-odd">戻り値<span class="colon">:</span></dt>
-<dd class="field-odd"><p>dict クローリング結果</p>
+<dd class="field-odd"><p>クローリング結果</p>
+</dd>
+<dt class="field-even">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict</p>
 </dd>
 </dl>
 </dd></dl>
@@ -207,7 +281,10 @@ requestsでスクレイピングできないページのスクレイピング</p
 <dd><p>対象サイトタイトルを取得する</p>
 <dl class="field-list simple">
 <dt class="field-odd">戻り値<span class="colon">:</span></dt>
-<dd class="field-odd"><p>str 対象サイトタイトル</p>
+<dd class="field-odd"><p>対象サイトタイトル</p>
+</dd>
+<dt class="field-even">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
 </dd>
 </dl>
 </dd></dl>
@@ -218,7 +295,10 @@ requestsでスクレイピングできないページのスクレイピング</p
 <dd><p>値オブジェクトを取得する</p>
 <dl class="field-list simple">
 <dt class="field-odd">戻り値<span class="colon">:</span></dt>
-<dd class="field-odd"><p>TenkiValue 値オブジェクト</p>
+<dd class="field-odd"><p>値オブジェクト</p>
+</dd>
+<dt class="field-even">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#helper.tenki.TenkiValue" title="helper.tenki.TenkiValue">TenkiValue</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -229,21 +309,30 @@ requestsでスクレイピングできないページのスクレイピング</p
 <dd><p>独自フォーマットなファイルからデータを読み込む</p>
 <dl class="field-list simple">
 <dt class="field-odd">パラメータ<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>load_path</strong> -- str ロードする独自フォーマットなファイルのパス</p>
+<dd class="field-odd"><p><strong>load_path</strong> (<em>str</em>) -- ロードする独自フォーマットなファイルのパス</p>
 </dd>
 <dt class="field-even">戻り値<span class="colon">:</span></dt>
-<dd class="field-even"><p>bool 成功/失敗=True/False</p>
+<dd class="field-even"><p>成功/失敗=True/False</p>
+</dd>
+<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="helper.tenki.Tenki.request">
-<span class="sig-name descname"><span class="pre">request</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/tenki.html#Tenki.request"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.tenki.Tenki.request" title="Link to this definition"></a></dt>
-<dd><p>target_urlに接続して、スクレイピングして、tenki_valueを更新する</p>
+<span class="sig-name descname"><span class="pre">request</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="_modules/helper/tenki.html#Tenki.request"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.tenki.Tenki.request" title="Link to this definition"></a></dt>
+<dd><p>target_urlに接続し、スクレイピングを実行してtenki_valueを更新する</p>
 <dl class="field-list simple">
 <dt class="field-odd">戻り値<span class="colon">:</span></dt>
-<dd class="field-odd"><p>bool 成功/失敗=True/False</p>
+<dd class="field-odd"><p>成功, False: 失敗</p>
+</dd>
+<dt class="field-even">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-even"><p>True</p>
+</dd>
+<dt class="field-odd">例外<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>RequestException</strong> -- リクエストエラーが発生した場合</p>
 </dd>
 </dl>
 </dd></dl>
@@ -264,10 +353,13 @@ requestsでスクレイピングできないページのスクレイピング</p
 </dl>
 <dl class="field-list simple">
 <dt class="field-odd">パラメータ<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>save_path</strong> -- str セーブする独自フォーマットなファイルのパス</p>
+<dd class="field-odd"><p><strong>save_path</strong> (<em>str</em>) -- セーブする独自フォーマットなファイルのパス</p>
 </dd>
 <dt class="field-even">戻り値<span class="colon">:</span></dt>
-<dd class="field-even"><p>bool 成功/失敗=True/False</p>
+<dd class="field-even"><p>成功/失敗=True/False</p>
+</dd>
+<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
 </dd>
 </dl>
 </dd></dl>
@@ -275,31 +367,26 @@ requestsでスクレイピングできないページのスクレイピング</p
 <dl class="py method">
 <dt class="sig sig-object py" id="helper.tenki.Tenki.special_func_temp">
 <span class="sig-name descname"><span class="pre">special_func_temp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/tenki.html#Tenki.special_func_temp"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.tenki.Tenki.special_func_temp" title="Link to this definition"></a></dt>
-<dd><p>特別製
-temp_itemのjava-scriptを解析して、
+<dd><p>特別製</p>
+<p>temp_itemのjava-scriptを解析して、
 データとカウンターを整える（元のデータを書き換える）</p>
-<dl class="field-list simple">
-<dt class="field-odd">戻り値<span class="colon">:</span></dt>
-<dd class="field-odd"><p></p>
-</dd>
-</dl>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="helper.tenki.Tenki.target_url">
-<span class="sig-name descname"><span class="pre">target_url</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#helper.tenki.Tenki.target_url" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="id3">
+<span class="sig-name descname"><span class="pre">target_url</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#id3" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="helper.tenki.Tenki.tenki_value">
-<span class="sig-name descname"><span class="pre">tenki_value</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#helper.tenki.TenkiValue" title="helper.tenki.TenkiValue"><span class="pre">TenkiValue</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#helper.tenki.Tenki.tenki_value" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="id4">
+<span class="sig-name descname"><span class="pre">tenki_value</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#helper.tenki.TenkiValue" title="helper.tenki.TenkiValue"><span class="pre">TenkiValue</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#id4" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="helper.tenki.TenkiValue">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">helper.tenki.</span></span><span class="sig-name descname"><span class="pre">TenkiValue</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target_url</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">css_root</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">css_selectors</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attrs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">forecasts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">counters</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/tenki.html#TenkiValue"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.tenki.TenkiValue" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">helper.tenki.</span></span><span class="sig-name descname"><span class="pre">TenkiValue</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target_url:</span> <span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">css_root:</span> <span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">css_selectors:</span> <span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attrs:</span> <span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title:</span> <span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">forecasts:</span> <span class="pre">dict</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">counters:</span> <span class="pre">dict</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/tenki.html#TenkiValue"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.tenki.TenkiValue" title="Link to this definition"></a></dt>
 <dd><p>ベースクラス: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>クローリング値オブジェクト</p>
 <dl class="py attribute">
@@ -341,8 +428,20 @@ temp_itemのjava-scriptを解析して、
 
 <dl class="py function">
 <dt class="sig sig-object py" id="helper.tenki.is_num">
-<span class="sig-prename descclassname"><span class="pre">helper.tenki.</span></span><span class="sig-name descname"><span class="pre">is_num</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/tenki.html#is_num"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.tenki.is_num" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-prename descclassname"><span class="pre">helper.tenki.</span></span><span class="sig-name descname"><span class="pre">is_num</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="_modules/helper/tenki.html#is_num"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.tenki.is_num" title="Link to this definition"></a></dt>
+<dd><p>数値かどうかを判定する</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>s</strong> -- 判定対象の文字列</p>
+</dd>
+<dt class="field-even">戻り値<span class="colon">:</span></dt>
+<dd class="field-even"><p>数値の場合, False: 数値でない場合</p>
+</dd>
+<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-odd"><p>True</p>
+</dd>
+</dl>
+</dd></dl>
 
 </section>
 

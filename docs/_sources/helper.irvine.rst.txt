@@ -1,7 +1,7 @@
-helper.irvineHelper module
+helper.irvine module
 ==========================
 
-.. automodule:: helper.irvineHelper
+.. automodule:: helper.irvine
    :members:
    :undoc-members:
    :show-inheritance:

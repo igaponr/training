@@ -10,7 +10,7 @@ Submodules
    helper.chromeDriverHelper
    helper.crawling
    helper.egoser_zipper
-   helper.irvineHelper
+   helper.irvine
    helper.line_message_api
    helper.scraping
    helper.slack_message_api
