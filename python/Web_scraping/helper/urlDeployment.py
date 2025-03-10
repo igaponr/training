@@ -21,7 +21,7 @@ import datetime
 from dataclasses import dataclass
 from urllib.parse import urlparse  # URLパーサー
 from urllib.parse import urlunparse
-import helper.chromeDriverHelper
+import helper.chromeDriver
 import helper.webFile
 import helper.webFileList
 
@@ -92,7 +92,7 @@ class UrlDeployment:
                 else:
                     __selectors = selectors_or_title
                     page_url = value_object
-                    __driver = helper.chromeDriverHelper.ChromeDriverHelper(value_object, __selectors)
+                    __driver = helper.chromeDriver.ChromeDriver(value_object, __selectors)
                     items = __driver.get_items()
 
                     _title = None

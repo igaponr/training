@@ -197,7 +197,7 @@ webクローリング関連の処理を行う。
 
 以下は「新しい」
 
-- chromeDriverHelper: selenium chromeドライバーのヘルパークラス
+- chromeDriver: selenium chromeドライバーのヘルパークラス
 - crawling: クローリングヘルパークラス
   - web巡回して、スクレイピングして、ファイルダウンロードして、zipファイルにまとめる
 - egoser_zipper: google 画像検索して、先頭20サムネイル画像をzipにまとめる

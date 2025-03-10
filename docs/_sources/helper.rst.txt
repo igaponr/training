@@ -7,7 +7,7 @@ Submodules
 .. toctree::
    :maxdepth: 4
 
-   helper.chromeDriverHelper
+   helper.chromeDriver
    helper.crawling
    helper.egoser_zipper
    helper.irvine

@@ -17,7 +17,7 @@ import pyperclip  # クリップボード
 import json
 import inspect
 # local source
-from helper import chromeDriverHelper
+from helper import chromeDriver
 
 # 最大再起回数を1万回にする
 sys.setrecursionlimit(10000)
@@ -76,11 +76,11 @@ class Scraping:
         return copy.deepcopy(self.value_object)
 
     def scraping_chrome_driver(self):
-        """ TODO: ChromeDriverHelperから、dictでスクレイピング結果を受け取りたい
+        """ TODO: ChromeDriverから、dictでスクレイピング結果を受け取りたい
         :return:
         """
         __value_object = self.get_value_object()
-        __chrome_driver = chromeDriverHelper.ChromeDriverHelper(__value_object.site_url, __value_object.selectors)
+        __chrome_driver = chromeDriver.ChromeDriver(__value_object.site_url, __value_object.selectors)
         return {'title': __chrome_driver.get_title(), 'last_image_url': __chrome_driver.get_last_image_url()}
 
     def create_save_text(self):

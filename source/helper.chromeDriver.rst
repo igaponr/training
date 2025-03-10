@@ -1,7 +1,7 @@
-helper.chromeDriverHelper module
+helper.chromeDriver module
 ================================
 
-.. automodule:: helper.chromeDriverHelper
+.. automodule:: helper.chromeDriver
    :members:
    :undoc-members:
    :show-inheritance:

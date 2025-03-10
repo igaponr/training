@@ -15,7 +15,7 @@ import pathlib
 import datetime
 
 import helper.uri
-import helper.chromeDriverHelper
+import helper.chromeDriver
 import helper.webFile
 import helper.irvine
 
@@ -231,7 +231,7 @@ class WebFileList:
         """selenium chromeDriverを用いて、画像をデフォルトダウンロードフォルダにダウンロードして、指定のフォルダに移動する
         :return:
         """
-        chromedriver = helper.chromeDriverHelper.ChromeDriverHelper()
+        chromedriver = helper.chromeDriver.ChromeDriver()
         for url, web_file in zip(self.get_url_list(), self.get_web_file_list()):
             chromedriver.download_image(url, web_file.get_path())
 

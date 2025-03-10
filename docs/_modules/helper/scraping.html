@@ -89,7 +89,7 @@
 <span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">import</span> <span class="nn">inspect</span>
 <span class="c1"># local source</span>
-<span class="kn">from</span> <span class="nn">helper</span> <span class="kn">import</span> <span class="n">chromeDriverHelper</span>
+<span class="kn">from</span> <span class="nn">helper</span> <span class="kn">import</span> <span class="n">chromeDriver</span>
 
 <span class="c1"># 最大再起回数を1万回にする</span>
 <span class="n">sys</span><span class="o">.</span><span class="n">setrecursionlimit</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span>
@@ -158,11 +158,11 @@
 <div class="viewcode-block" id="Scraping.scraping_chrome_driver">
 <a class="viewcode-back" href="../../helper.scraping.html#helper.scraping.Scraping.scraping_chrome_driver">[ドキュメント]</a>
     <span class="k">def</span> <span class="nf">scraping_chrome_driver</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; TODO: ChromeDriverHelperから、dictでスクレイピング結果を受け取りたい</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; TODO: ChromeDriverから、dictでスクレイピング結果を受け取りたい</span>
 <span class="sd">        :return:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">__value_object</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_value_object</span><span class="p">()</span>
-        <span class="n">__chrome_driver</span> <span class="o">=</span> <span class="n">chromeDriverHelper</span><span class="o">.</span><span class="n">ChromeDriverHelper</span><span class="p">(</span><span class="n">__value_object</span><span class="o">.</span><span class="n">site_url</span><span class="p">,</span> <span class="n">__value_object</span><span class="o">.</span><span class="n">selectors</span><span class="p">)</span>
+        <span class="n">__chrome_driver</span> <span class="o">=</span> <span class="n">chromeDriver</span><span class="o">.</span><span class="n">ChromeDriver</span><span class="p">(</span><span class="n">__value_object</span><span class="o">.</span><span class="n">site_url</span><span class="p">,</span> <span class="n">__value_object</span><span class="o">.</span><span class="n">selectors</span><span class="p">)</span>
         <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="n">__chrome_driver</span><span class="o">.</span><span class="n">get_title</span><span class="p">(),</span> <span class="s1">&#39;last_image_url&#39;</span><span class="p">:</span> <span class="n">__chrome_driver</span><span class="o">.</span><span class="n">get_last_image_url</span><span class="p">()}</span></div>
 
 

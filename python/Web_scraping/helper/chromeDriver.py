@@ -46,7 +46,7 @@ import helper.webFileList
 
 
 @dataclass(frozen=True)
-class ChromeDriverHelperValue:
+class ChromeDriverValue:
     """Chromeドライバ値オブジェクト"""
     url: str = None
     selectors: dict = None
@@ -55,7 +55,7 @@ class ChromeDriverHelperValue:
     def __init__(self, url: str, selectors, items):
         """完全コンストラクタパターン
 
-        Attributes:
+        Args:
             url: str 処理対象サイトURL
             selectors: dict スクレイピングする際のセレクタリスト
             items: dict スクレイピングして取得した値の辞書
@@ -90,20 +90,16 @@ class ChromeDriverHelperValue:
         return len(urlparse(string).scheme) > 0
 
 
-class ChromeDriverHelper:
+class ChromeDriver:
     """chromeドライバを操作する
 
-    Attributes:
-        value_object: ChromeDriverHelperValue インスタンス。スクレイピング結果などを保持する
-        download_path: ダウンロードファイルの保存先パス
-
     Example:
-        >>> helper = ChromeDriverHelper(url="https://www.google.com", selectors={"title": [(By.TAG_NAME, "title", lambda elem: elem.text)]})
+        >>> helper = ChromeDriver(url="https://www.google.com", selectors={"title": [(By.TAG_NAME, "title", lambda elem: elem.text)]})
         >>> print(helper.get_items())
         {'title': ['Google']}
         >>> helper.destroy()
     """
-    value_object: ChromeDriverHelperValue = None
+    value_object: ChromeDriverValue = None
     download_path: str = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                                       '../download').replace(os.sep, '/')
 
@@ -121,7 +117,7 @@ class ChromeDriverHelper:
                              # '--headless',  # バックグラウンドで起動する
                              ]
     __chrome_add_experimental_option = [('debuggerAddress', f'127.0.0.1:{__port}'),
-                                        # TODO: prefsはdebuggerAddressと同時に指定できない？
+                                        # NOTE: prefsはdebuggerAddressと同時に指定できない？
                                         # ('prefs', {'download.default_directory': download_path}),
                                         ]
     profile_path = r'C:\Users\igapon\temp'
@@ -130,7 +126,7 @@ class ChromeDriverHelper:
             f' --user-data-dir="{profile_path}"'
 
     def __init__(self,
-                 value_object: t.Union[ChromeDriverHelperValue, str] = None,
+                 value_object: t.Union[ChromeDriverValue, str] = None,
                  selectors: dict = None,
                  download_path: str = download_path):
         """コンストラクタ
@@ -138,19 +134,19 @@ class ChromeDriverHelper:
         値オブジェクトからの復元、または、urlとselectorsより、値オブジェクトを作成する
 
         Args:
-            value_object (ChromeDriverHelperValue | str | None): 対象となるサイトURL、または、値オブジェクト。デフォルトは None
+            value_object (ChromeDriverValue | str | None): 対象となるサイトURL、または、値オブジェクト。デフォルトは None
             selectors (dict, optional): スクレイピングする際のセレクタリスト。デフォルトは None
             download_path (str, optional): ダウンロードフォルダのパス。デフォルトは download_path
 
         Raises:
-            ValueError: value_object が ChromeDriverHelperValue または str ではない場合、または selectors が不正な場合
+            ValueError: value_object が ChromeDriverValue または str ではない場合、または selectors が不正な場合
         """
         self._window_handle_list = []
         self.__start()
         if download_path:
             self.download_path = download_path
         if value_object:
-            if isinstance(value_object, ChromeDriverHelperValue):
+            if isinstance(value_object, ChromeDriverValue):
                 value_object = copy.deepcopy(value_object)
                 self.value_object = value_object
             elif isinstance(value_object, str):
@@ -186,7 +182,7 @@ class ChromeDriverHelper:
             return False
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             try:
-                s.connect(('127.0.0.1', int(ChromeDriverHelper.__port)))
+                s.connect(('127.0.0.1', int(ChromeDriver.__port)))
                 return True
             except ConnectionRefusedError:
                 print("chrome見つかるが、9222に応答せず。")
@@ -223,7 +219,7 @@ class ChromeDriverHelper:
         """
         file_name = file_name.replace(os.sep, '￥')
         file_name = file_name.replace('/', '／')
-        return ChromeDriverHelper.fixed_path(file_name)
+        return ChromeDriver.fixed_path(file_name)
 
     def scraping(self, selectors: dict[str, list[tuple[By, str, t.Callable[[WebElement], str]]]]) -> dict[str, list[str]]:
         """現在表示の URL に対してスクレイピングを実行する
@@ -242,7 +238,7 @@ class ChromeDriverHelper:
                 items[key] = [self._driver.title]
             else:
                 items[key] = self.__get_scraping_selector_list(selector_list)
-        self.value_object = ChromeDriverHelperValue(self._driver.current_url, selectors, items)
+        self.value_object = ChromeDriverValue(self._driver.current_url, selectors, items)
         return items
 
     def scroll_element(self, element: WebElement) -> None:
@@ -255,7 +251,7 @@ class ChromeDriverHelper:
         actions.move_to_element(element)
         actions.perform()
 
-    def get_value_object(self) -> ChromeDriverHelperValue:
+    def get_value_object(self) -> ChromeDriverValue:
         """値オブジェクトを取得する
 
         Returns:
@@ -522,16 +518,16 @@ class ChromeDriverHelper:
         next_handle = self._window_handle_list[next_index]
         self._driver.switch_to.window(next_handle)
 
-    def download_image(self, url: str, download_path: str = None) -> None:
+    def download_image(self, url: str, download_image_path: str = None) -> None:
         """(画面遷移有)urlの画像を保存する(open_new_tab → save_image → closeする)
 
         Args:
             url (str): 画像のurl
-            download_path (str, optional): ダウンロード先のパス。指定しない場合は、インスタンスの download_path を使用する
+            download_image_path (str, optional): ダウンロード先のパス。指定しない場合は、インスタンスの download_image_path を使用する
         """
         uri = helper.uri.Uri(url)
         if uri.is_data_uri(url):
-            uri.save_data_uri(download_path)
+            uri.save_data_uri(download_image_path)
         else:
             __handle = self.open_new_tab(url)
             self.save_image(uri.get_filename(), uri.get_ext())

@@ -2,16 +2,13 @@
 # -*- coding: utf-8 -*-
 """
 クローリング
-    * 指定サイト(site_url)をセレクタ(site_selectors)でクローリングする(ChromeDriverHelperを使用)
+    * 指定サイト(site_url)をセレクタ(site_selectors)でクローリングする(ChromeDriverを使用)
     * クローリング結果を、crawling_file_pathに保存する
     * crawling_file_pathのpage_urlsは、スクレイピングする対象urlリストである
     * crawling_file_pathのexclusion_urlsは、スクレイピングの除外urlリストである
     * zip保存まで終わると、page_urlsからexclusion_urlsにurlを移す
     * セレクタを、image_urlで定義すると、crawling_url_deploymentでスクレイピングして末尾画像URLの展開URLでダウンロードして、zipに保存する
     * セレクタを、image_urlsで定義すると、crawling_urlsでスクレイピングしてダウンロードして、zipに保存する
-
-Todo:
-    - docstringを整える
 """
 import os
 import sys
@@ -21,7 +18,7 @@ import json
 import datetime
 from dataclasses import dataclass
 from typing import Union, Optional
-import helper.chromeDriverHelper
+import helper.chromeDriver
 import helper.webFile
 import helper.webFileList
 import helper.line_message_api
@@ -33,17 +30,14 @@ import helper.status
 class CrawlingValue:
     """Crawlingの値オブジェクトクラス
 
-    サイトURL、セレクタ、クローリングアイテム、クローリングファイルパスを保持します
-
     Attributes:
-        site_url (str): サイトURL。
+        site_url (str): サイトURL
         site_selectors (Dict[str, str]): サイトセレクタ。キーはアイテム名、値はCSSセレクタ
         crawling_items (Dict[str, List[str]]): クローリングアイテム。キーはアイテムの種類（例：'page_urls'）、値はURLのリスト
         crawling_file_path (str): クローリングファイルパス
 
     Raises:
         ValueError: 各属性が不正な値（None、空文字列、不正な型）の場合
-
     """
     site_url: str = None
     site_selectors: dict = None
@@ -93,7 +87,6 @@ class Crawling:
     value_object: CrawlingValue = None
     site_selectors: dict = None
     crawling_items: dict = {URLS_TARGET: [], URLS_EXCLUSION: [], URLS_FAILURE: []}
-    # crawling_file_path: str = '../crawling_list.txt'
     crawling_file_path: str = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                                            '../crawling_list.txt').replace(os.sep, '/')
 
@@ -136,9 +129,9 @@ class Crawling:
 
     @staticmethod
     def scraping(url, selectors):
-        """ChromeDriverHelperを使ってスクレイピングする"""
+        """ChromeDriverを使ってスクレイピングする"""
         selectors = copy.deepcopy(selectors)
-        chrome_driver = helper.chromeDriverHelper.ChromeDriverHelper(url, selectors)
+        chrome_driver = helper.chromeDriver.ChromeDriver(url, selectors)
         return chrome_driver.get_items()
 
     @staticmethod
@@ -177,13 +170,13 @@ class Crawling:
                 title = f'{now:%Y%m%d_%H%M%S}'
             else:
                 title = title_sub
-        return helper.chromeDriverHelper.ChromeDriverHelper.fixed_file_name(title)
+        return helper.chromeDriver.ChromeDriver.fixed_file_name(title)
 
     @staticmethod
     def download_chrome_driver(web_file_list):
         """selenium chromeDriverを用いて、画像をデフォルトダウンロードフォルダにダウンロードして、指定のフォルダに移動する
         """
-        chromedriver = helper.chromeDriverHelper.ChromeDriverHelper()
+        chromedriver = helper.chromeDriver.ChromeDriver()
         for url, path in zip(web_file_list.get_url_list(), web_file_list.get_path_list()):
             chromedriver.download_image(url, path)
 
@@ -224,11 +217,15 @@ class Crawling:
 
     def create_save_text(self):
         """保存用文字列の作成
+
+        以下を保存する
             * サイトURL
             * セレクタ
             * saveファイルのフルパス
             * クローリング結果urls
-        :return: str 保存用文字列の作成
+
+        Returns:
+            str: 保存用文字列の作成
         """
         __buff = json.dumps(self.get_site_url(), ensure_ascii=False) + '\n'  # サイトURL
         # TODO: selectorsはjson.dumpsでシリアライズできないオブジェクトたぶんlambdaを含んでいる。pickleでもだめらしい。
@@ -244,7 +241,9 @@ class Crawling:
 
     def save_text(self):
         """クローリング情報をファイルに、保存する
-        :return: bool 成功/失敗=True/False
+
+        Returns:
+            bool: 成功/失敗=True/False
         """
         with open(self.get_crawling_file_path(), 'w', encoding='utf-8') as __work_file:
             __buff = self.create_save_text()
@@ -253,11 +252,13 @@ class Crawling:
 
     def load_text(self, selectors=None, crawling_file_path=crawling_file_path):
         """独自フォーマットなファイルからデータを読み込み、value_objectを作り直す
-        作成されるvalue_objectは、引数を最優先して、次にvalue_objectの値を優先して、最後にファイルの値を適用する
-        ファイルがなかったり、ファイルが空だったらFalseを返す。
-        読み込みに失敗したらファイル名に日時分を付けてバックアップしてFalseを返す。
-        crawling_file_pathで指定したファイルを読み込む
-        crawling_itemsはマージする
+
+        Args:
+            selectors (dict, optional): スクレイピングする際のセレクタリスト。デフォルトは None
+            crawling_file_path (str, optional): ダウンロードフォルダのパス。デフォルトは crawling_file_path
+
+        Returns:
+            bool: 成功、True。ファイルがなかったり、ファイルが空だったら、False
         """
         if not os.path.exists(crawling_file_path):
             return False
@@ -350,8 +351,7 @@ class Crawling:
         self.save_text()
 
     def marge_crawling_items(self):
-        """crawling_itemsのpage_urlsにexclusion_urlsがあったら削除する
-        """
+        """crawling_itemsのpage_urlsにexclusion_urlsがあったら削除する"""
         crawling_items = self.get_crawling_items()
         page_urls = []
         if self.URLS_TARGET in crawling_items:
@@ -395,7 +395,7 @@ class Crawling:
             items = self.scraping(page_url, page_selectors)
             languages = self.take_out(items, 'languages')
             title = Crawling.validate_title(items, 'title_jp', 'title_en')
-            url_title = helper.chromeDriverHelper.ChromeDriverHelper.fixed_file_name(page_url)
+            url_title = helper.chromeDriver.ChromeDriver.fixed_file_name(page_url)
 
             # フォルダがなかったらフォルダを作る
             os.makedirs(helper.webFileList.WebFileList.work_path, exist_ok=True)
@@ -439,7 +439,7 @@ class Crawling:
                         sys.exit()
                 web_file_list.delete_local_files()
                 # 成功したらチェック用ファイルを残す
-                helper.chromeDriverHelper.ChromeDriverHelper().save_source(target_file_name)
+                helper.chromeDriver.ChromeDriver().save_source(target_file_name)
                 # page_urlsからexclusion_urlsにURLを移して保存する
                 self.move_url_from_page_urls_to_exclusion_urls(page_url)
             else:
@@ -472,7 +472,7 @@ class Crawling:
                 continue
             items = self.scraping(page_url, page_selectors)
             title = Crawling.validate_title(items, 'title_jp', 'title_en')
-            url_title = helper.chromeDriverHelper.ChromeDriverHelper.fixed_file_name(page_url)
+            url_title = helper.chromeDriver.ChromeDriver.fixed_file_name(page_url)
 
             # フォルダがなかったらフォルダを作る
             os.makedirs(helper.webFileList.WebFileList.work_path, exist_ok=True)
@@ -497,6 +497,6 @@ class Crawling:
                         sys.exit()
                 web_file_list.delete_local_files()
                 # 成功したらチェック用ファイルを残す
-                helper.chromeDriverHelper.ChromeDriverHelper().save_source(target_file_name)
+                helper.chromeDriver.ChromeDriver().save_source(target_file_name)
             # page_urlsからexclusion_urlsにURLを移して保存する
             self.move_url_from_page_urls_to_exclusion_urls(page_url)

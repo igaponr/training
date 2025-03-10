@@ -21,7 +21,7 @@
     <link rel="index" title="索引" href="genindex.html" />
     <link rel="search" title="検索" href="search.html" />
     <link rel="next" title="helper.egoser_zipper module" href="helper.egoser_zipper.html" />
-    <link rel="prev" title="helper.chromeDriverHelper module" href="helper.chromeDriverHelper.html" /> 
+    <link rel="prev" title="helper.chromeDriver module" href="helper.chromeDriver.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -47,7 +47,7 @@
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="helper.html">helper package</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="helper.html#submodules">Submodules</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="helper.chromeDriverHelper.html">helper.chromeDriverHelper module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="helper.chromeDriver.html">helper.chromeDriver module</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">helper.crawling module</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#helper.crawling.Crawling"><code class="docutils literal notranslate"><span class="pre">Crawling</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#helper.crawling.CrawlingValue"><code class="docutils literal notranslate"><span class="pre">CrawlingValue</span></code></a></li>
@@ -61,8 +61,10 @@
 <li class="toctree-l3"><a class="reference internal" href="helper.spreadsheet.html">helper.spreadsheet module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="helper.status.html">helper.status module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="helper.tenki.html">helper.tenki module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="helper.uriHelper.html">helper.uriHelper module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="helper.uri.html">helper.uri module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="helper.urlDeployment.html">helper.urlDeployment module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="helper.webFile.html">helper.webFile module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="helper.webFileList.html">helper.webFileList module</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="helper.html#module-helper">Module contents</a></li>
@@ -99,7 +101,7 @@
 <span id="helper-crawling-module"></span><h1>helper.crawling module<a class="headerlink" href="#module-helper.crawling" title="Link to this heading"></a></h1>
 <dl class="simple">
 <dt>クローリング</dt><dd><ul class="simple">
-<li><p>指定サイト(site_url)をセレクタ(site_selectors)でクローリングする(ChromeDriverHelperを使用)</p></li>
+<li><p>指定サイト(site_url)をセレクタ(site_selectors)でクローリングする(ChromeDriverを使用)</p></li>
 <li><p>クローリング結果を、crawling_file_pathに保存する</p></li>
 <li><p>crawling_file_pathのpage_urlsは、スクレイピングする対象urlリストである</p></li>
 <li><p>crawling_file_pathのexclusion_urlsは、スクレイピングの除外urlリストである</p></li>
@@ -109,12 +111,6 @@
 </ul>
 </dd>
 </dl>
-<div class="admonition-todo admonition" id="id1">
-<p class="admonition-title">課題</p>
-<ul class="simple">
-<li><p>docstringを整える</p></li>
-</ul>
-</div>
 <dl class="py class">
 <dt class="sig sig-object py" id="helper.crawling.Crawling">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">helper.crawling.</span></span><span class="sig-name descname"><span class="pre">Crawling</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value_object</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">site_selectors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crawling_items</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crawling_file_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'D:/git/igaponr/training/python/Web_scraping/helper/../crawling_list.txt'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/crawling.html#Crawling"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.crawling.Crawling" title="Link to this definition"></a></dt>
@@ -171,8 +167,9 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="helper.crawling.Crawling.create_save_text">
 <span class="sig-name descname"><span class="pre">create_save_text</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/crawling.html#Crawling.create_save_text"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.crawling.Crawling.create_save_text" title="Link to this definition"></a></dt>
-<dd><dl class="simple">
-<dt>保存用文字列の作成</dt><dd><ul class="simple">
+<dd><p>保存用文字列の作成</p>
+<dl class="simple">
+<dt>以下を保存する</dt><dd><ul class="simple">
 <li><p>サイトURL</p></li>
 <li><p>セレクタ</p></li>
 <li><p>saveファイルのフルパス</p></li>
@@ -182,7 +179,10 @@
 </dl>
 <dl class="field-list simple">
 <dt class="field-odd">戻り値<span class="colon">:</span></dt>
-<dd class="field-odd"><p>str 保存用文字列の作成</p>
+<dd class="field-odd"><p>保存用文字列の作成</p>
+</dd>
+<dt class="field-even">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
 </dd>
 </dl>
 </dd></dl>
@@ -244,12 +244,21 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="helper.crawling.Crawling.load_text">
 <span class="sig-name descname"><span class="pre">load_text</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">selectors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crawling_file_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'D:/git/igaponr/training/python/Web_scraping/helper/../crawling_list.txt'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/crawling.html#Crawling.load_text"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.crawling.Crawling.load_text" title="Link to this definition"></a></dt>
-<dd><p>独自フォーマットなファイルからデータを読み込み、value_objectを作り直す
-作成されるvalue_objectは、引数を最優先して、次にvalue_objectの値を優先して、最後にファイルの値を適用する
-ファイルがなかったり、ファイルが空だったらFalseを返す。
-読み込みに失敗したらファイル名に日時分を付けてバックアップしてFalseを返す。
-crawling_file_pathで指定したファイルを読み込む
-crawling_itemsはマージする</p>
+<dd><p>独自フォーマットなファイルからデータを読み込み、value_objectを作り直す</p>
+<dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>selectors</strong> (<em>dict</em><em>, </em><em>optional</em>) -- スクレイピングする際のセレクタリスト。デフォルトは None</p></li>
+<li><p><strong>crawling_file_path</strong> (<em>str</em><em>, </em><em>optional</em>) -- ダウンロードフォルダのパス。デフォルトは crawling_file_path</p></li>
+</ul>
+</dd>
+<dt class="field-even">戻り値<span class="colon">:</span></dt>
+<dd class="field-even"><p>成功、True。ファイルがなかったり、ファイルが空だったら、False</p>
+</dd>
+<dt class="field-odd">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -273,14 +282,21 @@ crawling_itemsはマージする</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="helper.crawling.Crawling.save_text">
 <span class="sig-name descname"><span class="pre">save_text</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/crawling.html#Crawling.save_text"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.crawling.Crawling.save_text" title="Link to this definition"></a></dt>
-<dd><p>クローリング情報をファイルに、保存する
-:return: bool 成功/失敗=True/False</p>
+<dd><p>クローリング情報をファイルに、保存する</p>
+<dl class="field-list simple">
+<dt class="field-odd">戻り値<span class="colon">:</span></dt>
+<dd class="field-odd"><p>成功/失敗=True/False</p>
+</dd>
+<dt class="field-even">戻り値の型<span class="colon">:</span></dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="helper.crawling.Crawling.scraping">
 <em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">scraping</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">selectors</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/crawling.html#Crawling.scraping"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.crawling.Crawling.scraping" title="Link to this definition"></a></dt>
-<dd><p>ChromeDriverHelperを使ってスクレイピングする</p>
+<dd><p>ChromeDriverを使ってスクレイピングする</p>
 </dd></dl>
 
 <dl class="py attribute">
@@ -311,11 +327,10 @@ crawling_itemsはマージする</p>
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">helper.crawling.</span></span><span class="sig-name descname"><span class="pre">CrawlingValue</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">site_url</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">site_selectors</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crawling_items</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crawling_file_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/crawling.html#CrawlingValue"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.crawling.CrawlingValue" title="Link to this definition"></a></dt>
 <dd><p>ベースクラス: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Crawlingの値オブジェクトクラス</p>
-<p>サイトURL、セレクタ、クローリングアイテム、クローリングファイルパスを保持します</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="helper.crawling.CrawlingValue.site_url">
 <span class="sig-name descname"><span class="pre">site_url</span></span><a class="headerlink" href="#helper.crawling.CrawlingValue.site_url" title="Link to this definition"></a></dt>
-<dd><p>サイトURL。</p>
+<dd><p>サイトURL</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>str</p>
@@ -367,18 +382,18 @@ crawling_itemsはマージする</p>
 <dd></dd></dl>
 
 <dl class="py attribute">
+<dt class="sig sig-object py" id="id1">
+<span class="sig-name descname"><span class="pre">crawling_items</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#id1" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="id2">
-<span class="sig-name descname"><span class="pre">crawling_items</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#id2" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">site_selectors</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#id2" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="id3">
-<span class="sig-name descname"><span class="pre">site_selectors</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#id3" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="id4">
-<span class="sig-name descname"><span class="pre">site_url</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#id4" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">site_url</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#id3" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -389,7 +404,7 @@ crawling_itemsはマージする</p>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="helper.chromeDriverHelper.html" class="btn btn-neutral float-left" title="helper.chromeDriverHelper module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="helper.chromeDriver.html" class="btn btn-neutral float-left" title="helper.chromeDriver module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="helper.egoser_zipper.html" class="btn btn-neutral float-right" title="helper.egoser_zipper module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

@@ -74,16 +74,13 @@
 <span class="c1"># -*- coding: utf-8 -*-</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">クローリング</span>
-<span class="sd">    * 指定サイト(site_url)をセレクタ(site_selectors)でクローリングする(ChromeDriverHelperを使用)</span>
+<span class="sd">    * 指定サイト(site_url)をセレクタ(site_selectors)でクローリングする(ChromeDriverを使用)</span>
 <span class="sd">    * クローリング結果を、crawling_file_pathに保存する</span>
 <span class="sd">    * crawling_file_pathのpage_urlsは、スクレイピングする対象urlリストである</span>
 <span class="sd">    * crawling_file_pathのexclusion_urlsは、スクレイピングの除外urlリストである</span>
 <span class="sd">    * zip保存まで終わると、page_urlsからexclusion_urlsにurlを移す</span>
 <span class="sd">    * セレクタを、image_urlで定義すると、crawling_url_deploymentでスクレイピングして末尾画像URLの展開URLでダウンロードして、zipに保存する</span>
 <span class="sd">    * セレクタを、image_urlsで定義すると、crawling_urlsでスクレイピングしてダウンロードして、zipに保存する</span>
-
-<span class="sd">Todo:</span>
-<span class="sd">    - docstringを整える</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">sys</span>
@@ -93,7 +90,7 @@
 <span class="kn">import</span> <span class="nn">datetime</span>
 <span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Optional</span>
-<span class="kn">import</span> <span class="nn">helper.chromeDriverHelper</span>
+<span class="kn">import</span> <span class="nn">helper.chromeDriver</span>
 <span class="kn">import</span> <span class="nn">helper.webFile</span>
 <span class="kn">import</span> <span class="nn">helper.webFileList</span>
 <span class="kn">import</span> <span class="nn">helper.line_message_api</span>
@@ -107,17 +104,14 @@
 <span class="k">class</span> <span class="nc">CrawlingValue</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Crawlingの値オブジェクトクラス</span>
 
-<span class="sd">    サイトURL、セレクタ、クローリングアイテム、クローリングファイルパスを保持します</span>
-
 <span class="sd">    Attributes:</span>
-<span class="sd">        site_url (str): サイトURL。</span>
+<span class="sd">        site_url (str): サイトURL</span>
 <span class="sd">        site_selectors (Dict[str, str]): サイトセレクタ。キーはアイテム名、値はCSSセレクタ</span>
 <span class="sd">        crawling_items (Dict[str, List[str]]): クローリングアイテム。キーはアイテムの種類（例：&#39;page_urls&#39;）、値はURLのリスト</span>
 <span class="sd">        crawling_file_path (str): クローリングファイルパス</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        ValueError: 各属性が不正な値（None、空文字列、不正な型）の場合</span>
-
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">site_url</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">site_selectors</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="kc">None</span>
@@ -170,7 +164,6 @@
     <span class="n">value_object</span><span class="p">:</span> <span class="n">CrawlingValue</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">site_selectors</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">crawling_items</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="p">{</span><span class="n">URLS_TARGET</span><span class="p">:</span> <span class="p">[],</span> <span class="n">URLS_EXCLUSION</span><span class="p">:</span> <span class="p">[],</span> <span class="n">URLS_FAILURE</span><span class="p">:</span> <span class="p">[]}</span>
-    <span class="c1"># crawling_file_path: str = &#39;../crawling_list.txt&#39;</span>
     <span class="n">crawling_file_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)),</span>
                                            <span class="s1">&#39;../crawling_list.txt&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">,</span> <span class="s1">&#39;/&#39;</span><span class="p">)</span>
 
@@ -215,9 +208,9 @@
 <a class="viewcode-back" href="../../helper.crawling.html#helper.crawling.Crawling.scraping">[ドキュメント]</a>
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">scraping</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">selectors</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;ChromeDriverHelperを使ってスクレイピングする&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;ChromeDriverを使ってスクレイピングする&quot;&quot;&quot;</span>
         <span class="n">selectors</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">selectors</span><span class="p">)</span>
-        <span class="n">chrome_driver</span> <span class="o">=</span> <span class="n">helper</span><span class="o">.</span><span class="n">chromeDriverHelper</span><span class="o">.</span><span class="n">ChromeDriverHelper</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">selectors</span><span class="p">)</span>
+        <span class="n">chrome_driver</span> <span class="o">=</span> <span class="n">helper</span><span class="o">.</span><span class="n">chromeDriver</span><span class="o">.</span><span class="n">ChromeDriver</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">selectors</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">chrome_driver</span><span class="o">.</span><span class="n">get_items</span><span class="p">()</span></div>
 
 
@@ -265,7 +258,7 @@
                 <span class="n">title</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">now</span><span class="si">:</span><span class="s1">%Y%m%d_%H%M%S</span><span class="si">}</span><span class="s1">&#39;</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">title</span> <span class="o">=</span> <span class="n">title_sub</span>
-        <span class="k">return</span> <span class="n">helper</span><span class="o">.</span><span class="n">chromeDriverHelper</span><span class="o">.</span><span class="n">ChromeDriverHelper</span><span class="o">.</span><span class="n">fixed_file_name</span><span class="p">(</span><span class="n">title</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">helper</span><span class="o">.</span><span class="n">chromeDriver</span><span class="o">.</span><span class="n">ChromeDriver</span><span class="o">.</span><span class="n">fixed_file_name</span><span class="p">(</span><span class="n">title</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Crawling.download_chrome_driver">
@@ -274,7 +267,7 @@
     <span class="k">def</span> <span class="nf">download_chrome_driver</span><span class="p">(</span><span class="n">web_file_list</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;selenium chromeDriverを用いて、画像をデフォルトダウンロードフォルダにダウンロードして、指定のフォルダに移動する</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">chromedriver</span> <span class="o">=</span> <span class="n">helper</span><span class="o">.</span><span class="n">chromeDriverHelper</span><span class="o">.</span><span class="n">ChromeDriverHelper</span><span class="p">()</span>
+        <span class="n">chromedriver</span> <span class="o">=</span> <span class="n">helper</span><span class="o">.</span><span class="n">chromeDriver</span><span class="o">.</span><span class="n">ChromeDriver</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">url</span><span class="p">,</span> <span class="n">path</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">web_file_list</span><span class="o">.</span><span class="n">get_url_list</span><span class="p">(),</span> <span class="n">web_file_list</span><span class="o">.</span><span class="n">get_path_list</span><span class="p">()):</span>
             <span class="n">chromedriver</span><span class="o">.</span><span class="n">download_image</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span></div>
 
@@ -333,11 +326,15 @@
 <a class="viewcode-back" href="../../helper.crawling.html#helper.crawling.Crawling.create_save_text">[ドキュメント]</a>
     <span class="k">def</span> <span class="nf">create_save_text</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;保存用文字列の作成</span>
+
+<span class="sd">        以下を保存する</span>
 <span class="sd">            * サイトURL</span>
 <span class="sd">            * セレクタ</span>
 <span class="sd">            * saveファイルのフルパス</span>
 <span class="sd">            * クローリング結果urls</span>
-<span class="sd">        :return: str 保存用文字列の作成</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: 保存用文字列の作成</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">__buff</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_site_url</span><span class="p">(),</span> <span class="n">ensure_ascii</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>  <span class="c1"># サイトURL</span>
         <span class="c1"># TODO: selectorsはjson.dumpsでシリアライズできないオブジェクトたぶんlambdaを含んでいる。pickleでもだめらしい。</span>
@@ -356,7 +353,9 @@
 <a class="viewcode-back" href="../../helper.crawling.html#helper.crawling.Crawling.save_text">[ドキュメント]</a>
     <span class="k">def</span> <span class="nf">save_text</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;クローリング情報をファイルに、保存する</span>
-<span class="sd">        :return: bool 成功/失敗=True/False</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: 成功/失敗=True/False</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_crawling_file_path</span><span class="p">(),</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">__work_file</span><span class="p">:</span>
             <span class="n">__buff</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_save_text</span><span class="p">()</span>
@@ -368,11 +367,13 @@
 <a class="viewcode-back" href="../../helper.crawling.html#helper.crawling.Crawling.load_text">[ドキュメント]</a>
     <span class="k">def</span> <span class="nf">load_text</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">selectors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">crawling_file_path</span><span class="o">=</span><span class="n">crawling_file_path</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;独自フォーマットなファイルからデータを読み込み、value_objectを作り直す</span>
-<span class="sd">        作成されるvalue_objectは、引数を最優先して、次にvalue_objectの値を優先して、最後にファイルの値を適用する</span>
-<span class="sd">        ファイルがなかったり、ファイルが空だったらFalseを返す。</span>
-<span class="sd">        読み込みに失敗したらファイル名に日時分を付けてバックアップしてFalseを返す。</span>
-<span class="sd">        crawling_file_pathで指定したファイルを読み込む</span>
-<span class="sd">        crawling_itemsはマージする</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            selectors (dict, optional): スクレイピングする際のセレクタリスト。デフォルトは None</span>
+<span class="sd">            crawling_file_path (str, optional): ダウンロードフォルダのパス。デフォルトは crawling_file_path</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: 成功、True。ファイルがなかったり、ファイルが空だったら、False</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">crawling_file_path</span><span class="p">):</span>
             <span class="k">return</span> <span class="kc">False</span>
@@ -480,8 +481,7 @@
 <div class="viewcode-block" id="Crawling.marge_crawling_items">
 <a class="viewcode-back" href="../../helper.crawling.html#helper.crawling.Crawling.marge_crawling_items">[ドキュメント]</a>
     <span class="k">def</span> <span class="nf">marge_crawling_items</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;crawling_itemsのpage_urlsにexclusion_urlsがあったら削除する</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;crawling_itemsのpage_urlsにexclusion_urlsがあったら削除する&quot;&quot;&quot;</span>
         <span class="n">crawling_items</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_crawling_items</span><span class="p">()</span>
         <span class="n">page_urls</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">URLS_TARGET</span> <span class="ow">in</span> <span class="n">crawling_items</span><span class="p">:</span>
@@ -528,7 +528,7 @@
             <span class="n">items</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scraping</span><span class="p">(</span><span class="n">page_url</span><span class="p">,</span> <span class="n">page_selectors</span><span class="p">)</span>
             <span class="n">languages</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">take_out</span><span class="p">(</span><span class="n">items</span><span class="p">,</span> <span class="s1">&#39;languages&#39;</span><span class="p">)</span>
             <span class="n">title</span> <span class="o">=</span> <span class="n">Crawling</span><span class="o">.</span><span class="n">validate_title</span><span class="p">(</span><span class="n">items</span><span class="p">,</span> <span class="s1">&#39;title_jp&#39;</span><span class="p">,</span> <span class="s1">&#39;title_en&#39;</span><span class="p">)</span>
-            <span class="n">url_title</span> <span class="o">=</span> <span class="n">helper</span><span class="o">.</span><span class="n">chromeDriverHelper</span><span class="o">.</span><span class="n">ChromeDriverHelper</span><span class="o">.</span><span class="n">fixed_file_name</span><span class="p">(</span><span class="n">page_url</span><span class="p">)</span>
+            <span class="n">url_title</span> <span class="o">=</span> <span class="n">helper</span><span class="o">.</span><span class="n">chromeDriver</span><span class="o">.</span><span class="n">ChromeDriver</span><span class="o">.</span><span class="n">fixed_file_name</span><span class="p">(</span><span class="n">page_url</span><span class="p">)</span>
 
             <span class="c1"># フォルダがなかったらフォルダを作る</span>
             <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">helper</span><span class="o">.</span><span class="n">webFileList</span><span class="o">.</span><span class="n">WebFileList</span><span class="o">.</span><span class="n">work_path</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -572,7 +572,7 @@
                         <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
                 <span class="n">web_file_list</span><span class="o">.</span><span class="n">delete_local_files</span><span class="p">()</span>
                 <span class="c1"># 成功したらチェック用ファイルを残す</span>
-                <span class="n">helper</span><span class="o">.</span><span class="n">chromeDriverHelper</span><span class="o">.</span><span class="n">ChromeDriverHelper</span><span class="p">()</span><span class="o">.</span><span class="n">save_source</span><span class="p">(</span><span class="n">target_file_name</span><span class="p">)</span>
+                <span class="n">helper</span><span class="o">.</span><span class="n">chromeDriver</span><span class="o">.</span><span class="n">ChromeDriver</span><span class="p">()</span><span class="o">.</span><span class="n">save_source</span><span class="p">(</span><span class="n">target_file_name</span><span class="p">)</span>
                 <span class="c1"># page_urlsからexclusion_urlsにURLを移して保存する</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">move_url_from_page_urls_to_exclusion_urls</span><span class="p">(</span><span class="n">page_url</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
@@ -608,7 +608,7 @@
                 <span class="k">continue</span>
             <span class="n">items</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scraping</span><span class="p">(</span><span class="n">page_url</span><span class="p">,</span> <span class="n">page_selectors</span><span class="p">)</span>
             <span class="n">title</span> <span class="o">=</span> <span class="n">Crawling</span><span class="o">.</span><span class="n">validate_title</span><span class="p">(</span><span class="n">items</span><span class="p">,</span> <span class="s1">&#39;title_jp&#39;</span><span class="p">,</span> <span class="s1">&#39;title_en&#39;</span><span class="p">)</span>
-            <span class="n">url_title</span> <span class="o">=</span> <span class="n">helper</span><span class="o">.</span><span class="n">chromeDriverHelper</span><span class="o">.</span><span class="n">ChromeDriverHelper</span><span class="o">.</span><span class="n">fixed_file_name</span><span class="p">(</span><span class="n">page_url</span><span class="p">)</span>
+            <span class="n">url_title</span> <span class="o">=</span> <span class="n">helper</span><span class="o">.</span><span class="n">chromeDriver</span><span class="o">.</span><span class="n">ChromeDriver</span><span class="o">.</span><span class="n">fixed_file_name</span><span class="p">(</span><span class="n">page_url</span><span class="p">)</span>
 
             <span class="c1"># フォルダがなかったらフォルダを作る</span>
             <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">helper</span><span class="o">.</span><span class="n">webFileList</span><span class="o">.</span><span class="n">WebFileList</span><span class="o">.</span><span class="n">work_path</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -633,7 +633,7 @@
                         <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
                 <span class="n">web_file_list</span><span class="o">.</span><span class="n">delete_local_files</span><span class="p">()</span>
                 <span class="c1"># 成功したらチェック用ファイルを残す</span>
-                <span class="n">helper</span><span class="o">.</span><span class="n">chromeDriverHelper</span><span class="o">.</span><span class="n">ChromeDriverHelper</span><span class="p">()</span><span class="o">.</span><span class="n">save_source</span><span class="p">(</span><span class="n">target_file_name</span><span class="p">)</span>
+                <span class="n">helper</span><span class="o">.</span><span class="n">chromeDriver</span><span class="o">.</span><span class="n">ChromeDriver</span><span class="p">()</span><span class="o">.</span><span class="n">save_source</span><span class="p">(</span><span class="n">target_file_name</span><span class="p">)</span>
             <span class="c1"># page_urlsからexclusion_urlsにURLを移して保存する</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">move_url_from_page_urls_to_exclusion_urls</span><span class="p">(</span><span class="n">page_url</span><span class="p">)</span></div>
 </div>
