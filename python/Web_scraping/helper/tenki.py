@@ -22,8 +22,13 @@ import json
 from dataclasses import dataclass, field
 import pyperclip
 from requests_html import HTMLSession
-from requests.exceptions import RequestException
+from requests.exceptions import RequestException, Timeout, ConnectionError
 
+CYCLE = 4
+FORECAST_ITEM_KEY = 'forecast_item'
+DAYS_ITEM_KEY = 'days_item'
+TIME_ITEM_KEY = 'time_item'
+WEEK_ITEM_KEY = 'week_item'
 
 def is_num(s: str) -> bool:
     """数値かどうかを判定する
@@ -75,9 +80,7 @@ class Tenki:
     def __init__(
             self,
             target_value: TenkiValue | str = None,
-            css_root: str = None,
-            css_selectors: dict = None,
-            attrs: dict = None
+            **kwargs,
     ) -> None:
         """コンストラクタ
 
@@ -89,26 +92,22 @@ class Tenki:
         """
         if target_value is not None:
             if isinstance(target_value, TenkiValue):
-                tenki_value = target_value
-                self.tenki_value = tenki_value
-                if tenki_value.target_url is not None:
-                    self.target_url = tenki_value.target_url
-                if tenki_value.css_root is not None:
-                    self.css_root = tenki_value.css_root
-                if tenki_value.css_selectors is not None:
-                    self.css_selectors = tenki_value.css_selectors
-                if tenki_value.attrs is not None:
-                    self.attrs = tenki_value.attrs
+                self._initialize_from_tenki_value(target_value)
             else:
                 if isinstance(target_value, str):
                     self.target_url = target_value
-                    if css_root is not None:
-                        self.css_root = css_root
-                        if css_selectors is not None:
-                            self.css_selectors = css_selectors
-                            if attrs is not None:
-                                self.attrs = attrs
-                                self.request()
+                    self.css_root = kwargs.get('css_root')
+                    self.css_selectors = kwargs.get('css_selectors')
+                    self.attrs = kwargs.get('attrs')
+                    if all([self.css_root, self.css_selectors, self.attrs]):
+                        self.request()
+
+    def _initialize_from_tenki_value(self, tenki_value: TenkiValue):
+            self.tenki_value = tenki_value
+            self.target_url = tenki_value.target_url
+            self.css_root = tenki_value.css_root
+            self.css_selectors = tenki_value.css_selectors
+            self.attrs = tenki_value.attrs
 
     def special_func_temp(self):
         """特別製
@@ -146,58 +145,47 @@ class Tenki:
         self.tenki_value.forecasts[sp_key] = temp_item_forecasts
         self.tenki_value.counters[sp_key] = temp_item_counters
 
-    def create_LINE_BOT_TOBA_format(self):
-        """時間毎の天気予報配列を作る
-
-        Returns:
-            dict: 天気予報配列
-        """
-        forecasts = self.get_result_forecasts()
-        counters = self.get_result_counters()
-        data = {}
-
-        # 日付列作成
-        sp_key = 'forecast_item'  # 日付以外で数が少ない項目を使用する
-        target_key = 'days_item'
-        data[target_key] = []
-        sub_key = 'week_item'
-        data[sub_key] = []
+    @staticmethod
+    def _create_date_column(forecasts, counters):
+        data = {DAYS_ITEM_KEY: [], WEEK_ITEM_KEY: []}
         pre = 0
-        for index in range(len(counters[sp_key])):
-            num = counters[sp_key][index] - pre
-            if num:  # 0または、増加していない時以外
+        for index in range(len(counters[FORECAST_ITEM_KEY])):
+            num = counters[FORECAST_ITEM_KEY][index] - pre
+            if num:
                 for i in range(num):
-                    num1 = counters[target_key][index]
-                    _buff = forecasts[target_key][num1 - 1]
+                    num1 = counters[DAYS_ITEM_KEY][index]
+                    _buff = forecasts[DAYS_ITEM_KEY][num1 - 1]
                     left = _buff.find('(')
                     right = _buff.find(')')
-                    data[target_key].append(_buff[:left])
-                    data[sub_key].append(_buff[left + 1:right])
-                pre = counters[sp_key][index]
+                    data[DAYS_ITEM_KEY].append(_buff[:left])
+                    data[WEEK_ITEM_KEY].append(_buff[left + 1:right])
+                pre = counters[FORECAST_ITEM_KEY][index]
+        return data
 
-        # 時間列作成
-        cycle = 4
-        target_key = 'time_item'
-        data[target_key] = []
+    @staticmethod
+    def _create_time_column(forecasts, counters):
+        data = {TIME_ITEM_KEY: []}
         pre_sp_key = 0
         pre_target_key = 0
-        for index in range(len(counters[sp_key])):
-            num = counters[sp_key][index] - pre_sp_key
-            start = pre_target_key + cycle - num
-            end = counters[target_key][index] - 1
+        for index in range(len(counters[FORECAST_ITEM_KEY])):
+            num = counters[FORECAST_ITEM_KEY][index] - pre_sp_key
+            start = pre_target_key + CYCLE - num
+            end = counters[TIME_ITEM_KEY][index] - 1
             if num:
                 for i in range(start, end):
-                    _buff = forecasts[target_key][i] + '時-' + forecasts[target_key][i + 1] + '時'
-                    data[target_key].append(_buff)
-                pre_target_key = counters[target_key][index]
-                pre_sp_key = counters[sp_key][index]
+                    _buff = forecasts[TIME_ITEM_KEY][i] + '時-' + forecasts[TIME_ITEM_KEY][i + 1] + '時'
+                    data[TIME_ITEM_KEY].append(_buff)
+                pre_target_key = counters[TIME_ITEM_KEY][index]
+                pre_sp_key = counters[FORECAST_ITEM_KEY][index]
+        return data
 
-        # 天気、湿度、降水量列作成
-        target_keys = {'天気': 'forecast_item', '温度': 'prob_precip_item', '降水量': 'precip_item'}
-        for target_key in target_keys.values():
+    @staticmethod
+    def _create_weather_column_on(forecasts, counters, target_keys):
+        data = {}
+        for key, target_key in target_keys.items():
             data[target_key] = []
             pre_target_key = 0
-            for index in range(len(counters[sp_key])):
+            for index in range(len(counters[FORECAST_ITEM_KEY])):
                 num = counters[target_key][index] - pre_target_key
                 start = pre_target_key
                 end = counters[target_key][index]
@@ -206,15 +194,17 @@ class Tenki:
                         _buff = forecasts[target_key][i]
                         data[target_key].append(_buff)
                     pre_target_key = counters[target_key][index]
+        return data
 
-        # 気温、風向、風力列作成
-        target_keys = {'気温': 'temp_item', '風向': 'wind_item_blow', '風力': 'wind_item_speed'}
-        for target_key in target_keys.values():
+    @staticmethod
+    def _create_weather_column_off(forecasts, counters, target_keys):
+        data = {}
+        for key, target_key in target_keys.items():
             data[target_key] = []
             pre_sp_key = 0
             pre_target_key = 0
-            for index in range(len(counters[sp_key])):
-                num = counters[sp_key][index] - pre_sp_key
+            for index in range(len(counters[FORECAST_ITEM_KEY])):
+                num = counters[FORECAST_ITEM_KEY][index] - pre_sp_key
                 start = pre_target_key
                 end = counters[target_key][index] - 1
                 if num:
@@ -222,8 +212,23 @@ class Tenki:
                         _buff = forecasts[target_key][i] + '-' + forecasts[target_key][i + 1]
                         data[target_key].append(_buff)
                     pre_target_key = counters[target_key][index]
-                    pre_sp_key = counters[sp_key][index]
+                    pre_sp_key = counters[FORECAST_ITEM_KEY][index]
+        return data
 
+    def create_LINE_BOT_TOBA_format(self):
+        forecasts = self.get_result_forecasts()
+        counters = self.get_result_counters()
+        data = {}
+        data.update(self._create_date_column(forecasts, counters))
+        data.update(self._create_time_column(forecasts, counters))
+        data.update(self._create_weather_column_on(forecasts, counters, {
+            '天気': 'forecast_item',
+            '温度': 'prob_precip_item',
+            '降水量': 'precip_item'}))
+        data.update(self._create_weather_column_off(forecasts, counters, {
+            '気温': 'temp_item',
+            '風向': 'wind_item_blow',
+            '風力': 'wind_item_speed'}))
         return data
 
     def get_value_objects(self):
@@ -316,13 +321,18 @@ class Tenki:
                                           forecasts,
                                           counters,
                                           )
+        except Timeout as e:
+          print(f"タイムアウトエラー: {e}")
+          return False
+        except ConnectionError as e:
+            print(f"接続エラー: {e}")
+            return False
         except RequestException as e:
-            print(f"リクエストエラー: {e}")
+            print(f"その他のリクエストエラー: {e}")
             return False
         except Exception as e:
             print(f"スクレイピングエラー:{e}")
             return False
-
         return True
 
 
@@ -400,11 +410,11 @@ class Tenki:
             del buff[0]
             counters: dict = json.loads(buff[0].rstrip('\n'))
             self.tenki_value = TenkiValue(self.target_url,
-                                          self.css_root,
-                                          self.css_selectors,
-                                          self.attrs,
-                                          title,
-                                          forecasts,
-                                          counters,
+                                          css_root=self.css_root,
+                                          css_selectors=self.css_selectors,
+                                          attrs=self.attrs,
+                                          title=title,
+                                          forecasts=forecasts,
+                                          counters=counters,
                                           )
             return True

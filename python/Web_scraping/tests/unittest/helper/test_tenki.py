@@ -52,9 +52,9 @@ class TestSpreadsheet(unittest.TestCase):
                  "wind_item_speed": "",
                  }
         tenki1 = helper.tenki.Tenki("https://tenki.jp/forecast/4/20/5620/17202/10days.html",
-                                    css_root,
-                                    css_selectors,
-                                    attrs,
+                                    css_root=css_root,
+                                    css_selectors=css_selectors,
+                                    attrs=attrs,
                                     )
         tenki1.save_text(RESULT_FILE_PATH + '1.txt')
         # 値オブジェクトを生成
