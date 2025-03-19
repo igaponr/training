@@ -102,14 +102,14 @@ class Tenki:
                     if all([self.css_root, self.css_selectors, self.attrs]):
                         self.request()
 
-    def _initialize_from_tenki_value(self, tenki_value: TenkiValue):
-            self.tenki_value = tenki_value
-            self.target_url = tenki_value.target_url
-            self.css_root = tenki_value.css_root
-            self.css_selectors = tenki_value.css_selectors
-            self.attrs = tenki_value.attrs
+    def _initialize_from_tenki_value(self, tenki_value: TenkiValue) -> None:
+        self.tenki_value = tenki_value
+        self.target_url = tenki_value.target_url
+        self.css_root = tenki_value.css_root
+        self.css_selectors = tenki_value.css_selectors
+        self.attrs = tenki_value.attrs
 
-    def special_func_temp(self):
+    def special_func_temp(self) -> None:
         """特別製
 
         temp_itemのjava-scriptを解析して、
@@ -173,7 +173,7 @@ class Tenki:
             end = counters[TIME_ITEM_KEY][index] - 1
             if num:
                 for i in range(start, end):
-                    _buff = forecasts[TIME_ITEM_KEY][i] + '時-' + forecasts[TIME_ITEM_KEY][i + 1] + '時'
+                    _buff = '\'' + forecasts[TIME_ITEM_KEY][i] + '時-' + forecasts[TIME_ITEM_KEY][i + 1] + '時'
                     data[TIME_ITEM_KEY].append(_buff)
                 pre_target_key = counters[TIME_ITEM_KEY][index]
                 pre_sp_key = counters[FORECAST_ITEM_KEY][index]
@@ -215,7 +215,7 @@ class Tenki:
                     pre_sp_key = counters[FORECAST_ITEM_KEY][index]
         return data
 
-    def create_LINE_BOT_TOBA_format(self):
+    def create_line_bot_toba_format(self):
         forecasts = self.get_result_forecasts()
         counters = self.get_result_counters()
         data = {}

@@ -65,7 +65,7 @@ if __name__ == '__main__':  # インポート時には動かない
                                                   )
     # spreadsheet1.save_text(RESULT_FILE_PATH + 'spreadsheet3.txt')
     spreadsheet1.clear_worksheet()
-    spreadsheet1.write_dict_columns(tenki1.create_LINE_BOT_TOBA_format(), (1, 1))
+    spreadsheet1.write_dict_columns(tenki1.create_line_bot_toba_format(), (1, 1))
 
     main_url = "https://tenki.jp/forecast/4/19/5520/16211/10days.html"
     worksheet_name = '射水市海竜町'
@@ -80,4 +80,4 @@ if __name__ == '__main__':  # インポート時には動かない
                                                   )
     # spreadsheet1.save_text(RESULT_FILE_PATH + 'spreadsheet4.txt')
     spreadsheet1.clear_worksheet()
-    spreadsheet1.write_dict_columns(tenki1.create_LINE_BOT_TOBA_format(), (1, 1))
+    spreadsheet1.write_dict_columns(tenki1.create_line_bot_toba_format(), (1, 1))
