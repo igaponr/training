@@ -24,11 +24,6 @@ import pyperclip
 from requests_html import HTMLSession
 from requests.exceptions import RequestException, Timeout, ConnectionError
 
-CYCLE = 4
-FORECAST_ITEM_KEY = 'forecast_item'
-DAYS_ITEM_KEY = 'days_item'
-TIME_ITEM_KEY = 'time_item'
-WEEK_ITEM_KEY = 'week_item'
 
 def is_num(s: str) -> bool:
     """数値かどうかを判定する
@@ -76,6 +71,11 @@ class Tenki:
     css_root: str = None
     css_selectors: dict = None
     attrs: dict = None
+    CYCLE = 4
+    FORECAST_ITEM_KEY = 'forecast_item'
+    DAYS_ITEM_KEY = 'days_item'
+    TIME_ITEM_KEY = 'time_item'
+    WEEK_ITEM_KEY = 'week_item'
 
     def __init__(
             self,
@@ -145,47 +145,44 @@ class Tenki:
         self.tenki_value.forecasts[sp_key] = temp_item_forecasts
         self.tenki_value.counters[sp_key] = temp_item_counters
 
-    @staticmethod
-    def _create_date_column(forecasts, counters):
-        data = {DAYS_ITEM_KEY: [], WEEK_ITEM_KEY: []}
+    def _create_date_column(self, forecasts: dict, counters: dict) -> dict:
+        data = {self.DAYS_ITEM_KEY: [], self.WEEK_ITEM_KEY: []}
         pre = 0
-        for index in range(len(counters[FORECAST_ITEM_KEY])):
-            num = counters[FORECAST_ITEM_KEY][index] - pre
+        for index in range(len(counters[self.FORECAST_ITEM_KEY])):
+            num = counters[self.FORECAST_ITEM_KEY][index] - pre
             if num:
                 for i in range(num):
-                    num1 = counters[DAYS_ITEM_KEY][index]
-                    _buff = forecasts[DAYS_ITEM_KEY][num1 - 1]
+                    num1 = counters[self.DAYS_ITEM_KEY][index]
+                    _buff = forecasts[self.DAYS_ITEM_KEY][num1 - 1]
                     left = _buff.find('(')
                     right = _buff.find(')')
-                    data[DAYS_ITEM_KEY].append(_buff[:left])
-                    data[WEEK_ITEM_KEY].append(_buff[left + 1:right])
-                pre = counters[FORECAST_ITEM_KEY][index]
+                    data[self.DAYS_ITEM_KEY].append(_buff[:left])
+                    data[self.WEEK_ITEM_KEY].append(_buff[left + 1:right])
+                pre = counters[self.FORECAST_ITEM_KEY][index]
         return data
 
-    @staticmethod
-    def _create_time_column(forecasts, counters):
-        data = {TIME_ITEM_KEY: []}
+    def _create_time_column(self, forecasts: dict, counters: dict) -> dict:
+        data = {self.TIME_ITEM_KEY: []}
         pre_sp_key = 0
         pre_target_key = 0
-        for index in range(len(counters[FORECAST_ITEM_KEY])):
-            num = counters[FORECAST_ITEM_KEY][index] - pre_sp_key
-            start = pre_target_key + CYCLE - num
-            end = counters[TIME_ITEM_KEY][index] - 1
+        for index in range(len(counters[self.FORECAST_ITEM_KEY])):
+            num = counters[self.FORECAST_ITEM_KEY][index] - pre_sp_key
+            start = pre_target_key + self.CYCLE - num
+            end = counters[self.TIME_ITEM_KEY][index] - 1
             if num:
                 for i in range(start, end):
-                    _buff = '\'' + forecasts[TIME_ITEM_KEY][i] + '時-' + forecasts[TIME_ITEM_KEY][i + 1] + '時'
-                    data[TIME_ITEM_KEY].append(_buff)
-                pre_target_key = counters[TIME_ITEM_KEY][index]
-                pre_sp_key = counters[FORECAST_ITEM_KEY][index]
+                    _buff = '\'' + forecasts[self.TIME_ITEM_KEY][i] + '時-' + forecasts[self.TIME_ITEM_KEY][i + 1] + '時'
+                    data[self.TIME_ITEM_KEY].append(_buff)
+                pre_target_key = counters[self.TIME_ITEM_KEY][index]
+                pre_sp_key = counters[self.FORECAST_ITEM_KEY][index]
         return data
 
-    @staticmethod
-    def _create_weather_column_on(forecasts, counters, target_keys):
+    def _create_weather_column_on(self, forecasts: dict, counters: dict, target_keys: dict) -> dict:
         data = {}
         for key, target_key in target_keys.items():
             data[target_key] = []
             pre_target_key = 0
-            for index in range(len(counters[FORECAST_ITEM_KEY])):
+            for index in range(len(counters[self.FORECAST_ITEM_KEY])):
                 num = counters[target_key][index] - pre_target_key
                 start = pre_target_key
                 end = counters[target_key][index]
@@ -196,15 +193,14 @@ class Tenki:
                     pre_target_key = counters[target_key][index]
         return data
 
-    @staticmethod
-    def _create_weather_column_off(forecasts, counters, target_keys):
+    def _create_weather_column_off(self, forecasts: dict, counters: dict, target_keys: dict) -> dict:
         data = {}
         for key, target_key in target_keys.items():
             data[target_key] = []
             pre_sp_key = 0
             pre_target_key = 0
-            for index in range(len(counters[FORECAST_ITEM_KEY])):
-                num = counters[FORECAST_ITEM_KEY][index] - pre_sp_key
+            for index in range(len(counters[self.FORECAST_ITEM_KEY])):
+                num = counters[self.FORECAST_ITEM_KEY][index] - pre_sp_key
                 start = pre_target_key
                 end = counters[target_key][index] - 1
                 if num:
@@ -212,14 +208,18 @@ class Tenki:
                         _buff = forecasts[target_key][i] + '-' + forecasts[target_key][i + 1]
                         data[target_key].append(_buff)
                     pre_target_key = counters[target_key][index]
-                    pre_sp_key = counters[FORECAST_ITEM_KEY][index]
+                    pre_sp_key = counters[self.FORECAST_ITEM_KEY][index]
         return data
 
-    def create_line_bot_toba_format(self):
+    def create_line_bot_toba_format(self) -> dict:
+        """LINE Bot向けにデータを整形する
+
+        Returns:
+            dict: 整形されたデータ
+        """
         forecasts = self.get_result_forecasts()
         counters = self.get_result_counters()
-        data = {}
-        data.update(self._create_date_column(forecasts, counters))
+        data = self._create_date_column(forecasts, counters)
         data.update(self._create_time_column(forecasts, counters))
         data.update(self._create_weather_column_on(forecasts, counters, {
             '天気': 'forecast_item',
@@ -231,7 +231,7 @@ class Tenki:
             '風力': 'wind_item_speed'}))
         return data
 
-    def get_value_objects(self):
+    def get_value_objects(self) -> TenkiValue:
         """値オブジェクトを取得する
 
         Returns:
@@ -239,7 +239,7 @@ class Tenki:
         """
         return copy.deepcopy(self.tenki_value)
 
-    def get_result_forecasts(self):
+    def get_result_forecasts(self) -> dict:
         """クローリング結果を取得する
 
         Returns:
@@ -247,7 +247,7 @@ class Tenki:
         """
         return copy.deepcopy(self.tenki_value.forecasts)
 
-    def get_result_counters(self):
+    def get_result_counters(self) -> dict:
         """クローリング結果を取得する
 
         Returns:
@@ -255,7 +255,7 @@ class Tenki:
         """
         return copy.deepcopy(self.tenki_value.counters)
 
-    def get_title(self):
+    def get_title(self) -> str:
         """対象サイトタイトルを取得する
 
         Returns:
@@ -336,7 +336,7 @@ class Tenki:
         return True
 
 
-    def create_save_text(self):
+    def create_save_text(self) -> str:
         """保存用文字列の作成
 
         Returns:
@@ -351,7 +351,7 @@ class Tenki:
         buff += json.dumps(self.tenki_value.counters, ensure_ascii=False) + '\n'  # 画像URL追加
         return buff
 
-    def clip_copy(self):
+    def clip_copy(self) -> bool:
         """クローリング結果をクリップボードにコピーする
 
         Returns:
@@ -363,7 +363,7 @@ class Tenki:
         pyperclip.copy(buff)  # クリップボードへのコピー
         return True
 
-    def save_text(self, save_path):
+    def save_text(self, save_path: str) -> bool:
         """データをファイルに、以下の独自フォーマットで保存する
             * 処理対象サイトURL
             * ルートCSSセレクタ
@@ -385,7 +385,7 @@ class Tenki:
             work_file.write(buff)  # ファイルへの保存
             return True
 
-    def load_text(self, load_path):
+    def load_text(self, load_path: str) -> bool:
         """独自フォーマットなファイルからデータを読み込む
 
         Args:
