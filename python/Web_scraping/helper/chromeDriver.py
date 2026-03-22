@@ -109,7 +109,8 @@ class ChromeDriver:
     __start_window_handle = None
     root_path = os.path.dirname(os.path.abspath(__file__))
     driver_path = os.path.join(root_path, r'driver\chromedriver.exe')
-    chrome_path = r'"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe"'
+    # chrome_path = r'"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe"'
+    chrome_path = r'"C:\Program Files\Google\Chrome\Application\chrome.exe"'
     __options = ChromeOptions()
     __port = "9222"
     __chrome_add_argument = ['--blink-settings=imagesEnabled=false',  # 画像非表示
@@ -122,7 +123,7 @@ class ChromeDriver:
                                         ]
     profile_path = r'C:\Users\igapon\temp'
     __cmd = f'{chrome_path}' \
-            f' -remote-debugging-port={__port}' \
+            f' --remote-debugging-port={__port}' \
             f' --user-data-dir="{profile_path}"'
 
     def __init__(self,

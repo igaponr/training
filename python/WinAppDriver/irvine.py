@@ -14,8 +14,7 @@ from appium import webdriver
 from selenium.webdriver.common.keys import Keys
 
 
-# cmd = r'c:\Program1\irvine1_3_0\irvine.exe ./result_list.txt'
-cmd = r'c:\Program1\irvine1_3_0\irvine.exe'
+cmd = r'C:\Users\igapon\OneDrive\irvine1_3_0\irvine.exe'
 # proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
 desired_caps = {}
 # 起動する場合

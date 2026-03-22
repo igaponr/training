@@ -51,7 +51,8 @@ from helper.slack_message_api import *
 site_selectors = {
     Crawling.URLS_TARGET: [
         (By.XPATH,
-         '//body/div[2]/div/div/a',
+         '//*[@id="content"]/div[2]/div/a',
+#         '//body/div[2]/div/div/a',
          lambda el: el.get_attribute("href")
          ),
     ]

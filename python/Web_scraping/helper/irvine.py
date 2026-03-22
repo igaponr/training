@@ -58,18 +58,18 @@ from typing import List, Optional, Union
 
 @dataclass(frozen=True)
 class IrvineValue:
-    """Irvineの値オブジェクトクラス
+    r"""Irvineの値オブジェクトクラス
 
     Args:
         url_list (list): ダウンロードするURLのリスト
-        exe_path (str): Irvine.exeのパス。デフォルトは "c:\Program1\irvine1_3_0\irvine.exe"
+        exe_path (str): Irvine.exeのパス。デフォルトは "C:\Users\igapon\OneDrive\irvine1_3_0\irvine.exe"
         list_path (str): Irvineでダウンロードするファイルリストのファイルパス。デフォルトは "../irvine_download_list.txt"
 
     Raises:
         FileNotFoundError: exe_pathで指定されたファイルが存在しない場合
     """
     url_list: List[str]
-    exe_path: str = field(default=r'c:\Program1\irvine1_3_0\irvine.exe'.replace(os.sep, '/'))
+    exe_path: str = field(default=r'C:\Users\igapon\OneDrive\irvine1_3_0\irvine.exe'.replace(os.sep, '/'))
     list_path: str = field(default=os.path.join(os.path.dirname(os.path.abspath(__file__)),
                                                 '../irvine_download_list.txt').replace(os.sep, '/'))
 
