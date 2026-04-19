@@ -132,8 +132,41 @@ class Crawling:
     def scraping(url, selectors):
         """ChromeDriverを使ってスクレイピングする"""
         selectors = copy.deepcopy(selectors)
-        chrome_driver = helper.chromeDriver.ChromeDriver(url, selectors)
-        return chrome_driver.get_items()
+        chrome_driver = helper.chromeDriver.ChromeDriver()
+        try:
+            # 0. 対象のURLを開く
+            chrome_driver.open_current_tab(url)
+            # 1. ブラウザのタイトルでロボ認証/Cloudflareブロックを判定
+            # ロボ認証画面ではタイトルがドメイン名のみや "Cloudflare" になることが多い
+            actual_title = chrome_driver._driver.title
+            if actual_title == "nhentai.net" or "Cloudflare" in actual_title or "Attention Required!" in actual_title:
+                # 「last_image_urlが不正」という文言を含めることで、呼び出し元のリトライ判定にヒットさせる
+                raise ValueError(f"Bot detection detected by title: {actual_title} (last_image_urlが不正)")
+            # 2. セレクタによる明示的なロボ認証要素の確認
+            if 'bot_check' in selectors:
+                for by, path, func in selectors['bot_check']:
+                    # chrome_driver._driver を直接参照して要素を探す
+                    elements = chrome_driver._driver.find_elements(by, path)
+                    if len(elements) > 0:
+                        raise ValueError(f"Bot check element found (last_image_urlが不正): {url}")
+            # 3. スクレイピングを実行
+            # ここで Selenium の "element not interactable" 等の例外が発生する可能性がある
+            try:
+                items = chrome_driver.scraping(selectors)
+            except Exception as e:
+                raise ValueError(f"Scraping interaction error: {e} (last_image_urlが不正)")
+            # 指定したセレクタのすべてで結果が空（リストが空）の場合のみブロックとみなす
+            # 判定対象のキー（bot_check以外）を取得
+            data_keys = [k for k in selectors.keys() if k != 'bot_check']
+            # すべての結果が空リスト、または None かチェック
+            is_all_empty = all(not items.get(k) for k in data_keys)
+            if is_all_empty:
+                time.sleep(8)
+                raise ValueError(f"Cloudflare blocking / Data empty (last_image_urlが不正): {url}")
+            return items
+        except Exception as e:
+            # ここで発生した例外は上位の crawling_url_deployment メソッドの try-except へ伝播する
+            raise e
 
     @staticmethod
     def dict_merge(dict1, dict2):
@@ -445,10 +478,15 @@ class Crawling:
                         helper.chromeDriver.ChromeDriver().save_source(target_file_name)
                         print("処理成功。除外リストに移動します。")
                         self.move_url_from_page_urls_to_exclusion_urls(page_url)
-                    else:
-                        print("ダウンロード対象外、または処理済みのためスキップします。")
+                    elif os.path.exists(target_file_name):
+                        # 既にファイルがあるので「除外（処理済み）リスト」へ
+                        print(f"既に処理済みです（ファイルが存在します）: {title}")
                         self.move_url_from_page_urls_to_exclusion_urls(page_url)
-                    # ここまで到達すれば成功なので、リトライのループを抜ける
+                    else:
+                        # 言語が japanese ではなかった、あるいは判定に失敗した場合は
+                        # 「失敗リスト」へ送り、次回リトライできるようにする
+                        print(f"条件不一致（言語: {languages}）のため、失敗リストへ移動します。")
+                        self.move_url_from_page_urls_to_failure_urls(page_url)
                     break
                 except ValueError as e:
                     # 指定したエラーメッセージの場合のみリトライ処理を行う
@@ -458,13 +496,13 @@ class Crawling:
                             print(f"{retry_delay}秒後にリトライします... (試行 {attempt + 2}/{max_retries})")
                             time.sleep(retry_delay)
                         else:
-                            print(f"最大リトライ回数({max_retries}回)に達しました。このURLの処理を失敗として記録します。")
+                            print(f"最大リトライ回数に達しました。失敗リストへ移動します。")
                             self.move_url_from_page_urls_to_failure_urls(page_url)
                     else:
-                        # 想定外のValueErrorの場合は、リトライせずにエラーを伝播させる
-                        print(f"想定外のValueErrorです: {e}")
+                        # その他のValueError（仕様による対象外など）
+                        print(f"ValueErrorのため処理を中断します: {e}")
                         self.move_url_from_page_urls_to_failure_urls(page_url)
-                        break # リトライせず次のURLへ
+                        break
                 except Exception as e:
                     # その他の予期せぬエラー（ネットワークエラーなど）
                     print(f"予期せぬエラーが発生しました: {e}")
