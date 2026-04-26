@@ -129,46 +129,6 @@ class Crawling:
                              f"引数エラー:value_object=None")
 
     @staticmethod
-    def scraping(url, selectors):
-        """ChromeDriverを使ってスクレイピングする"""
-        selectors = copy.deepcopy(selectors)
-        chrome_driver = helper.chromeDriver.ChromeDriver()
-        try:
-            # 0. 対象のURLを開く
-            chrome_driver.open_current_tab(url)
-            # 1. ブラウザのタイトルでロボ認証/Cloudflareブロックを判定
-            # ロボ認証画面ではタイトルがドメイン名のみや "Cloudflare" になることが多い
-            actual_title = chrome_driver._driver.title
-            if actual_title == "nhentai.net" or "Cloudflare" in actual_title or "Attention Required!" in actual_title:
-                # 「last_image_urlが不正」という文言を含めることで、呼び出し元のリトライ判定にヒットさせる
-                raise ValueError(f"Bot detection detected by title: {actual_title} (last_image_urlが不正)")
-            # 2. セレクタによる明示的なロボ認証要素の確認
-            if 'bot_check' in selectors:
-                for by, path, func in selectors['bot_check']:
-                    # chrome_driver._driver を直接参照して要素を探す
-                    elements = chrome_driver._driver.find_elements(by, path)
-                    if len(elements) > 0:
-                        raise ValueError(f"Bot check element found (last_image_urlが不正): {url}")
-            # 3. スクレイピングを実行
-            # ここで Selenium の "element not interactable" 等の例外が発生する可能性がある
-            try:
-                items = chrome_driver.scraping(selectors)
-            except Exception as e:
-                raise ValueError(f"Scraping interaction error: {e} (last_image_urlが不正)")
-            # 指定したセレクタのすべてで結果が空（リストが空）の場合のみブロックとみなす
-            # 判定対象のキー（bot_check以外）を取得
-            data_keys = [k for k in selectors.keys() if k != 'bot_check']
-            # すべての結果が空リスト、または None かチェック
-            is_all_empty = all(not items.get(k) for k in data_keys)
-            if is_all_empty:
-                time.sleep(8)
-                raise ValueError(f"Cloudflare blocking / Data empty (last_image_urlが不正): {url}")
-            return items
-        except Exception as e:
-            # ここで発生した例外は上位の crawling_url_deployment メソッドの try-except へ伝播する
-            raise e
-
-    @staticmethod
     def dict_merge(dict1, dict2):
         """dict2をdict1にマージする。dictは値がlistであること。list内の重複は削除。list内の順序を維持"""
         dict1 = copy.deepcopy(dict1)
@@ -217,6 +177,73 @@ class Crawling:
         chromedriver = helper.chromeDriver.ChromeDriver()
         for url, path in zip(web_file_list.get_url_list(), web_file_list.get_path_list()):
             chromedriver.download_image(url, path)
+
+    @staticmethod
+    def scraping(url, selectors):
+        """ChromeDriverを使ってスクレイピングする"""
+        selectors = copy.deepcopy(selectors)
+        chrome_driver = helper.chromeDriver.ChromeDriver()
+        try:
+            # 0. 対象のURLを開く
+            chrome_driver.open_current_tab(url)
+            # 1. ブラウザのタイトルでロボ認証/Cloudflareブロックを判定
+            # ロボ認証画面ではタイトルがドメイン名のみや "Cloudflare" になることが多い
+            actual_title = chrome_driver._driver.title
+            if actual_title == "nhentai.net" or "Cloudflare" in actual_title or "Attention Required!" in actual_title:
+                # 「last_image_urlが不正」という文言を含めることで、呼び出し元のリトライ判定にヒットさせる
+                raise ValueError(f"Bot detection detected by title: {actual_title} (last_image_urlが不正)")
+            # 2. セレクタによる明示的なロボ認証要素の確認
+            if 'bot_check' in selectors:
+                for by, path, func in selectors['bot_check']:
+                    # chrome_driver._driver を直接参照して要素を探す
+                    elements = chrome_driver._driver.find_elements(by, path)
+                    if len(elements) > 0:
+                        raise ValueError(f"Bot check element found (last_image_urlが不正): {url}")
+            # 3. スクレイピングを実行
+            # ここで Selenium の "element not interactable" 等の例外が発生する可能性がある
+            try:
+                items = chrome_driver.scraping(selectors)
+            except Exception as e:
+                raise ValueError(f"Scraping interaction error: {e} (last_image_urlが不正)")
+            # 指定したセレクタのすべてで結果が空（リストが空）の場合のみブロックとみなす
+            # 判定対象のキー（bot_check以外）を取得
+            data_keys = [k for k in selectors.keys() if k != 'bot_check']
+            # すべての結果が空リスト、または None かチェック
+            is_all_empty = all(not items.get(k) for k in data_keys)
+            if is_all_empty:
+                time.sleep(8)
+                raise ValueError(f"Cloudflare blocking / Data empty (last_image_urlが不正): {url}")
+            return items
+        except Exception as e:
+            # ここで発生した例外は上位の crawling_url_deployment メソッドの try-except へ伝播する
+            raise e
+
+    @staticmethod
+    def scraping_current(chrome_driver, selectors):
+        """現在ブラウザで開いているページから、指定されたセレクタを使用して情報を取得する。
+        Args:
+            chrome_driver (WebDriver): Selenium chrome driver
+            selectors (dict): { '項目名': [(By, 'セレクタ', lambda), ...], ... } 形式の辞書
+        Returns:
+            dict: { '項目名': [取得した値のリスト], ... }
+        """
+        results = {}
+        for key, selector_list in selectors.items():
+            extracted_values = []
+            for by_type, selector_val, extract_func in selector_list:
+                try:
+                    # 要素をすべて取得（見つからない場合は空リストが返るためエラーにならない）
+                    elements = chrome_driver.find_elements(by_type, selector_val)
+                    for el in elements:
+                        # セレクタ定義にあるラムダ式を実行して値を抽出
+                        value = extract_func(el)
+                        if value:
+                            extracted_values.append(value)
+                except Exception as e:
+                    print(f"  [Warning] セレクタ実行中にエラー ({key}): {e}")
+            # 結果を辞書に格納
+            results[key] = extracted_values
+        return results
 
     def get_value_object(self):
         """値オブジェクトを取得する"""
@@ -404,45 +431,35 @@ class Crawling:
                 continue
 
     def crawling_url_deployment(self, page_selectors, image_selectors, notification_id=""):
-        """各ページをスクレイピングして、末尾画像のナンバーから、URLを予測して、画像ファイルをダウンロード＆圧縮する
-            # crawling_itemsに、page_urlsがあり、各page_urlをpage_selectorsでスクレイピングする
-            # タイトルとURLでダウンロード除外または済みかをチェックして、
-            # ダウンロードしない場合は、以降の処理をスキップする
-            # 各page_urlをimage_selectorsでスクレイピングしてダウンロードする画像URLリストを作る。
-            # 画像URLリストをirvineHelperでダウンロードして、zipファイルにする
-        """
+        chrome_instance = helper.chromeDriver.ChromeDriver()
+        driver = chrome_instance._driver
         crawling_items = self.get_crawling_items()
-        page_urls = []
-        if self.URLS_TARGET in crawling_items:
-            page_urls = crawling_items[self.URLS_TARGET]
+        page_urls = crawling_items.get(self.URLS_TARGET, [])
         total_pages = len(page_urls)
-        max_retries = 3  # 最大リトライ回数
-        retry_delay = 10 # リトライ間の待機時間（秒）
+        max_retries = 3
+        retry_delay = 10
         for i, page_url in enumerate(page_urls):
-            status = helper.status.Status()
-            if status is not None and not status.is_running():
-                print("stop status")
-                break
+            if not helper.status.Status().is_running(): break
             current_page = i + 1
-            remaining_pages = total_pages - current_page
-            print(page_url)
+            print(f"\nProcessing [{current_page}/{total_pages}]: {page_url}")
             if self.is_url_included_exclusion_list(page_url):
                 self.move_url_from_page_urls_to_exclusion_urls(page_url)
                 continue
-            if self.is_url_included_failure_list(page_url):
-                self.move_url_from_page_urls_to_failure_urls(page_url)
-                continue
             for attempt in range(max_retries):
                 try:
+                    # 1. ギャラリーページを開く
                     items = self.scraping(page_url, page_selectors)
                     languages = self.take_out(items, 'languages')
+                    # ロボットチェック待機ロジック
+                    if not languages or "Just a moment..." in driver.title:
+                        print(f"  [!] ロボットチェック待機中... (10s)")
+                        time.sleep(retry_delay)
+                        items = Crawling.scraping_current(driver, page_selectors)
+                        languages = self.take_out(items, 'languages')
                     title = Crawling.validate_title(items, 'title_jp', 'title_en')
                     url_title = helper.chromeDriver.ChromeDriver.fixed_file_name(page_url)
-                    # フォルダがなかったらフォルダを作る
-                    os.makedirs(helper.webFileList.WebFileList.work_path, exist_ok=True)
-                    target_file_name = os.path.join(helper.webFileList.WebFileList.work_path, f'{title}：{url_title}.html')
-                    print(f"タイトル: {title}, 言語: {languages}")
-                    if languages and languages == 'japanese' and not os.path.exists(target_file_name):
+                    print(f"  タイトル: {title}, 言語: {languages}")
+                    if languages == 'japanese':
                         # ダウンロードするときだけ通知する
                         # _line_message_api = LineMessageAPI(access_token="", channel_secret="")
                         # _line_message_api.send_message(
@@ -453,64 +470,44 @@ class Crawling:
                             notification_id,
                             f'crawling :現在{current_page}ページ目 / 全{total_pages}ページ中 (残り{total_pages - current_page}ページ)')
                         image_items = self.scraping(page_url, image_selectors)
-                        last_image_url = self.take_out(image_items, 'image_url')
-                        if not last_image_url:
-                            # リトライのために同じエラーを発生させる
-                            raise ValueError(f"エラー:last_image_urlが不正[{last_image_url}]")
-                        print(f"最終画像URLの取得成功: {last_image_url}")
-                        web_file_list = helper.webFileList.WebFileList([last_image_url])
+                        last_page_link = self.take_out(image_items, 'image_url')
+                        if not last_page_link:
+                            raise ValueError("最後のページへのリンク[{last_page_link}]が見つかりません")
+                        print(f"  最終画像直リンク取得成功: {last_page_link}")
+                        # --- ダウンロード処理 ---
+                        # 直リンクを渡すので、web_file_list.pyが正しく連番を展開できるようになります
+                        web_file_list = helper.webFileList.WebFileList([last_page_link])
                         web_file_list.update_value_object_by_deployment_url_list()
                         web_file_list.download_irvine()
-                        for count in enumerate(helper.webFile.WebFile.ext_list):
-                            if web_file_list.is_exist():
-                                break
+                        # 拡張子違いリトライ（既存ロジック）
+                        for _ in helper.webFile.WebFile.ext_list:
+                            if web_file_list.is_exist(): break
                             web_file_list.rename_url_ext_shift()
                             web_file_list.download_irvine()
-                        if not web_file_list.make_zip_file():
+                        # ZIP化・後処理
+                        if web_file_list.make_zip_file():
+                            web_file_list.rename_zip_file(title) or web_file_list.rename_zip_file(
+                                f'{title}：{url_title}')
                             web_file_list.delete_local_files()
-                            print("ZIPファイルの作成に失敗しました。")
-                            self.move_url_from_page_urls_to_failure_urls(page_url)
-                            # この continue は try-except の外側のループを継続する
-                            # リトライせず次のURLへ進むため、breakで抜ける
-                            break
-                        web_file_list.rename_zip_file(title) or web_file_list.rename_zip_file(f'{title}：{url_title}')
-                        web_file_list.delete_local_files()
-                        helper.chromeDriver.ChromeDriver().save_source(target_file_name)
-                        print("処理成功。除外リストに移動します。")
-                        self.move_url_from_page_urls_to_exclusion_urls(page_url)
-                    elif os.path.exists(target_file_name):
-                        # 既にファイルがあるので「除外（処理済み）リスト」へ
-                        print(f"既に処理済みです（ファイルが存在します）: {title}")
-                        self.move_url_from_page_urls_to_exclusion_urls(page_url)
-                    else:
-                        # 言語が japanese ではなかった、あるいは判定に失敗した場合は
-                        # 「失敗リスト」へ送り、次回リトライできるようにする
-                        print(f"条件不一致（言語: {languages}）のため、失敗リストへ移動します。")
-                        self.move_url_from_page_urls_to_failure_urls(page_url)
-                    break
-                except ValueError as e:
-                    # 指定したエラーメッセージの場合のみリトライ処理を行う
-                    if "last_image_urlが不正" in str(e):
-                        print(f"エラーが発生しました: {e}")
-                        if attempt < max_retries - 1:
-                            print(f"{retry_delay}秒後にリトライします... (試行 {attempt + 2}/{max_retries})")
-                            time.sleep(retry_delay)
+                            chrome_instance.save_source(
+                                os.path.join(helper.webFileList.WebFileList.work_path, f'{title}：{url_title}.html'))
+                            self.move_url_from_page_urls_to_exclusion_urls(page_url)
+                            print("  処理成功。")
                         else:
-                            print(f"最大リトライ回数に達しました。失敗リストへ移動します。")
+                            web_file_list.delete_local_files()
                             self.move_url_from_page_urls_to_failure_urls(page_url)
-                    else:
-                        # その他のValueError（仕様による対象外など）
-                        print(f"ValueErrorのため処理を中断します: {e}")
-                        self.move_url_from_page_urls_to_failure_urls(page_url)
+                        break  # リトライループ終了
+                    elif languages:
+                        print(f"  対象外言語 ({languages})。除外リストへ。")
+                        self.move_url_from_page_urls_to_exclusion_urls(page_url)
                         break
+                    else:
+                        raise ValueError("languages_empty")
                 except Exception as e:
-                    # その他の予期せぬエラー（ネットワークエラーなど）
-                    print(f"予期せぬエラーが発生しました: {e}")
+                    print(f"  エラー発生 (試行 {attempt + 1}): {e}")
                     if attempt < max_retries - 1:
-                        print(f"{retry_delay}秒後にリトライします... (試行 {attempt + 2}/{max_retries})")
                         time.sleep(retry_delay)
                     else:
-                        print(f"最大リトライ回数({max_retries}回)に達しました。このURLの処理を失敗として記録します。")
                         self.move_url_from_page_urls_to_failure_urls(page_url)
 
     def crawling_urls(self, page_selectors, image_selectors):
