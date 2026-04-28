@@ -299,11 +299,11 @@ class WebFileList:
         """
         __zip_folder = self.get_download_path_from_1st_element()
         print('ファイル削除します(フォルダごと削除して、フォルダを作り直します)')
-        shutil.rmtree(__zip_folder)
-        if __zip_folder[len(__zip_folder) - 1] == '\\':
-            os.mkdir(__zip_folder)
-        else:
-            os.mkdir(__zip_folder + '\\')
+        # フォルダが存在する場合のみ削除
+        if os.path.exists(__zip_folder):
+            shutil.rmtree(__zip_folder)
+        # フォルダを再作成（os.makedirsなら中間ディレクトリも作れるので安全）
+        os.makedirs(__zip_folder, exist_ok=True)
 
     def delete_local_files(self):
         """ファイルリストのファイルについて、ローカルから削除する

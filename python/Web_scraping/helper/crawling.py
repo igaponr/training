@@ -478,6 +478,7 @@ class Crawling:
                         # 直リンクを渡すので、web_file_list.pyが正しく連番を展開できるようになります
                         web_file_list = helper.webFileList.WebFileList([last_page_link])
                         web_file_list.update_value_object_by_deployment_url_list()
+                        web_file_list.delete_local_folder()
                         web_file_list.download_irvine()
                         # 拡張子違いリトライ（既存ロジック）
                         for _ in helper.webFile.WebFile.ext_list:
