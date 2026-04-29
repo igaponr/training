@@ -59,15 +59,15 @@ site_selectors = {
 }
 page_selectors = {
     'title_jp': [(By.XPATH,
-                  '//div/div/div/h2',
+                  '//div[@id="info"]/h2',
                   lambda el: el.text),
                  ],
     'title_en': [(By.XPATH,
-                  '//div/div/div/h1',
+                  '//div[@id="info"]/h1',
                   lambda el: el.text),
                  ],
     'languages': [(By.XPATH,
-                   '//div/div/section/div[6]/span/a/span[1]',
+                   '//section[@id="tags"]//a[contains(@href, "/language/")]/span[@class="name"]',
                    lambda el: el.text),
                   ],
 }
