@@ -164,6 +164,12 @@ class Crawling:
     def validate_title(items: dict, title: str, title_sub: str):
         title = Crawling.take_out(items, title)
         title_sub = Crawling.take_out(items, title_sub)
+        # 複数ヒットしてリストで取得された場合は、最初の要素を採用する
+        if isinstance(title, list) and title:
+            title = title[0]
+        if isinstance(title_sub, list) and title_sub:
+            title_sub = title_sub[0]
+
         if not title:
             if not title_sub:
                 # タイトルが得られない時は、タイトルを日時文字列にする
