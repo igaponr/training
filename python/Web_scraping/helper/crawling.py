@@ -381,92 +381,89 @@ class Crawling:
             # 画像URLリストをirvineHelperでダウンロードして、zipファイルにする
         """
         crawling_items = self.get_crawling_items()
-        page_urls = []
-        if self.URLS_TARGET in crawling_items:
-            page_urls = crawling_items[self.URLS_TARGET]
+        page_urls = crawling_items.get(self.URLS_TARGET, [])
         total_pages = len(page_urls)
         max_retries = 3  # 最大リトライ回数
-        retry_delay = 10 # リトライ間の待機時間（秒）
+        retry_delay = 20 # リトライ間の待機時間（秒）
         for i, page_url in enumerate(page_urls):
             status = helper.status.Status()
             if status is not None and not status.is_running():
                 print("stop status")
                 break
             current_page = i + 1
-            remaining_pages = total_pages - current_page
-            print(page_url)
+            print(f"\nProcessing [{current_page}/{total_pages}]: {page_url}")
+            # すでに除外リストや失敗リストにある場合はスキップ
             if self.is_url_included_exclusion_list(page_url):
                 self.move_url_from_page_urls_to_exclusion_urls(page_url)
                 continue
             if self.is_url_included_failure_list(page_url):
+                # 失敗リストにあるものは再試行せず移動（必要に応じてロジック変更可）
                 self.move_url_from_page_urls_to_failure_urls(page_url)
                 continue
+#            remaining_pages = total_pages - current_page
+            success = False
             for attempt in range(max_retries):
                 try:
+                    # 1. ページ情報のスクレイピング
                     items = self.scraping(page_url, page_selectors)
+                    # 2. 言語の取得とチェック
                     languages = self.take_out(items, 'languages')
+                    # リクエストの要件: LanguagesがNoneまたは[]の場合にリトライさせる
+                    if not languages:
+                        raise ValueError(f"Languagesが取得できませんでした (Attempt {attempt + 1}/{max_retries})")
                     title = Crawling.validate_title(items, 'title_jp', 'title_en')
                     url_title = helper.chromeDriver.ChromeDriver.fixed_file_name(page_url)
-                    # フォルダがなかったらフォルダを作る
+                    # フォルダ準備
                     os.makedirs(helper.webFileList.WebFileList.work_path, exist_ok=True)
                     target_file_name = os.path.join(helper.webFileList.WebFileList.work_path, f'{title}：{url_title}.html')
                     print(f"タイトル: {title}, 言語: {languages}")
-                    if languages and languages == 'japanese' and not os.path.exists(target_file_name):
+                    if 'japanese' in str(languages).lower() and not os.path.exists(target_file_name):
                         # ダウンロードするときだけ通知する
                         # _line_message_api = LineMessageAPI(access_token="", channel_secret="")
                         # _line_message_api.send_message(
                         #     notification_id,
                         #     f'crawling :現在{current_page}ページ目 / 全{total_pages}ページ中 (残り{remaining_pages}ページ)')
+                        # Slack/通知処理
                         _slack_message_api = helper.slack_message_api.SlackMessageAPI(access_token="")
                         _slack_message_api.send_message(
                             notification_id,
                             f'crawling :現在{current_page}ページ目 / 全{total_pages}ページ中 (残り{total_pages - current_page}ページ)')
+                        # 画像URLの取得
                         image_items = self.scraping(page_url, image_selectors)
                         last_image_url = self.take_out(image_items, 'image_url')
                         if not last_image_url:
                             # リトライのために同じエラーを発生させる
                             raise ValueError(f"エラー:last_image_urlが不正[{last_image_url}]")
                         print(f"最終画像URLの取得成功: {last_image_url}")
+                        # ダウンロード実行
                         web_file_list = helper.webFileList.WebFileList([last_image_url])
                         web_file_list.update_value_object_by_deployment_url_list()
                         web_file_list.download_irvine()
-                        for count in enumerate(helper.webFile.WebFile.ext_list):
+                        # 拡張子違いのチェックとリトライ（irvine側）
+                        for _ in range(len(helper.webFile.WebFile.ext_list)):
                             if web_file_list.is_exist():
                                 break
                             web_file_list.rename_url_ext_shift()
                             web_file_list.download_irvine()
+                        # ZIP化
                         if not web_file_list.make_zip_file():
                             web_file_list.delete_local_files()
                             print("ZIPファイルの作成に失敗しました。")
                             self.move_url_from_page_urls_to_failure_urls(page_url)
-                            # この continue は try-except の外側のループを継続する
                             # リトライせず次のURLへ進むため、breakで抜ける
                             break
                         web_file_list.rename_zip_file(f'{title}：{url_title}')
                         web_file_list.delete_local_files()
+                        # 完了の証跡としてHTMLソースを保存
                         helper.chromeDriver.ChromeDriver().save_source(target_file_name)
-                        print("処理成功。除外リストに移動します。")
+                        print("成功。除外リストに移動しました。")
                         self.move_url_from_page_urls_to_exclusion_urls(page_url)
                     else:
-                        print("ダウンロード対象外、または処理済みのためスキップします。")
+                        print("ダウンロード対象外、または処理済みのためスキップしました。")
                         self.move_url_from_page_urls_to_exclusion_urls(page_url)
                     # ここまで到達すれば成功なので、リトライのループを抜ける
+                    success = True
                     break
-                except ValueError as e:
-                    # 指定したエラーメッセージの場合のみリトライ処理を行う
-                    if "last_image_urlが不正" in str(e):
-                        print(f"エラーが発生しました: {e}")
-                        if attempt < max_retries - 1:
-                            print(f"{retry_delay}秒後にリトライします... (試行 {attempt + 2}/{max_retries})")
-                            time.sleep(retry_delay)
-                        else:
-                            print(f"最大リトライ回数({max_retries}回)に達しました。このURLの処理を失敗として記録します。")
-                            self.move_url_from_page_urls_to_failure_urls(page_url)
-                    else:
-                        # 想定外のValueErrorの場合は、リトライせずにエラーを伝播させる
-                        print(f"想定外のValueErrorです: {e}")
-                        self.move_url_from_page_urls_to_failure_urls(page_url)
-                        break # リトライせず次のURLへ
                 except Exception as e:
                     # その他の予期せぬエラー（ネットワークエラーなど）
                     print(f"予期せぬエラーが発生しました: {e}")
@@ -476,6 +473,10 @@ class Crawling:
                     else:
                         print(f"最大リトライ回数({max_retries}回)に達しました。このURLの処理を失敗として記録します。")
                         self.move_url_from_page_urls_to_failure_urls(page_url)
+            # 処理中にステータスが変わった場合はループを中断
+            if not success:
+                # 失敗時のログなどは上記Exception内で処理済み
+                pass
 
     def crawling_urls(self, page_selectors, image_selectors):
         """各ページをスクレイピングして、画像ファイルをダウンロード＆圧縮する
