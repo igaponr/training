@@ -442,7 +442,7 @@ class Crawling:
                             # この continue は try-except の外側のループを継続する
                             # リトライせず次のURLへ進むため、breakで抜ける
                             break
-                        web_file_list.rename_zip_file(title) or web_file_list.rename_zip_file(f'{title}：{url_title}')
+                        web_file_list.rename_zip_file(f'{title}：{url_title}')
                         web_file_list.delete_local_files()
                         helper.chromeDriver.ChromeDriver().save_source(target_file_name)
                         print("処理成功。除外リストに移動します。")
