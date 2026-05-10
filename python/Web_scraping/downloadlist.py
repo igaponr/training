@@ -7,7 +7,6 @@ Todo:
 import os
 import sys
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
-import helper.urlDeployment
 import helper.crawling
 import helper.chromeDriver
 import helper.webFileList
@@ -23,11 +22,9 @@ if __name__ == '__main__':  # インポート時には動かない
         for line in buff:
             target_url = line.rstrip('\n')
             # スクレイピングして末尾画像のナンバーから全ての画像URLを推測して展開する
-            url_deployment = helper.urlDeployment.UrlDeployment(target_url, SELECTORS)
-            title = url_deployment.get_title()
             url_title = helper.chromeDriver.ChromeDriver.fixed_file_name(target_url)
-            # url_list = url_deployment.get_image_urls()
             image_items = helper.crawling.Crawling.scraping(target_url, SELECTORS)
+            title = helper.crawling.Crawling.validate_title(image_items, 'title_jp', 'title_en')
             image_urls = helper.crawling.Crawling.take_out(image_items, 'image_urls')
             last_image_url = helper.crawling.Crawling.take_out(image_items, 'image_url')
             if not last_image_url:
