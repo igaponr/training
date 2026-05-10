@@ -1,3 +1,7 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""LINEにメッセージを送る
+"""
 import json
 from dataclasses import dataclass, asdict
 import os
@@ -13,12 +17,17 @@ from linebot import LineBotSdkDeprecatedIn30
 
 @dataclass(frozen=True)
 class LineMessageAPI:
-    """
-    LINE Messaging API のアクセストークンとChannel Secretを保持し、
-    メッセージ送信機能と、設定情報のJSONファイル保存・ロード機能を提供するクラス。
-    デストラクタで設定情報をJSONファイルに保存します。
-    設定情報指定せずにインスタンス作成時は、JSONファイルがあればロードし、
-    JSONファイルがなければエラー表示で終了します。
+    """LINEの設定情報を管理して、メッセージを送信するクラス。
+    access_tokenとchannel_secretを指定せず、jsonファイルからaccess_tokenとchannel_secretが読み込めない場合はアプリ終了する
+
+    Args:
+        access_token (str): (省略可)LINE Messaging API のトークンを指定する。指定しない場合はJSONファイルから読み込む
+        channel_secret (str): (省略可)Channel Secretを指定する。指定しない場合はJSONファイルから読み込む
+        json_path (str): (省略可)設定情報を保存するjsonファイルのパス
+        line_bot_api (LineBotApi): (省略可)LineBotApiインスタンス
+        handler (WebhookHandler): (省略可)WebhookHandlerインスタンス
+    Returns:
+        LineMessageAPI: インスタンス
     """
     access_token: str
     channel_secret: str
@@ -27,10 +36,6 @@ class LineMessageAPI:
     handler: WebhookHandler = None  # 型ヒントを追加
 
     def __post_init__(self):
-        """
-        アクセストークンとChannel Secretが指定されていない場合、JSONファイルからロードを試みる。
-        JSONファイルが存在しない場合は、エラーメッセージを表示して終了する。
-        """
         if not self.access_token or not self.channel_secret:
             try:
                 loaded_self = self.load_from_json()
@@ -46,14 +51,13 @@ class LineMessageAPI:
         object.__setattr__(self, "handler", WebhookHandler(self.channel_secret))
 
     def send_message(self, user_id: str, message: str) -> bool:
-        """
-        指定したユーザーにメッセージを送信する。
+        """Slackにメッセージを送信する
 
         Args:
-            user_id: 送信先のユーザーID。
-            message: 送信するメッセージ。
+            user_id (str): 送信先のユーザーID
+            message (str): 送信するメッセージ
         Returns:
-            送信に成功した場合はTrue、失敗した場合はFalseを返す。
+            bool: 送信に成功した場合はTrue、失敗した場合はFalseを返す
         """
         text_message = TextSendMessage(text=message)
         try:
@@ -64,8 +68,8 @@ class LineMessageAPI:
             return False  # 送信失敗
 
     def save_to_json(self) -> None:
-        """
-        設定情報をJSONファイルに保存する。
+        """設定情報をJSONファイルに保存する。
+        設定情報の保存に失敗した場合は、エラーを表示して処理を継続する
         """
         try:
             with open(self.json_path, 'w', encoding='utf-8') as f:
@@ -75,14 +79,14 @@ class LineMessageAPI:
 
     @classmethod
     def load_from_json(cls, json_path: Optional[str] = None) -> "LineMessageAPI":
-        """
-        JSONファイルから設定情報を読み込み、インスタンスを生成する。
+        """JSONファイルから設定情報を読み込み、インスタンスを生成する
 
         Args:
-            json_path: JSONファイルのパス。指定しない場合は、デフォルトのパスを使用する。
-
+            json_path (str): JSONファイルのパス。指定しない場合は、デフォルトのパスを使用する
         Returns:
-            LineMessageAPI インスタンス。
+            LineMessageAPI: インスタンス
+        Raises:
+            FileNotFoundError: JSONファイルが見つからない、設定情報の保存に失敗した
         """
         path = json_path or cls.json_path
         if os.path.exists(path):
@@ -94,6 +98,11 @@ class LineMessageAPI:
 
 
 def get_option():
+    """オプションをパースする
+
+    Returns:
+        Namespace: オプションのパース結果
+    """
     arg_parser = ArgumentParser()
     arg_parser.add_argument('-a', '--access_token', type=str, default="",
                             help='LINE Messege APIのアクセストークンを指定する')

@@ -1,0 +1,325 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="ja" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>helper.webFile module &mdash; Web_scraping 1.0.0 ドキュメント</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=144c8c96"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/translations.js?v=4755f45a"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="索引" href="genindex.html" />
+    <link rel="search" title="検索" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Web_scraping
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="helper.html">helper package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Web_scraping</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">helper.webFile module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/helper.webFileHelper.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-helper.webFile">
+<span id="helper-webfile-module"></span><h1>helper.webFile module<a class="headerlink" href="#module-helper.webFile" title="Link to this heading"></a></h1>
+<p>webファイルのヘルパー</p>
+<div class="admonition-todo admonition" id="id1">
+<p class="admonition-title">課題</p>
+<ul class="simple">
+<li><p>docstringを整える</p></li>
+</ul>
+</div>
+<dl class="py class">
+<dt class="sig sig-object py" id="helper.webFile.WebFile">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">helper.webFile.</span></span><span class="sig-name descname"><span class="pre">WebFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value_object</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#helper.webFile.WebFileValue" title="helper.webFile.WebFileValue"><span class="pre">WebFileValue</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">download_file_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_ext</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'.jpg'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">download_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'D:/git/igaponr/training/python/Web_scraping/helper/../download'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/webFile.html#WebFile"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.webFile.WebFile" title="Link to this definition"></a></dt>
+<dd><p>ベースクラス: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>webファイルのヘルパー</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="helper.webFile.WebFile.delete_local_file">
+<span class="sig-name descname"><span class="pre">delete_local_file</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/webFile.html#WebFile.delete_local_file"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.webFile.WebFile.delete_local_file" title="Link to this definition"></a></dt>
+<dd><p>ローカルのファイルを削除する
+:return: None</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="helper.webFile.WebFile.download_file_name">
+<span class="sig-name descname"><span class="pre">download_file_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#helper.webFile.WebFile.download_file_name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="helper.webFile.WebFile.download_path">
+<span class="sig-name descname"><span class="pre">download_path</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'D:/git/igaponr/training/python/Web_scraping/helper/../download'</span></em><a class="headerlink" href="#helper.webFile.WebFile.download_path" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helper.webFile.WebFile.download_requests">
+<span class="sig-name descname"><span class="pre">download_requests</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/webFile.html#WebFile.download_requests"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.webFile.WebFile.download_requests" title="Link to this definition"></a></dt>
+<dd><p>requestsを用いて、ファイルをダウンロードする
+:return: bool 成功/失敗=True/False</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="helper.webFile.WebFile.ext_dict">
+<span class="sig-name descname"><span class="pre">ext_dict</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'.gif':</span> <span class="pre">['.gif',</span> <span class="pre">'.jpg',</span> <span class="pre">'.png',</span> <span class="pre">'.webp'],</span> <span class="pre">'.jpg':</span> <span class="pre">['.jpg',</span> <span class="pre">'.png',</span> <span class="pre">'.gif',</span> <span class="pre">'.webp'],</span> <span class="pre">'.png':</span> <span class="pre">['.png',</span> <span class="pre">'.jpg',</span> <span class="pre">'.gif',</span> <span class="pre">'.webp'],</span> <span class="pre">'.webp':</span> <span class="pre">['.webp',</span> <span class="pre">'.jpg',</span> <span class="pre">'.png',</span> <span class="pre">'.gif']}</span></em><a class="headerlink" href="#helper.webFile.WebFile.ext_dict" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="helper.webFile.WebFile.ext_list">
+<span class="sig-name descname"><span class="pre">ext_list</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['.jpg',</span> <span class="pre">'.png',</span> <span class="pre">'.gif',</span> <span class="pre">'.webp']</span></em><a class="headerlink" href="#helper.webFile.WebFile.ext_list" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helper.webFile.WebFile.fixed_file_name">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">fixed_file_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/helper/webFile.html#WebFile.fixed_file_name"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.webFile.WebFile.fixed_file_name" title="Link to this definition"></a></dt>
+<dd><p>ファイル名の禁止文字を全角文字に置き換える
+:param file_name: str 置き換えたいファイル名
+:return: str 置き換え後のファイル名</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helper.webFile.WebFile.fixed_path">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">fixed_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/helper/webFile.html#WebFile.fixed_path"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.webFile.WebFile.fixed_path" title="Link to this definition"></a></dt>
+<dd><p>フォルダ名の禁止文字を全角文字に置き換える
+:param file_path: str 置き換えたいフォルダパス
+:return: str 置き換え後のフォルダパス</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helper.webFile.WebFile.get_deployment_url_list">
+<span class="sig-name descname"><span class="pre">get_deployment_url_list</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/webFile.html#WebFile.get_deployment_url_list"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.webFile.WebFile.get_deployment_url_list" title="Link to this definition"></a></dt>
+<dd><p>ナンバリングされたURLであれば、数字部分を末尾とした、URL展開してURLリスト=url_listを作る
+TODO: ナンバリングのチェック、1000以上ならエラーにするなど
+:return: list 展開した画像URLリスト</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helper.webFile.WebFile.get_download_file_name">
+<span class="sig-name descname"><span class="pre">get_download_file_name</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/webFile.html#WebFile.get_download_file_name"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.webFile.WebFile.get_download_file_name" title="Link to this definition"></a></dt>
+<dd><p>ダウンロードファイル名を得る
+:return: str download_file_name</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helper.webFile.WebFile.get_download_path">
+<span class="sig-name descname"><span class="pre">get_download_path</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/webFile.html#WebFile.get_download_path"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.webFile.WebFile.get_download_path" title="Link to this definition"></a></dt>
+<dd><p>ダウンロードパスを得る
+:return: str download_path</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helper.webFile.WebFile.get_ext">
+<span class="sig-name descname"><span class="pre">get_ext</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/webFile.html#WebFile.get_ext"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.webFile.WebFile.get_ext" title="Link to this definition"></a></dt>
+<dd><p>現在の拡張子を得る
+:return: str ファイルの拡張子(ドットを含む)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helper.webFile.WebFile.get_filename">
+<span class="sig-name descname"><span class="pre">get_filename</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/webFile.html#WebFile.get_filename"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.webFile.WebFile.get_filename" title="Link to this definition"></a></dt>
+<dd><p>現在のファイル名を得る
+:return: str ファイル名(拡張子除く)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helper.webFile.WebFile.get_image_content_by_requests">
+<span class="sig-name descname"><span class="pre">get_image_content_by_requests</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">30</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/webFile.html#WebFile.get_image_content_by_requests"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.webFile.WebFile.get_image_content_by_requests" title="Link to this definition"></a></dt>
+<dd><p>requestsを用いて、imageのコンテンツを取得する。
+サーバー落ちているとリダイレクトでエラー画像になることがあるのでリダイレクトFalse
+:param timeout: int タイムアウト時間[s]
+:return: bytes 読み込んだimageのバイナリデータ</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helper.webFile.WebFile.get_path">
+<span class="sig-name descname"><span class="pre">get_path</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/webFile.html#WebFile.get_path"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.webFile.WebFile.get_path" title="Link to this definition"></a></dt>
+<dd><p>現在のフルパスを得る
+:return: str ファイルのフルパス(セパレータはスラッシュ)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helper.webFile.WebFile.get_start_ext">
+<span class="sig-name descname"><span class="pre">get_start_ext</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/webFile.html#WebFile.get_start_ext"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.webFile.WebFile.get_start_ext" title="Link to this definition"></a></dt>
+<dd><p>開始時の拡張子を得る
+:return: str ファイルの拡張子(ドットを含む)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helper.webFile.WebFile.get_url">
+<span class="sig-name descname"><span class="pre">get_url</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/webFile.html#WebFile.get_url"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.webFile.WebFile.get_url" title="Link to this definition"></a></dt>
+<dd><p>URLを得る
+:return: str URL</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helper.webFile.WebFile.get_value_object">
+<span class="sig-name descname"><span class="pre">get_value_object</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/webFile.html#WebFile.get_value_object"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.webFile.WebFile.get_value_object" title="Link to this definition"></a></dt>
+<dd><p>valueオブジェクトを得る</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helper.webFile.WebFile.is_exist">
+<span class="sig-name descname"><span class="pre">is_exist</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/webFile.html#WebFile.is_exist"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.webFile.WebFile.is_exist" title="Link to this definition"></a></dt>
+<dd><p>ファイルがローカルに存在すればTrueを返す
+urlでダウンロードしたファイル、変名した後のファイルをチェックする
+:return: bool</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helper.webFile.WebFile.is_image">
+<span class="sig-name descname"><span class="pre">is_image</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/webFile.html#WebFile.is_image"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.webFile.WebFile.is_image" title="Link to this definition"></a></dt>
+<dd><p>画像か判定する(ext_listにある拡張子か調べる)
+:return: bool</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helper.webFile.WebFile.is_jpeg_data_uri">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is_jpeg_data_uri</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/webFile.html#WebFile.is_jpeg_data_uri"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.webFile.WebFile.is_jpeg_data_uri" title="Link to this definition"></a></dt>
+<dd><p>Data URIのjpeg画像かつbase64であればTrue
+:return: bool</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helper.webFile.WebFile.move">
+<span class="sig-name descname"><span class="pre">move</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/webFile.html#WebFile.move"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.webFile.WebFile.move" title="Link to this definition"></a></dt>
+<dd><p>ファイルを移動する(get_download_path()は変わらない)
+:param new_path: 移動先のフォルダーパス
+:return:</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helper.webFile.WebFile.rename_filename">
+<span class="sig-name descname"><span class="pre">rename_filename</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_file_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/webFile.html#WebFile.rename_filename"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.webFile.WebFile.rename_filename" title="Link to this definition"></a></dt>
+<dd><p>dst_filenameに設定して、ローカルにあるファイルのファイル名も変更する
+TODO: dst_file_nameにセットするときは、download_file_nameでvalue_objectを作り直すべきか
+:param new_file_name: str 変更する新しいファイル名
+:return: bool True/False=変更(した/しなかった)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="helper.webFile.WebFile.rename_url_ext_shift">
+<span class="sig-name descname"><span class="pre">rename_url_ext_shift</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/webFile.html#WebFile.rename_url_ext_shift"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.webFile.WebFile.rename_url_ext_shift" title="Link to this definition"></a></dt>
+<dd><p>urlの画像拡張子を、ext_listの次の拡張子にシフトする
+現在の拡張子はext_listの何番目か調べて、次の拡張子にurlを変更して、値オブジェクトを作り直す
+:return:</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="helper.webFile.WebFile.start_ext">
+<span class="sig-name descname"><span class="pre">start_ext</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'.jpg'</span></em><a class="headerlink" href="#helper.webFile.WebFile.start_ext" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="helper.webFile.WebFile.value_object">
+<span class="sig-name descname"><span class="pre">value_object</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#helper.webFile.WebFileValue" title="helper.webFile.WebFileValue"><span class="pre">WebFileValue</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#helper.webFile.WebFile.value_object" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="helper.webFile.WebFileValue">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">helper.webFile.</span></span><span class="sig-name descname"><span class="pre">WebFileValue</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Uri</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">download_file_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_ext</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'.jpg'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">download_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'D:/git/igaponr/training/python/Web_scraping/helper/../download'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/helper/webFile.html#WebFileValue"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#helper.webFile.WebFileValue" title="Link to this definition"></a></dt>
+<dd><p>ベースクラス: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>webファイルヘルパー値オブジェクト</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="helper.webFile.WebFileValue.download_file_name">
+<span class="sig-name descname"><span class="pre">download_file_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#helper.webFile.WebFileValue.download_file_name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="helper.webFile.WebFileValue.download_path">
+<span class="sig-name descname"><span class="pre">download_path</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'D:/git/igaponr/training/python/Web_scraping/helper/../download'</span></em><a class="headerlink" href="#helper.webFile.WebFileValue.download_path" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="helper.webFile.WebFileValue.start_ext">
+<span class="sig-name descname"><span class="pre">start_ext</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'.jpg'</span></em><a class="headerlink" href="#helper.webFile.WebFileValue.start_ext" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="helper.webFile.WebFileValue.url">
+<span class="sig-name descname"><span class="pre">url</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Uri</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#helper.webFile.WebFileValue.url" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Ryosuke Igarashi.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

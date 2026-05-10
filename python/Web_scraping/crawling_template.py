@@ -1,15 +1,48 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""
-ヘルプ参照のこと
-site_selectors, page_selectors, image_selectorsをサイトに合わせて変更すること
+"""Webサイトをクローリングし、情報をスクレイピングして画像をダウンロードするスクリプト
 
-例. site_urlを指定して、クローリングして、チェックして、ダウンロードする
-> python crawling_template.py -u https://*/?page= -a add=True -c check=True -d download=True
-例. 開始ページの指定
-> python crawling_template.py -s start=1
-例. 終了ページの指定
-> python crawling_template.py -e end=10
+このスクリプトは、Seleniumを使用してWebサイトをクローリングし、指定されたセレクタを使用して情報をスクレイピングし、画像をダウンロードします
+コマンドライン引数を使用して、クローリングするURL、開始ページと終了ページ、および実行するアクション（URLの追加、チェック、ダウンロード）を指定できます
+また、SlackまたはLINEに通知を送信することもできます
+
+site_selectors, page_selectors, image_selectors をクローリング対象のサイトに合わせて変更する必要があります
+
+Attributes:
+    site_selectors (dict): サイトのURLを取得するためのセレクタ
+    page_selectors (dict): ページからタイトルや言語などの情報を取得するためのセレクタ
+    image_selectors (dict): ページから画像URLを取得するためのセレクタ
+
+Examples:
+    サイトURLを指定して、クローリング、チェック、ダウンロードを実行する:
+
+    ```bash
+    python crawling_template.py -u https://*/?page= -a True -c True -d True
+    ```
+
+    開始ページを指定する:
+
+    ```bash
+    python crawling_template.py -s 1
+    ```
+
+    終了ページを指定する:
+
+    ```bash
+    python crawling_template.py -e 10
+    ```
+    slackに通知を送る
+
+    ```bash
+    python crawling_template.py -i $SLACK_CHANNEL_ID
+    ```
+
+Todo:
+    * 例外処理を詳細化
+    * ログ出力機能を追加
+    * SlackとLINE通知の切り替え機能を実装
+    * 人間チェックが表示されるときがある
+        * site_check = '//*[@id="uHkM6"]/div/label/input'
 """
 from selenium.webdriver.common.by import By
 from helper.crawling import *
@@ -18,22 +51,23 @@ from helper.slack_message_api import *
 site_selectors = {
     Crawling.URLS_TARGET: [
         (By.XPATH,
-         '//body/div[2]/div/div/a',
+         '//*[@id="content"]/div[2]/div/a',
+#         '//body/div[2]/div/div/a',
          lambda el: el.get_attribute("href")
          ),
     ]
 }
 page_selectors = {
     'title_jp': [(By.XPATH,
-                  '//div/div/div/h2',
+                  '//div[@id="info"]/h2',
                   lambda el: el.text),
                  ],
     'title_en': [(By.XPATH,
-                  '//div/div/div/h1',
+                  '//div[@id="info"]/h1',
                   lambda el: el.text),
                  ],
     'languages': [(By.XPATH,
-                   '//div/div/section/div[6]/span/a/span[1]',
+                   '//section[@id="tags"]//a[contains(@href, "/language/")]/span[@class="name"]',
                    lambda el: el.text),
                   ],
 }
@@ -56,6 +90,11 @@ image_selectors = {
 
 
 def get_option():
+    """コマンドライン引数を解析する
+
+    Returns:
+        argparse.Namespace: 解析されたコマンドライン引数
+    """
     arg_parser = ArgumentParser()
     arg_parser.add_argument('-a', '--add', type=bool, default=False,
                             help='クローリングしてurlリスト[crawling_list.txt]を作成する')

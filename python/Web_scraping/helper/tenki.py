@@ -1,32 +1,39 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-requests-htmlでスクレイピング
+"""requests-htmlでスクレイピング
+
 requestsでスクレイピングできないページのスクレイピング
 
-参考資料
-https://gammasoft.jp/blog/how-to-download-web-page-created-javascript/
-https://docs.python-requests.org/projects/requests-html/en/latest/
-https://commte.net/7628
-https://qiita.com/uitspitss/items/f131ea79dffd58bc01ae
-https://computer.masas-record-storage-container.com/2021/03/01/requestshtml/
+- 参考資料
+   - https://gammasoft.jp/blog/how-to-download-web-page-created-javascript/
+   - https://docs.python-requests.org/projects/requests-html/en/latest/
+   - https://commte.net/7628
+   - https://qiita.com/uitspitss/items/f131ea79dffd58bc01ae
+   - https://computer.masas-record-storage-container.com/2021/03/01/requestshtml/
 
-Documents
-https://requests.readthedocs.io/projects/requests-html/en/latest/
+- Documents
+   - https://requests.readthedocs.io/projects/requests-html/en/latest/
 
-requests-htmlのGitHub
-https://github.com/kennethreitz/requests-html
+- requests-htmlのGitHub
+   - https://github.com/kennethreitz/requests-html
 """
 import copy
 import json
-import os
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 import pyperclip
 from requests_html import HTMLSession
-from helper import spreadsheet
+from requests.exceptions import RequestException, Timeout, ConnectionError
 
 
-def is_num(s):
+def is_num(s: str) -> bool:
+    """数値かどうかを判定する
+
+    Args:
+        s: 判定対象の文字列
+
+    Returns:
+        True: 数値の場合, False: 数値でない場合
+    """
     try:
         float(s)
     except ValueError:
@@ -37,98 +44,76 @@ def is_num(s):
 
 @dataclass(frozen=True)
 class TenkiValue:
-    """
-    クローリング値オブジェクト
-    """
+    """クローリング値オブジェクト"""
     target_url: str
     css_root: str
     css_selectors: dict
     attrs: dict
     title: str
-    forecasts: dict
-    counters: dict
-
-    def __init__(self, target_url, css_root, css_selectors, attrs, title, forecasts, counters):
-        """
-        完全コンストラクタパターン
-
-        :param target_url: str 処理対象サイトURL
-        :param css_root: str スクレイピングする際のルートCSSセレクタ
-        :param css_selectors: dict スクレイピングする際のCSSセレクタ辞書
-        :param attrs: dict スクレイピングする際の属性辞書
-        :param title: str 対象サイトタイトル
-        :param forecasts: dict スクレイピングして得た属性のリスト
-        :param counters: dict スクレイピングして得た属性のリストの個数リスト
-        """
-        if target_url is not None:
-            object.__setattr__(self, "target_url", target_url)
-        if css_root is not None:
-            object.__setattr__(self, "css_root", css_root)
-        if css_selectors is not None:
-            object.__setattr__(self, "css_selectors", css_selectors)
-        if attrs is not None:
-            object.__setattr__(self, "attrs", attrs)
-        if title is not None:
-            object.__setattr__(self, "title", title)
-        if 0 < len(forecasts):
-            object.__setattr__(self, "forecasts", forecasts)
-        if 0 < len(counters):
-            object.__setattr__(self, "counters", counters)
+    forecasts: dict = field(default_factory=dict)
+    counters: dict = field(default_factory=dict)
 
 
 class Tenki:
-    """
-    クローリングのユーティリティ
-        * 指定のサイトを読み込む
-        * 指定のCSSセレクタ(css_selectors)と属性でクローリング(attrs)する
-        * クローリング結果でTenkiValueを生成する
-        * TenkiValueをファイルに保存したり読み込んだりできる
+    """クローリングユーティリティ
+
+    指定のサイトを読み込み、指定のCSSセレクタ(css_selectors)と属性でクローリング(attrs)し、クローリング結果でTenkiValueを生成する
+
+    Attributes:
+        tenki_value: TenkiValueオブジェクト
+        target_url: 対象サイトのURL
+        css_root: スクレイピングルートCSSセレクタ
+        css_selectors: スクレイピングCSSセレクタ辞書
+        attrs: スクレイピング属性辞書
     """
     tenki_value: TenkiValue = None
     target_url: str = None
     css_root: str = None
     css_selectors: dict = None
     attrs: dict = None
+    CYCLE = 4
+    FORECAST_ITEM_KEY = 'forecast_item'
+    DAYS_ITEM_KEY = 'days_item'
+    TIME_ITEM_KEY = 'time_item'
+    WEEK_ITEM_KEY = 'week_item'
 
-    def __init__(self, target_value=None, css_root=None, css_selectors=None, attrs=None):
-        """
-        コンストラクタ
+    def __init__(
+            self,
+            target_value: TenkiValue | str = None,
+            **kwargs,
+    ) -> None:
+        """コンストラクタ
 
-        :param target_value: str 対象となるサイトURL、または、TenkiValue 値オブジェクト
-        :param css_root: str スクレイピングする際のルートCSSセレクタ
-        :param css_selectors: dict スクレイピングする際のCSSセレクタ
-        :param attrs: dict スクレイピングする際の属性
+        Args:
+            target_value: 対象サイトURL文字列、またはTenkiValueオブジェクト
+            css_root: スクレイピングルートCSSセレクタ
+            css_selectors: スクレイピングCSSセレクタ辞書
+            attrs: スクレイピング属性辞書
         """
         if target_value is not None:
             if isinstance(target_value, TenkiValue):
-                tenki_value = target_value
-                self.tenki_value = tenki_value
-                if tenki_value.target_url is not None:
-                    self.target_url = tenki_value.target_url
-                if tenki_value.css_root is not None:
-                    self.css_root = tenki_value.css_root
-                if tenki_value.css_selectors is not None:
-                    self.css_selectors = tenki_value.css_selectors
-                if tenki_value.attrs is not None:
-                    self.attrs = tenki_value.attrs
+                self._initialize_from_tenki_value(target_value)
             else:
                 if isinstance(target_value, str):
                     self.target_url = target_value
-                    if css_root is not None:
-                        self.css_root = css_root
-                        if css_selectors is not None:
-                            self.css_selectors = css_selectors
-                            if attrs is not None:
-                                self.attrs = attrs
-                                self.request()
+                    self.css_root = kwargs.get('css_root')
+                    self.css_selectors = kwargs.get('css_selectors')
+                    self.attrs = kwargs.get('attrs')
+                    if all([self.css_root, self.css_selectors, self.attrs]):
+                        self.request()
 
-    def special_func_temp(self):
-        """
-        特別製
+    def _initialize_from_tenki_value(self, tenki_value: TenkiValue) -> None:
+        self.tenki_value = tenki_value
+        self.target_url = tenki_value.target_url
+        self.css_root = tenki_value.css_root
+        self.css_selectors = tenki_value.css_selectors
+        self.attrs = tenki_value.attrs
+
+    def special_func_temp(self) -> None:
+        """特別製
+
         temp_itemのjava-scriptを解析して、
         データとカウンターを整える（元のデータを書き換える）
-
-        :return:
         """
         temp_item_forecasts = []
         temp_item_counters = []
@@ -160,58 +145,44 @@ class Tenki:
         self.tenki_value.forecasts[sp_key] = temp_item_forecasts
         self.tenki_value.counters[sp_key] = temp_item_counters
 
-    def create_LINE_BOT_TOBA_format(self):
-        """
-        時間毎の天気予報配列を作る
-
-        :return data: dict 天気予報配列
-        """
-        forecasts = self.get_result_forecasts()
-        counters = self.get_result_counters()
-        data = {}
-
-        # 日付列作成
-        sp_key = 'forecast_item'  # 日付以外で数が少ない項目を使用する
-        target_key = 'days_item'
-        data[target_key] = []
-        sub_key = 'week_item'
-        data[sub_key] = []
+    def _create_date_column(self, forecasts: dict, counters: dict) -> dict:
+        data = {self.DAYS_ITEM_KEY: [], self.WEEK_ITEM_KEY: []}
         pre = 0
-        for index in range(len(counters[sp_key])):
-            num = counters[sp_key][index] - pre
-            if num:  # 0または、増加していない時以外
+        for index in range(len(counters[self.FORECAST_ITEM_KEY])):
+            num = counters[self.FORECAST_ITEM_KEY][index] - pre
+            if num:
                 for i in range(num):
-                    num1 = counters[target_key][index]
-                    _buff = forecasts[target_key][num1 - 1]
+                    num1 = counters[self.DAYS_ITEM_KEY][index]
+                    _buff = forecasts[self.DAYS_ITEM_KEY][num1 - 1]
                     left = _buff.find('(')
                     right = _buff.find(')')
-                    data[target_key].append(_buff[:left])
-                    data[sub_key].append(_buff[left + 1:right])
-                pre = counters[sp_key][index]
+                    data[self.DAYS_ITEM_KEY].append(_buff[:left])
+                    data[self.WEEK_ITEM_KEY].append(_buff[left + 1:right])
+                pre = counters[self.FORECAST_ITEM_KEY][index]
+        return data
 
-        # 時間列作成
-        cycle = 4
-        target_key = 'time_item'
-        data[target_key] = []
+    def _create_time_column(self, forecasts: dict, counters: dict) -> dict:
+        data = {self.TIME_ITEM_KEY: []}
         pre_sp_key = 0
         pre_target_key = 0
-        for index in range(len(counters[sp_key])):
-            num = counters[sp_key][index] - pre_sp_key
-            start = pre_target_key + cycle - num
-            end = counters[target_key][index] - 1
+        for index in range(len(counters[self.FORECAST_ITEM_KEY])):
+            num = counters[self.FORECAST_ITEM_KEY][index] - pre_sp_key
+            start = pre_target_key + self.CYCLE - num
+            end = counters[self.TIME_ITEM_KEY][index] - 1
             if num:
                 for i in range(start, end):
-                    _buff = forecasts[target_key][i] + '時-' + forecasts[target_key][i + 1] + '時'
-                    data[target_key].append(_buff)
-                pre_target_key = counters[target_key][index]
-                pre_sp_key = counters[sp_key][index]
+                    _buff = '\'' + forecasts[self.TIME_ITEM_KEY][i] + '時-' + forecasts[self.TIME_ITEM_KEY][i + 1] + '時'
+                    data[self.TIME_ITEM_KEY].append(_buff)
+                pre_target_key = counters[self.TIME_ITEM_KEY][index]
+                pre_sp_key = counters[self.FORECAST_ITEM_KEY][index]
+        return data
 
-        # 天気、湿度、降水量列作成
-        target_keys = {'天気': 'forecast_item', '温度': 'prob_precip_item', '降水量': 'precip_item'}
-        for target_key in target_keys.values():
+    def _create_weather_column_on(self, forecasts: dict, counters: dict, target_keys: dict) -> dict:
+        data = {}
+        for key, target_key in target_keys.items():
             data[target_key] = []
             pre_target_key = 0
-            for index in range(len(counters[sp_key])):
+            for index in range(len(counters[self.FORECAST_ITEM_KEY])):
                 num = counters[target_key][index] - pre_target_key
                 start = pre_target_key
                 end = counters[target_key][index]
@@ -220,15 +191,16 @@ class Tenki:
                         _buff = forecasts[target_key][i]
                         data[target_key].append(_buff)
                     pre_target_key = counters[target_key][index]
+        return data
 
-        # 気温、風向、風力列作成
-        target_keys = {'気温': 'temp_item', '風向': 'wind_item_blow', '風力': 'wind_item_speed'}
-        for target_key in target_keys.values():
+    def _create_weather_column_off(self, forecasts: dict, counters: dict, target_keys: dict) -> dict:
+        data = {}
+        for key, target_key in target_keys.items():
             data[target_key] = []
             pre_sp_key = 0
             pre_target_key = 0
-            for index in range(len(counters[sp_key])):
-                num = counters[sp_key][index] - pre_sp_key
+            for index in range(len(counters[self.FORECAST_ITEM_KEY])):
+                num = counters[self.FORECAST_ITEM_KEY][index] - pre_sp_key
                 start = pre_target_key
                 end = counters[target_key][index] - 1
                 if num:
@@ -236,102 +208,139 @@ class Tenki:
                         _buff = forecasts[target_key][i] + '-' + forecasts[target_key][i + 1]
                         data[target_key].append(_buff)
                     pre_target_key = counters[target_key][index]
-                    pre_sp_key = counters[sp_key][index]
-
+                    pre_sp_key = counters[self.FORECAST_ITEM_KEY][index]
         return data
 
-    def get_value_objects(self):
-        """
-        値オブジェクトを取得する
+    def create_line_bot_toba_format(self) -> dict:
+        """LINE Bot向けにデータを整形する
 
-        :return: TenkiValue 値オブジェクト
+        Returns:
+            dict: 整形されたデータ
+        """
+        forecasts = self.get_result_forecasts()
+        counters = self.get_result_counters()
+        data = self._create_date_column(forecasts, counters)
+        data.update(self._create_time_column(forecasts, counters))
+        data.update(self._create_weather_column_on(forecasts, counters, {
+            '天気': 'forecast_item',
+            '温度': 'prob_precip_item',
+            '降水量': 'precip_item'}))
+        data.update(self._create_weather_column_off(forecasts, counters, {
+            '気温': 'temp_item',
+            '風向': 'wind_item_blow',
+            '風力': 'wind_item_speed'}))
+        return data
+
+    def get_value_objects(self) -> TenkiValue:
+        """値オブジェクトを取得する
+
+        Returns:
+            TenkiValue: 値オブジェクト
         """
         return copy.deepcopy(self.tenki_value)
 
-    def get_result_forecasts(self):
-        """
-        クローリング結果を取得する
+    def get_result_forecasts(self) -> dict:
+        """クローリング結果を取得する
 
-        :return: dict クローリング結果
+        Returns:
+            dict: クローリング結果
         """
         return copy.deepcopy(self.tenki_value.forecasts)
 
-    def get_result_counters(self):
-        """
-        クローリング結果を取得する
+    def get_result_counters(self) -> dict:
+        """クローリング結果を取得する
 
-        :return: dict クローリング結果
+        Returns:
+            dict: クローリング結果
         """
         return copy.deepcopy(self.tenki_value.counters)
 
-    def get_title(self):
-        """
-        対象サイトタイトルを取得する
+    def get_title(self) -> str:
+        """対象サイトタイトルを取得する
 
-        :return: str 対象サイトタイトル
+        Returns:
+            str: 対象サイトタイトル
         """
         return self.tenki_value.title
 
-    def request(self):
-        """
-        target_urlに接続して、スクレイピングして、tenki_valueを更新する
+    def request(self) -> bool:
+        """target_urlに接続し、スクレイピングを実行してtenki_valueを更新する
 
-        :return: bool 成功/失敗=True/False
+        Returns:
+            True: 成功, False: 失敗
+
+        Raises:
+            RequestException: リクエストエラーが発生した場合
         """
-        script = """
-            () => {
-                return {
-                    width: document.documentElement.clientWidth,
-                    height: document.documentElement.clientHeight,
-                    deviceScaleFactor: window.devicePixelRatio,
+        try:
+            script = """
+                () => {
+                    return {
+                        width: document.documentElement.clientWidth,
+                        height: document.documentElement.clientHeight,
+                        deviceScaleFactor: window.devicePixelRatio,
+                    }
                 }
-            }
-        """
-        forecasts = {}
-        counters = {}
-        session = HTMLSession()
-        response = session.get(self.target_url)
-        # Chromiumで応答を再読み込みし、JavaScriptを実行して、HTMLコンテンツを更新されたバージョンに置き換える
-        response.html.render(script=script,  # ページ読み込み時に実行するJavaScript
-                             reload=False,  # Falseの場合、コンテンツはブラウザからロードされず、メモリから提供される
-                             timeout=0,  # 0は無制限
-                             wait=5,  # ページレンダリング前のスリープ秒数
-                             sleep=15,  # ページレンダリング後のスリープ秒数
-                             )
-        # スクレイピング
-        title = response.html.find("html > head > title", first=True).text
+            """
+            forecasts = {}
+            counters = {}
+            session = HTMLSession()
+            response = session.get(self.target_url)
+            # Chromiumで応答を再読み込みし、JavaScriptを実行して、HTMLコンテンツを更新されたバージョンに置き換える
+            response.html.render(script=script,  # ページ読み込み時に実行するJavaScript
+                                 reload=False,  # Falseの場合、コンテンツはブラウザからロードされず、メモリから提供される
+                                 timeout=0,  # 0は無制限
+                                 wait=5,  # ページレンダリング前のスリープ秒数
+                                 sleep=15,  # ページレンダリング後のスリープ秒数
+                                 )
+            # スクレイピング
+            title = response.html.find("html > head > title", first=True).text
 
-        for key in self.css_selectors:
-            forecasts[key] = []
-            counters[key] = []
-        target_rows = response.html.find(self.css_root)
-        if target_rows:
-            for row in target_rows:
-                for key in self.css_selectors:
-                    buffer = row.find(self.css_selectors[key])
-                    if not self.attrs[key] == "":
-                        for buf in buffer:
-                            alt = buf.attrs[self.attrs[key]]
-                            if alt:
-                                forecasts[key].append(alt)
-                    else:
-                        for buf in buffer:
-                            forecasts[key].append(buf.text)
-                    counters[key].append(len(forecasts[key]))
-        self.tenki_value = TenkiValue(self.target_url,
-                                      self.css_root,
-                                      self.css_selectors,
-                                      self.attrs,
-                                      title,
-                                      forecasts,
-                                      counters,
-                                      )
+            for key in self.css_selectors:
+                forecasts[key] = []
+                counters[key] = []
+            target_rows = response.html.find(self.css_root)
+            if target_rows:
+                for row in target_rows:
+                    for key in self.css_selectors:
+                        buffer = row.find(self.css_selectors[key])
+                        if not self.attrs[key] == "":
+                            for buf in buffer:
+                                alt = buf.attrs[self.attrs[key]]
+                                if alt:
+                                    forecasts[key].append(alt)
+                        else:
+                            for buf in buffer:
+                                forecasts[key].append(buf.text)
+                        counters[key].append(len(forecasts[key]))
+            self.tenki_value = TenkiValue(self.target_url,
+                                          self.css_root,
+                                          self.css_selectors,
+                                          self.attrs,
+                                          title,
+                                          forecasts,
+                                          counters,
+                                          )
+        except Timeout as e:
+          print(f"タイムアウトエラー: {e}")
+          return False
+        except ConnectionError as e:
+            print(f"接続エラー: {e}")
+            return False
+        except RequestException as e:
+            print(f"その他のリクエストエラー: {e}")
+            return False
+        except Exception as e:
+            print(f"スクレイピングエラー:{e}")
+            return False
+        return True
 
-    def create_save_text(self):
-        """
-        保存用文字列の作成
 
-        :return: str 保存用文字列の作成
+    def create_save_text(self) -> str:
+        """保存用文字列の作成
+
+        Returns:
+            str: 保存用文字列の作成
         """
         buff = self.tenki_value.target_url + '\n'  # サイトURL追加
         buff += self.tenki_value.css_root + '\n'  # ルートcssセレクタ追加
@@ -342,11 +351,11 @@ class Tenki:
         buff += json.dumps(self.tenki_value.counters, ensure_ascii=False) + '\n'  # 画像URL追加
         return buff
 
-    def clip_copy(self):
-        """
-        クローリング結果をクリップボードにコピーする
+    def clip_copy(self) -> bool:
+        """クローリング結果をクリップボードにコピーする
 
-        :return: bool 成功/失敗=True/False
+        Returns:
+            bool: 成功/失敗=True/False
         """
         if self.tenki_value is None:
             return False
@@ -354,9 +363,8 @@ class Tenki:
         pyperclip.copy(buff)  # クリップボードへのコピー
         return True
 
-    def save_text(self, save_path):
-        """
-        データをファイルに、以下の独自フォーマットで保存する
+    def save_text(self, save_path: str) -> bool:
+        """データをファイルに、以下の独自フォーマットで保存する
             * 処理対象サイトURL
             * ルートCSSセレクタ
             * CSSセレクタ
@@ -364,8 +372,11 @@ class Tenki:
             * タイトル
             * クローリング結果
 
-        :param save_path: str セーブする独自フォーマットなファイルのパス
-        :return: bool 成功/失敗=True/False
+        Args:
+            save_path (str): セーブする独自フォーマットなファイルのパス
+
+        Returns:
+            bool: 成功/失敗=True/False
         """
         if self.tenki_value is None:
             return False
@@ -374,12 +385,14 @@ class Tenki:
             work_file.write(buff)  # ファイルへの保存
             return True
 
-    def load_text(self, load_path):
-        """
-        独自フォーマットなファイルからデータを読み込む
+    def load_text(self, load_path: str) -> bool:
+        """独自フォーマットなファイルからデータを読み込む
 
-        :param load_path: str ロードする独自フォーマットなファイルのパス
-        :return: bool 成功/失敗=True/False
+        Args:
+            load_path (str): ロードする独自フォーマットなファイルのパス
+
+        Returns:
+            bool: 成功/失敗=True/False
         """
         with open(load_path, 'r', encoding='utf-8') as work_file:
             buff = work_file.readlines()
@@ -397,73 +410,11 @@ class Tenki:
             del buff[0]
             counters: dict = json.loads(buff[0].rstrip('\n'))
             self.tenki_value = TenkiValue(self.target_url,
-                                          self.css_root,
-                                          self.css_selectors,
-                                          self.attrs,
-                                          title,
-                                          forecasts,
-                                          counters,
+                                          css_root=self.css_root,
+                                          css_selectors=self.css_selectors,
+                                          attrs=self.attrs,
+                                          title=title,
+                                          forecasts=forecasts,
+                                          counters=counters,
                                           )
             return True
-
-
-if __name__ == '__main__':  # インポート時には動かない
-    RESULT_FILE_PATH = './result.txt'
-    main_url = "https://tenki.jp/forecast/4/20/5620/17202/10days.html"
-    main_css_root = "dd.forecast10days-actab"
-    main_css_selectors = {"days_item": "div.days",
-                          "time_item": "dd.time-item > span",
-                          "forecast_item": "dd.forecast-item > p > img",
-                          "prob_precip_item": "dd.prob-precip-item > span > span",
-                          "precip_item": "dd.precip-item > span > span",
-                          "temp_item": "dd.temp-item > script",
-                          "wind_item_blow": "dd.wind-item > p > img",
-                          "wind_item_speed": "dd.wind-item > p > span",
-                          }
-    main_attrs = {"days_item": "",
-                  "time_item": "",
-                  "forecast_item": "alt",
-                  "prob_precip_item": "",
-                  "precip_item": "",
-                  "temp_item": "",
-                  "wind_item_blow": "alt",
-                  "wind_item_speed": "",
-                  }
-    tenki1 = Tenki(main_url,
-                   main_css_root,
-                   main_css_selectors,
-                   main_attrs,
-                   )
-    tenki1.save_text(RESULT_FILE_PATH + 'tenki1.txt')
-
-    json_keyfile_name = (os.path.dirname(__file__) + r"\..\..\..\json\tenki-347610-1bc0fec79f90.json")
-    workbook_name = '天気予報'
-    worksheet_name = '七尾市和倉町data'
-    spreadsheet1 = spreadsheet.Spreadsheet(json_keyfile_name,
-                                           workbook_name,
-                                           worksheet_name,
-                                           )
-    spreadsheet1.save_text(RESULT_FILE_PATH + 'spreadsheet1.txt')
-    spreadsheet1.clear_worksheet()
-    spreadsheet1.write_dict_columns(tenki1.get_result_forecasts(), (1, 1))
-    main_num = len(tenki1.get_result_forecasts())
-    spreadsheet1.write_dict_columns(tenki1.get_result_counters(), (1, 1 + main_num))
-    worksheet_name = '七尾市和倉町conv'
-    spreadsheet1 = spreadsheet.Spreadsheet(json_keyfile_name,
-                                           workbook_name,
-                                           worksheet_name,
-                                           )
-    spreadsheet1.save_text(RESULT_FILE_PATH + 'spreadsheet2.txt')
-    tenki1.special_func_temp()
-    spreadsheet1.clear_worksheet()
-    spreadsheet1.write_dict_columns(tenki1.get_result_forecasts(), (1, 1))
-    main_num = len(tenki1.get_result_forecasts())
-    spreadsheet1.write_dict_columns(tenki1.get_result_counters(), (1, 1 + main_num))
-    worksheet_name = '七尾市和倉町'
-    spreadsheet1 = spreadsheet.Spreadsheet(json_keyfile_name,
-                                           workbook_name,
-                                           worksheet_name,
-                                           )
-    spreadsheet1.save_text(RESULT_FILE_PATH + 'spreadsheet3.txt')
-    spreadsheet1.clear_worksheet()
-    spreadsheet1.write_dict_columns(tenki1.create_LINE_BOT_TOBA_format(), (1, 1))

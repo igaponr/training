@@ -14,7 +14,7 @@
 
 # Contributors
 
-- [igapon50](https://github.com/igapon50)
+- [igaponr](https://github.com/igaponr)
 
 <!-- CREATED_BY_LEADYOU_README_GENERATOR -->
 
@@ -192,34 +192,20 @@ pip install numpy
 
 
 # python/Web_scraping
-クローリングして、スクレイピングして、画像URLリストを作り、その画像をまとめてダウンロードして、ファイル名をナンバリングして、zipファイルにアーカイブする。
+webクローリング関連の処理を行う。
+使い方は、[ドキュメント](https://igaponr.github.io/training/index.html)や、ユニットテスト（例えば、test_crawling.py）を参照のこと
 
-使い方はユニットテスト（例えば、test_crawling.py）を参照のこと
-
-以下は「新しい」
-
-- chromeDriverHelper: selenium chromeドライバーのヘルパークラス
+- chromeDriver: selenium chromeドライバーのヘルパークラス
 - crawling: クローリングヘルパークラス
   - web巡回して、スクレイピングして、ファイルダウンロードして、zipファイルにまとめる
 - egoser_zipper: google 画像検索して、先頭20サムネイル画像をzipにまとめる
 - irvineHelper: Irvineを操作するヘルパークラス
-- uriHelper: URLのヘルパークラス
+- uri: URLのヘルパークラス
   - URLのパス、ファイル名、拡張子、DataURIのデータ、ファイルの存在確認など
-- webFileHelper: webファイルのヘルパークラス
+- webFile: webファイルのヘルパークラス
   - URLから、ダウンロードしたり、ファイル名変更したり、存在確認したり、削除したりする
-- webFileListHelper: webファイルリストのヘルパークラス
-  - URLリストから、webFileHelperのリストを作って、操作する。まとめてだウンロードしたり、zipファイルにする
-
-以下は「古い」
-
-- imgdl：クリップボードからURLを読み込み、urllib.requestでWeb情報を取得し、スクレイピングして、画像URLリストを作り、その画像をダウンロードして、ファイル名をナンバリングして、zipファイルに保存する
-- HTML2zip：画像のダウンロード処理だけ行わない他はimgdlと同じ(ダウンロードは外部ツールを使う)
-- HTML2imglist：クリップボードからURLを読み込み、スクレイピングして、画像URLリストを作り、クリップボードとファイルに保存する
-- imglist2clip：ファイルから読み込み、クリップボードにコピーする
-- imglist2zip：ファイルから読み込み、ファイル名をナンバリングして、zipファイルに保存する
-- makezip：ダウンロードフォルダ(folder01)以下を、zipファイルに保存する
-- folder01Rename：folder01以下のファイルについて、ファイル名の先頭に連番3桁を挿入する
-
+- webFileList: webファイルリストのヘルパークラス
+  - URLリストから、webFileのリストを作って、操作する。まとめてだウンロードしたり、zipファイルにする
 
 ### 参考
 
@@ -228,18 +214,6 @@ pip install numpy
 - [Python URL操作](https://villhell.com/2019/07/30/python-url/)
 - [README作成補助](https://qiita.com/Kyome/items/2112e9d1871ec0a367ea?utm_source=Qiita%E3%83%8B%E3%83%A5%E3%83%BC%E3%82%B9&utm_campaign=615586dc3e-Qiita_newsletter_425_08_26_2020_COPY_02&utm_medium=email&utm_term=0_e44feaa081-615586dc3e-33718969)
 - [Irvine](http://hp.vector.co.jp/authors/VA024591/doc/manual.html)
-
-
-# python/selenium
-[python/Web_scraping](https://github.com/igapon50/training/tree/develop#pythonweb_scraping)
-の「古い」では、Web情報の取得にurllib.requestを使用したが、ここではseleniumを使用する。seleniumを使用した結果[python/Web_scraping](https://github.com/igapon50/training/tree/develop#pythonweb_scraping)
-の「新しい」になった。
-
-- imgdl：クリップボードからURLを読み込み、FireFoxでWeb情報を取得し、スクレイピングして、画像URLリストを作り、その画像をダウンロードして、ファイル名をナンバリングして、zipファイルに保存する
-
-
-### 参考
-
 - [【完全版】PythonとSeleniumでブラウザを自動操作(クローリング／スクレイピング)するチートシート](https://tanuhack.com/selenium/)
 - [PythonでSeleniumを操作する](https://kurozumi.github.io/selenium-python/index.html)
 - [Selenium クリックリファレンスAPI(逆引き)](https://www.seleniumqref.com/api/webdriver_gyaku.html)
@@ -269,7 +243,6 @@ aws s3 syncコマンドは、とりあえずおいといて、AWS S3のバケッ
 動画から無音部分をカットするために、有音部分を切り出す
 
 - movieCutter：指定したmovファイルから、有音部分のmovを切り出す
-
 
 ### 参考
 
