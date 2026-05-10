@@ -195,8 +195,6 @@ pip install numpy
 webクローリング関連の処理を行う。
 使い方は、[ドキュメント](https://igaponr.github.io/training/index.html)や、ユニットテスト（例えば、test_crawling.py）を参照のこと
 
-以下は「新しい」
-
 - chromeDriver: selenium chromeドライバーのヘルパークラス
 - crawling: クローリングヘルパークラス
   - web巡回して、スクレイピングして、ファイルダウンロードして、zipファイルにまとめる
@@ -209,12 +207,6 @@ webクローリング関連の処理を行う。
 - webFileList: webファイルリストのヘルパークラス
   - URLリストから、webFileのリストを作って、操作する。まとめてだウンロードしたり、zipファイルにする
 
-以下は「古い」
-
-- makezip：ダウンロードフォルダ(folder01)以下を、zipファイルに保存する
-- folder01Rename：folder01以下のファイルについて、ファイル名の先頭に連番3桁を挿入する
-
-
 ### 参考
 
 - [note.nkmk.me Python関連記事まとめ](https://note.nkmk.me/python-post-summary/)
@@ -222,18 +214,6 @@ webクローリング関連の処理を行う。
 - [Python URL操作](https://villhell.com/2019/07/30/python-url/)
 - [README作成補助](https://qiita.com/Kyome/items/2112e9d1871ec0a367ea?utm_source=Qiita%E3%83%8B%E3%83%A5%E3%83%BC%E3%82%B9&utm_campaign=615586dc3e-Qiita_newsletter_425_08_26_2020_COPY_02&utm_medium=email&utm_term=0_e44feaa081-615586dc3e-33718969)
 - [Irvine](http://hp.vector.co.jp/authors/VA024591/doc/manual.html)
-
-
-# python/selenium
-[python/Web_scraping](https://github.com/igapon50/training/tree/develop#pythonweb_scraping)
-の「古い」では、Web情報の取得にurllib.requestを使用したが、ここではseleniumを使用する。seleniumを使用した結果[python/Web_scraping](https://github.com/igapon50/training/tree/develop#pythonweb_scraping)
-の「新しい」になった。
-
-- imgdl：クリップボードからURLを読み込み、FireFoxでWeb情報を取得し、スクレイピングして、画像URLリストを作り、その画像をダウンロードして、ファイル名をナンバリングして、zipファイルに保存する
-
-
-### 参考
-
 - [【完全版】PythonとSeleniumでブラウザを自動操作(クローリング／スクレイピング)するチートシート](https://tanuhack.com/selenium/)
 - [PythonでSeleniumを操作する](https://kurozumi.github.io/selenium-python/index.html)
 - [Selenium クリックリファレンスAPI(逆引き)](https://www.seleniumqref.com/api/webdriver_gyaku.html)
