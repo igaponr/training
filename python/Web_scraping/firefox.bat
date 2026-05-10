@@ -1,1 +1,0 @@
-"C:\Program Files\Mozilla Firefox\firefox.exe" -remote-debugging-port=9222 --user-data-dir="C:\Users\igapon\temp"
