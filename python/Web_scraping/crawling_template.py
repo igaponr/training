@@ -67,7 +67,7 @@ page_selectors = {
                   lambda el: el.text),
                  ],
     'languages': [(By.XPATH,
-                   '//section[@id="tags"]//a[contains(@href, "/language/")]/span[@class="name"]',
+                   '//section[@id="tags"]//a[contains(@href, "/language/")]/span[contains(@class, "name")]',
                    lambda el: el.text),
                   ],
 }
