@@ -73,10 +73,10 @@ page_selectors = {
 }
 image_selectors = {
     'image_url': [(By.XPATH,
-                   '(//*[@id="thumbnail-container"]/div/div/a)[last()]',
+                   '(//*[@id="thumbnail-container"]//a[contains(@class, "gallerythumb")])[last()]',
                    lambda el: el.get_attribute("href")),
                   (By.XPATH,
-                   '//*[@id="image-container"]/a/img',
+                   '//*[@id="image-container"]//img',
                    lambda el: el.get_attribute("src")),
                   ],
     # 'image_urls': [(By.XPATH,

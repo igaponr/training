@@ -31,6 +31,7 @@ from urllib.parse import urlparse
 from dataclasses import dataclass
 from selenium import webdriver
 from selenium.common import NoSuchElementException
+from selenium.common.exceptions import TimeoutException
 from selenium.webdriver import ActionChains
 from selenium.webdriver import ChromeOptions
 from selenium.webdriver.chrome.service import Service
@@ -413,11 +414,22 @@ class ChromeDriver:
             by, selector, action = selector_list.pop(0)
             ret_list = self.__get_scraping_selector(by, selector, action)
             if ret_list and ret_list[0] and selector_list:
+                # 次に探すべき要素の情報を取得（peek）
+                next_by, next_selector, _ = selector_list[0]
                 # ret_listに値があり、selector_listの末尾ではない時
                 for url in ret_list:
                     ret_parse = urlparse(url)
                     if ret_parse.scheme:
                         self.open_new_tab(url)
+                        try:
+                            # 最大60秒（1分）待機。人間が手動で解く時間も考慮。
+                            # 次のステップで使う要素(next_selector)が表示されるまで待つ
+                            print(f"Waiting for element: {next_selector} ...")
+                            WebDriverWait(self._driver, 60).until(
+                                EC.presence_of_element_located((next_by, next_selector))
+                            )
+                        except TimeoutException:
+                            print(f"タイムアウト: {url} で要素 {next_selector} が見つかりませんでした。")
                     else:
                         raise ValueError(f"{self.__class__.__name__}.{inspect.stack()[1].function}"
                                          f"引数エラー:urlが不正[{url}]")
