@@ -414,26 +414,35 @@ class ChromeDriver:
             by, selector, action = selector_list.pop(0)
             ret_list = self.__get_scraping_selector(by, selector, action)
             if ret_list and ret_list[0] and selector_list:
-                # 次に探すべき要素の情報を取得（peek）
+                # 次のステップの情報を取得
                 next_by, next_selector, _ = selector_list[0]
-                # ret_listに値があり、selector_listの末尾ではない時
                 for url in ret_list:
                     ret_parse = urlparse(url)
                     if ret_parse.scheme:
+                        print(f"Opening: {url}")
                         self.open_new_tab(url)
+                        # --- 重要1: 確実に最新のタブへ切り替える ---
+                        # open_new_tabが内部で切り替えていない場合を考慮し、明示的に最後に開いたタブへ
+                        self._driver.switch_to.window(self._driver.window_handles[-1])
+                        # --- 重要2: タイムアウト時は例外を投げる ---
                         try:
-                            # 最大60秒（1分）待機。人間が手動で解く時間も考慮。
-                            # 次のステップで使う要素(next_selector)が表示されるまで待つ
                             print(f"Waiting for element: {next_selector} ...")
-                            WebDriverWait(self._driver, 60).until(
-                                EC.presence_of_element_located((next_by, next_selector))
+                            # セレクターが確実に見つかるまで待機
+                            WebDriverWait(self._driver, 300).until(
+                                EC.visibility_of_element_located((next_by, next_selector))
                             )
+                            print("Element found!")
                         except TimeoutException:
-                            print(f"タイムアウト: {url} で要素 {next_selector} が見つかりませんでした。")
+                            # ここで例外を投げることで、外側のリトライループを回します。
+                            # printだけで終わらせると、中身が空のまま次の scraping 処理に進んでしまいます。
+                            error_msg = f"タイムアウト: {url} で要素 {next_selector} が見つかりませんでした。ロボットチェックを解除してください。"
+                            raise RuntimeError(error_msg)
                     else:
                         raise ValueError(f"{self.__class__.__name__}.{inspect.stack()[1].function}"
                                          f"引数エラー:urlが不正[{url}]")
             else:
+                # ret_listが空、または最後のセレクターだった場合
+                # ここで ret_list が空だと、呼び出し元で「不正[[]]」エラーになります。
                 for _ in self._window_handle_list:
                     self.close()
                 return ret_list
