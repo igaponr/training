@@ -428,7 +428,7 @@ class ChromeDriver:
                         try:
                             print(f"Waiting for element: {next_selector} ...")
                             # セレクターが確実に見つかるまで待機
-                            WebDriverWait(self._driver, 300).until(
+                            WebDriverWait(self._driver, 60).until(
                                 EC.visibility_of_element_located((next_by, next_selector))
                             )
                             print("Element found!")
